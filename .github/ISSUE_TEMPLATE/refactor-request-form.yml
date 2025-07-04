@@ -1,0 +1,67 @@
+name: "Refactor request"
+description: "기존 코드를 개선하거나 구조를 변경할 때 사용하는 양식입니다. 생성된 이슈는 Jira와 연동됩니다."
+labels: [refactor]
+title: "[REFACTOR] 이슈 이름을 작성해주세요"
+body:
+  - type: dropdown
+    id: issuetype
+    attributes:
+      label: "🔖 이슈 유형 (Jira Issue Type)"
+      description: "Jira 상에서 사용할 이슈 타입을 선택해주세요"
+      options:
+        - Task
+        - Sub-task
+        - Story
+        - Epic
+    validations:
+      required: true
+
+  - type: input
+    id: parentKey
+    attributes:
+      label: "🎟️ 상위 작업 (Ticket Number)"
+      description: "연결할 상위 Jira 티켓 키(BADA-00) 를 입력해주세요"
+      placeholder: "BADA-00"
+    validations:
+      required: true
+
+  - type: input
+    id: branch
+    attributes:
+      label: "🌳 브랜치명 (Branch)"
+      description: "영어로 브랜치명을 작성해주세요"
+      placeholder: "refactor/BADA-00-Refactor_Target"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "🐛 문제 상황"
+      description: "현재 코드에서 리팩토링이 필요한 문제점이나 불편 사항을 구체적으로 작성해주세요."
+      placeholder: |
+        예: 컴포넌트 내 로직이 분리되지 않아 테스트가 어렵고 재사용성이 낮습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: direction
+    attributes:
+      label: "🛠️ 리팩토링 방향"
+      description: "문제를 해결하기 위한 리팩토링 전략이나 접근 방법을 설명해주세요."
+      placeholder: |
+        예: 복잡한 로직을 custom hook으로 분리하고, props 최소화를 통해 재사용성을 높일 예정입니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ To-do"
+      description: "리팩토링을 위한 세부 작업 목록을 작성해주세요."
+      value: |
+        - [ ] todo 1
+        - [ ] todo 2
+        - [ ] todo 3
+    validations:
+      required: true

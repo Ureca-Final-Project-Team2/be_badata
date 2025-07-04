@@ -1,0 +1,78 @@
+name: "Bug report"
+description: "버그 리포트를 위한 양식입니다. 생성된 이슈는 Jira와 연동됩니다."
+labels: [bug]
+title: "[BUG] 이슈 이름을 작성해주세요"
+body:
+  - type: dropdown
+    id: issuetype
+    attributes:
+      label: "🔖 이슈 유형 (Jira Issue Type)"
+      description: "Jira 상에서 사용할 이슈 타입을 선택해주세요"
+      options:
+        - Task
+        - Sub-task
+        - Story
+        - Epic
+    validations:
+      required: true
+
+  - type: input
+    id: parentKey
+    attributes:
+      label: "🎟️ 상위 작업 (Ticket Number)"
+      description: "연동할 상위 Jira 티켓 키(BADA-00) 를 입력해주세요"
+      placeholder: "BADA-00"
+    validations:
+      required: true
+
+  - type: input
+    id: branch
+    attributes:
+      label: "🌳 브랜치명 (Branch)"
+      description: "영어로 브랜치명을 작성해주세요"
+      placeholder: "fix/BADA-00-bugfix"
+    validations:
+      required: true
+
+  - type: input
+    id: summary
+    attributes:
+      label: "✨ 어떤 버그인가요?"
+      description: "어떤 버그인지 한 줄로 간결하게 요약해주세요."
+      placeholder: "예: 로그인 시 무한 로딩이 발생합니다."
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: "📌 어떤 상황에서 발생한 버그인가요?"
+      description: "(가능하면) Given–When–Then 형식으로 서술해주세요."
+      placeholder: |
+        Given: 로그인 페이지에 접속했을 때  
+        When: 아이디와 비밀번호를 입력 후 로그인 버튼을 클릭하면  
+        Then: 화면이 무한 로딩 상태로 빠집니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "🍀 예상 결과"
+      description: "정상적으로는 어떤 결과가 나와야 했는지 설명해주세요."
+      placeholder: "로그인 성공 후 대시보드가 보여져야 합니다."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 체크리스트(Tasks)"
+      description: "해당 버그를 해결하기 위한 작업 목록을 작성해주세요."
+      value: |
+        - [ ] todo 1
+        - [ ] todo 2
+        - [ ] todo 3
+        - [ ] todo 4
+    validations:
+      required: true

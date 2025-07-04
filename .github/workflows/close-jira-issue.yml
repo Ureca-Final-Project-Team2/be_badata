@@ -1,0 +1,46 @@
+name: Close Jira issue
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  close-issue:
+    name: Close Jira issue
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+
+      - name: Extract Jira Key from issue comments
+        id: extract-jira-key
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENTS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments --jq '.[].body')
+          echo "$COMMENTS" | grep -oE 'Jira Issue Created: \[([A-Z]+-[0-9]+)\]' | head -n1 | grep -oE '[A-Z]+-[0-9]+' > jira-key.txt
+
+          if [[ -s jira-key.txt ]]; then
+            KEY=$(cat jira-key.txt)
+            echo "✅ Extracted Jira key: $KEY"
+            echo "JIRA_KEY=$KEY" >> $GITHUB_ENV
+          else
+            echo "❌ Failed to extract Jira key from comments."
+            exit 1
+          fi
+
+      - name: Transition Jira issue to 완료
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ env.JIRA_KEY }}
+          transitionId: "31"
