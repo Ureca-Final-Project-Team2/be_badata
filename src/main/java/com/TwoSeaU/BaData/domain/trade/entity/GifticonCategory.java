@@ -19,7 +19,6 @@ public class GifticonCategory extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "category_name", nullable = false, length = 255)
     private String categoryName;
 
     public static GifticonCategory of(final String categoryName){
