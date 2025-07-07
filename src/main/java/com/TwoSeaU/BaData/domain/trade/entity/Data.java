@@ -11,25 +11,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
+@DiscriminatorValue("data")
 @Table(name = "data")
-public class Data extends BaseEntity {
+public class Data extends Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-
     private MobileCarrier mobileCarrier;
 
     private Integer capacity;
 
-    public static Data of(final Post post, final MobileCarrier mobileCarrier, final Integer capacity) {
+    public static Data of(final MobileCarrier mobileCarrier, final Integer capacity) {
 
         return Data.builder()
-                .post(post)
                 .mobileCarrier(mobileCarrier)
                 .capacity(capacity)
                 .build();

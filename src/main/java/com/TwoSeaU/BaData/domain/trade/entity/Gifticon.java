@@ -12,17 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
+@DiscriminatorValue("gifticon")
 @Table(name = "gifticon")
-public class Gifticon extends BaseEntity {
+public class Gifticon extends Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
 
     private String associateCompany;
 
@@ -38,13 +34,12 @@ public class Gifticon extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
-    public static Gifticon of(final Post post, final String associateCompany,
+    public static Gifticon of(final String associateCompany,
                               final LocalDateTime expirationDate, final LocalDateTime issueDate,
                               final String couponNumber, final String partner,
                               final GifticonCategory category) {
 
         return Gifticon.builder()
-                .post(post)
                 .associateCompany(associateCompany)
                 .expirationDate(expirationDate)
                 .issueDate(issueDate)
