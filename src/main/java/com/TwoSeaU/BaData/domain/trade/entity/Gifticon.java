@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 @Table(name = "gifticon")
 public class Gifticon extends Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String associateCompany;
 
     private LocalDateTime expirationDate;

@@ -15,10 +15,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "data")
 public class Data extends Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private MobileCarrier mobileCarrier;
 
     private Integer capacity;
