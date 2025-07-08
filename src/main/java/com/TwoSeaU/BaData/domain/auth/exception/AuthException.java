@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus;
 public enum AuthException implements BaseException {
 
     // 인증에러 1500
-    NOT_SUPPORTED_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, 1500, "지원하지 않는 소셜 타입입니다"),
-    ACCESS_DENIED(HttpStatus.UNAUTHORIZED,1700,"접근할 권한이 없습니다(인증예외)"),
-    ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN,1900,"접근이 거부되었습니다(권한예외)");
+    NOT_SUPPORTED_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, 6000, "지원하지 않는 소셜 타입입니다"),
+    ACCESS_DENIED(HttpStatus.UNAUTHORIZED,6001,"접근할 권한이 없습니다(인증예외)"),
+    ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN,6002,"접근이 거부되었습니다(권한예외)");
 
     private final HttpStatus httpStatus;
     private final int code;

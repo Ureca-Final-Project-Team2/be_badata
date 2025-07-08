@@ -61,7 +61,7 @@ public interface AuthApi {
                                             name = "소셜 타입이 kakao가 아닐 때",
                                             value = """
                                                     {
-                                                         "code": 1500,
+                                                         "code": 6000,
                                                          "message": "지원하지 않는 소셜 타입입니다",
                                                          "content": null
                                                      }
