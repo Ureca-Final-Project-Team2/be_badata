@@ -20,8 +20,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: a9e974dd847f946aa92f7ef14ffe4f98
-            client-secret: AokImK5HCFq5p76afdfLdFlAgcMbwgo3
+            client-id: ${SOCIAL_CLIENT_ID}
+            client-secret: ${SOCIAL_SECRET}
 
   data:
     redis:
