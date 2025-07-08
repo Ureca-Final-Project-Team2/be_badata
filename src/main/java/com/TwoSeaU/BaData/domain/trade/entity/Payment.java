@@ -29,7 +29,11 @@ public class Payment {
 
     private BigDecimal merchantUid;
 
+    @Enumerated(EnumType.STRING)
+    private PayMethod payMethod;
+
     private double amount;
 
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 }
