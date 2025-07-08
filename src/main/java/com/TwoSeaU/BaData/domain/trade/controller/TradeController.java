@@ -24,11 +24,11 @@ public class TradeController {
 
     @GetMapping("/posts/{userId}")
     public ResponseEntity<ApiResponse<PostsResponse>> getPostsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.findPostsByUserId(userId)));
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId)));
     }
 
     @GetMapping("/posts/deadline")
     public ResponseEntity<ApiResponse<PostsResponse>> getPostsByDeadLine() {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.findPostsDeadLine()));
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine()));
     }
 }
