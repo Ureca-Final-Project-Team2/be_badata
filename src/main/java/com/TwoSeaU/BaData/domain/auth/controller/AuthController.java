@@ -30,7 +30,7 @@ public class AuthController implements AuthApi {
     private static final String refreshTokenHeader = "refreshToken";
 
     @GetMapping("/token/issue")
-    public ResponseEntity<ApiResponse<CheckNewUserResponse>> getToken(@RequestParam("code") final String code,
+    public ResponseEntity<ApiResponse<CheckNewUserResponse>> getServiceToken(@RequestParam("code") final String code,
                                                                       @RequestParam("provider") final String provider){
 
         // 토큰 생성
@@ -51,8 +51,8 @@ public class AuthController implements AuthApi {
     }
 
     @GetMapping("/token/reissue")
-    public ResponseEntity<ApiResponse<Void>> reIssueToken(@RequestHeader("Authorization") final String accessToken,
-                                                          @CookieValue("refreshToken") final String refreshToken){
+        public ResponseEntity<ApiResponse<Void>> reIssueServiceToken(@RequestHeader("Authorization") final String accessToken,
+                                                                     @CookieValue("refreshToken") final String refreshToken){
         // 토큰 생성
         IssueServiceTokenResponse issueServiceTokenResponse = authService.reIssueServiceToken(
                 parseToken(accessToken), refreshToken);
