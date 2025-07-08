@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.controller;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
+import com.TwoSeaU.BaData.domain.trade.dto.response.UserPostsResponse;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class TradeController {
     }
 
     @GetMapping("/posts/{userId}")
-    public ResponseEntity<ApiResponse<PostsResponse>> getPostsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<UserPostsResponse>> getPostsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId)));
     }
 
