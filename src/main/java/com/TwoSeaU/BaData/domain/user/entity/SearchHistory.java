@@ -29,4 +29,12 @@ public class SearchHistory {
 	private User user;
 
 	private String searchKeyword;
+
+	public static SearchHistory of(final User user, final String searchKeyword){
+
+		return SearchHistory.builder()
+			.user(user)
+			.searchKeyword(searchKeyword)
+			.build();
+	}
 }

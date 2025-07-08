@@ -36,4 +36,13 @@ public class CoinHistory {
 	private CoinSource coinSource;
 
 	private int amount;
+
+	public static CoinHistory of(final User user, final CoinSource coinSource, final int amount) {
+
+		return CoinHistory.builder()
+			.user(user)
+			.coinSource(coinSource)
+			.amount(amount)
+			.build();
+	}
 }

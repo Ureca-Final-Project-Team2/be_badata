@@ -32,4 +32,11 @@ public class UserLikes {
 	@JoinColumn(name = "follower_id", nullable = false)
 	private User followerUser;
 
+	public static UserLikes of(final User followingUser, final User followerUser){
+
+		return UserLikes.builder()
+			.followingUser(followingUser)
+			.followerUser(followerUser)
+			.build();
+	}
 }
