@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum GlobalException implements BaseException {
     //글로벌 에러 1000번대, 아래 코드는 자유롭게 삭제하세요
-    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 2001, "데이터 사용량 정보를 찾을 수 없습니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,1000,"서버 예외입니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
