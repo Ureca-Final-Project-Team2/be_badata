@@ -23,7 +23,7 @@ public class AuthService {
     private final ServiceTokenProvider serviceTokenProvider;
     private final RedisUtil redisUtil;
 
-    public IssueTokenUserStatusResponse getServiceToken(String code, String provider) {
+    public IssueTokenUserStatusResponse getServiceToken(final String code, final String provider) {
 
         SocialLoginApiProcessor apiProcessor = processorSelector.getApiProcessor(provider);
 
