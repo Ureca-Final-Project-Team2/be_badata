@@ -2,24 +2,18 @@ package com.TwoSeaU.BaData.domain.trade.entity;
 
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
-@DiscriminatorValue("gifticon")
+@DiscriminatorValue("GIFTICON")
 @Table(name = "gifticon")
-public class Gifticon extends Post {
-
-    private String associateCompany;
-
-    private LocalDateTime expirationDate;
-
+public class Gifticon extends Post{
     private LocalDateTime issueDate;
 
     private String couponNumber;
@@ -30,14 +24,10 @@ public class Gifticon extends Post {
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
-    public static Gifticon of(final String associateCompany,
-                              final LocalDateTime expirationDate, final LocalDateTime issueDate,
-                              final String couponNumber, final String partner,
-                              final GifticonCategory category) {
+    public static Gifticon of(final LocalDateTime issueDate, final String couponNumber,
+                              final String partner, final GifticonCategory category) {
 
         return Gifticon.builder()
-                .associateCompany(associateCompany)
-                .expirationDate(expirationDate)
                 .issueDate(issueDate)
                 .couponNumber(couponNumber)
                 .partner(partner)
