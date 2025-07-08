@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CheckNewUserResponse {
 
     private boolean isNewUser;
-    public static CheckNewUserResponse from(final boolean isNewUser){
+    public static CheckNewUserResponse of(final boolean isNewUser){
 
         return CheckNewUserResponse.builder()
                 .isNewUser(isNewUser)

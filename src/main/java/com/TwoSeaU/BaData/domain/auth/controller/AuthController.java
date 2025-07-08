@@ -46,8 +46,7 @@ public class AuthController implements AuthApi {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(accessTokenHeader, issueTokenUserStatusResponse.getIssueServiceTokenResponse().getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(ApiResponse.success(CheckNewUserResponse.from(
-                        issueTokenUserStatusResponse.isNewUser())));
+                .body(ApiResponse.success(CheckNewUserResponse.of(issueTokenUserStatusResponse.isNewUser())));
     }
 
     @GetMapping("/token/reissue")
