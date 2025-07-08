@@ -2,7 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.dto.response;
 
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.PostCategory;
+import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import lombok.*;
 
 import java.time.LocalDateTime;

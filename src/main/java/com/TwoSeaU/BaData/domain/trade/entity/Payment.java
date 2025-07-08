@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
+import com.TwoSeaU.BaData.domain.trade.enums.PayMethod;
+import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

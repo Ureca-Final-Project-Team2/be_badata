@@ -1,6 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
-import com.TwoSeaU.BaData.global.common.BaseEntity;
+import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import jakarta.persistence.*;
 import lombok.*;
 

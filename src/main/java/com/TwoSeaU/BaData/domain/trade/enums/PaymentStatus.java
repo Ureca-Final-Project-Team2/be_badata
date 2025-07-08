@@ -1,4 +1,4 @@
-package com.TwoSeaU.BaData.domain.trade.entity;
+package com.TwoSeaU.BaData.domain.trade.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
