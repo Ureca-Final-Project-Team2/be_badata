@@ -1,7 +1,7 @@
 package com.TwoSeaU.BaData.domain.auth.service;
 
 import com.TwoSeaU.BaData.domain.auth.exception.AuthException;
-import com.TwoSeaU.BaData.domain.user.entity.SocialType;
+import com.TwoSeaU.BaData.domain.user.enums.SocialType;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

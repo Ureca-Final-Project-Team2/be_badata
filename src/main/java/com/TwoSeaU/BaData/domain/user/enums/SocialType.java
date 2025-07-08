@@ -1,4 +1,4 @@
-package com.TwoSeaU.BaData.domain.user.entity;
+package com.TwoSeaU.BaData.domain.user.enums;
 
 import com.TwoSeaU.BaData.domain.auth.exception.AuthException;
 import com.TwoSeaU.BaData.global.response.GeneralException;

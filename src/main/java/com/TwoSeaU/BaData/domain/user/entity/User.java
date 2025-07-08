@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.entity;
 
+import com.TwoSeaU.BaData.domain.user.enums.Role;
+import com.TwoSeaU.BaData.domain.user.enums.SocialType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
