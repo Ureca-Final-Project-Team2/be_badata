@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.dto.response;
 
+import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
+import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostCategory;
 import lombok.*;
 
@@ -18,18 +20,15 @@ public class PostResponse {
     private String postImage;
     private PostCategory postCategory;
 
-    public static PostResponse of(final Long id, final String title,
-                        final String partner, final Integer price,
-                        final LocalDateTime createdAt, final String postImage, final PostCategory postCategory) {
-
+    public static PostResponse from(final Post post) {
         return PostResponse.builder()
-                .id(id)
-                .title(title)
-                .partner(partner)
-                .price(price)
-                .createdAt(createdAt)
-                .postImage(postImage)
-                .postCategory(postCategory)
+                .id(post.getId())
+                .title(post.getTitle())
+                .price(post.getPrice())
+                .createdAt(post.getCreatedAt())
+                .postImage(post.getPostImage())
+                .postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
+                .partner(post instanceof Gifticon gifticon ? gifticon.getPartner() : null)
                 .build();
     }
 }
