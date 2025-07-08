@@ -14,3 +14,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: a9e974dd847f946aa92f7ef14ffe4f98
+            client-secret: AokImK5HCFq5p76afdfLdFlAgcMbwgo3
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  validationTime: ${JWT_VALIDATION_TIME}

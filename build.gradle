@@ -37,6 +37,20 @@ dependencies {
 
 	//validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//webclient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//JWT
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+	//REDIS
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//SWAGGER
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 }
 
 tasks.named('test') {
