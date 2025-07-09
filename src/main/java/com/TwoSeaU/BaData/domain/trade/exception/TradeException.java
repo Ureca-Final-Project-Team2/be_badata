@@ -22,7 +22,8 @@ public enum TradeException implements BaseException {
     RECENT_SEARCH_NOT_FOUND(HttpStatus.NOT_FOUND, 3010, "최근 검색 기록을 찾을 수 없습니다."),
     OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3011, "OCR 처리에 실패했습니다."),
     EXPIRED_POST_ACCESS(HttpStatus.BAD_REQUEST, 3012, "이미 마감 기한이 지난 게시글입니다."),
-    EXPIRED_POST_MODIFY(HttpStatus.BAD_REQUEST, 3013, "마감 기한이 지난 게시글은 수정할 수 없습니다.");
+    EXPIRED_POST_MODIFY(HttpStatus.BAD_REQUEST, 3013, "마감 기한이 지난 게시글은 수정할 수 없습니다."),
+    NOT_LIKED_POST(HttpStatus.BAD_REQUEST, 3014, "찜한 적 없는 게시글입니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
