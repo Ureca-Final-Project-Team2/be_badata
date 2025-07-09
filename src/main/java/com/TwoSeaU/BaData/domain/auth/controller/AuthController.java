@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.auth.controller;
 
 import com.TwoSeaU.BaData.domain.auth.controller.swagger.AuthApi;
 import com.TwoSeaU.BaData.domain.auth.dto.response.CheckNewUserResponse;
+import com.TwoSeaU.BaData.domain.auth.dto.response.IssueServiceTokenResponse;
 import com.TwoSeaU.BaData.domain.auth.service.AuthService;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueTokenUserStatusResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -11,7 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +30,7 @@ public class AuthController implements AuthApi {
     private static final String refreshTokenHeader = "refreshToken";
 
     @GetMapping("/token/issue")
-    public ResponseEntity<ApiResponse<CheckNewUserResponse>> getToken(@RequestParam("code") final String code,
+    public ResponseEntity<ApiResponse<CheckNewUserResponse>> getServiceToken(@RequestParam("code") final String code,
                                                                       @RequestParam("provider") final String provider){
 
         // 토큰 생성
@@ -42,8 +46,25 @@ public class AuthController implements AuthApi {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(accessTokenHeader, issueTokenUserStatusResponse.getIssueServiceTokenResponse().getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(ApiResponse.success(CheckNewUserResponse.from(
-                        issueTokenUserStatusResponse.isNewUser())));
+                .body(ApiResponse.success(CheckNewUserResponse.of(issueTokenUserStatusResponse.isNewUser())));
+    }
+
+    @GetMapping("/token/reissue")
+        public ResponseEntity<ApiResponse<Void>> reIssueServiceToken(@RequestHeader("Authorization") final String accessToken,
+                                                                     @CookieValue("refreshToken") final String refreshToken){
+        // 토큰 생성
+        IssueServiceTokenResponse issueServiceTokenResponse = authService.reIssueServiceToken(
+                parseToken(accessToken), refreshToken);
+
+        // 쿠키 생성
+        ResponseCookie refreshTokenCookie = makeResponseCookie(
+                issueServiceTokenResponse.getRefreshToken(),
+                issueServiceTokenResponse.getRefreshTokenValidationTime());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(accessTokenHeader, issueServiceTokenResponse.getAccessToken())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(ApiResponse.success(null));
     }
 
     @GetMapping("/test")
@@ -61,6 +82,15 @@ public class AuthController implements AuthApi {
                 .maxAge(refreshTokenValidationTime)
                 .sameSite("Lax")
                 .build();
+    }
+
+    private String parseToken(final String accessToken){
+
+        if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")) {
+            return accessToken.substring(7);
+        }
+
+        return null;
     }
 
 }
