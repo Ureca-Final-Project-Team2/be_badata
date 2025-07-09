@@ -44,7 +44,8 @@ public class AuthService {
 
         IssueServiceTokenResponse issueServiceTokenResponse = serviceTokenProvider.createToken(authentication);
 
-        redisUtil.saveValueByKey(authentication.getName(),issueServiceTokenResponse.getRefreshToken(),issueServiceTokenResponse.getRefreshTokenValidationTime(),TimeUnit.MILLISECONDS);
+        redisUtil.saveValueByKey(authentication.getName(), issueServiceTokenResponse.getRefreshToken(),
+                issueServiceTokenResponse.getRefreshTokenValidationTime(), TimeUnit.MILLISECONDS);
 
         return issueServiceTokenResponse;
     }
