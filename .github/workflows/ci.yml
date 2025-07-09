@@ -48,7 +48,7 @@ jobs:
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
           echo "JWT_VALIDATION_TIME=${{ secrets.JWT_VALIDATION_TIME }}" >> $GITHUB_ENV
           echo "SOCIAL_CLIENT_ID=${{ secrets.SOCIAL_CLIENT_ID }}" >> $GITHUB_ENV
-            echo "SOCIAL_SECRET=${{ secrets.SOCIAL_SECRET }}" >> $GITHUB_ENV
+          echo "SOCIAL_SECRET=${{ secrets.SOCIAL_SECRET }}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
