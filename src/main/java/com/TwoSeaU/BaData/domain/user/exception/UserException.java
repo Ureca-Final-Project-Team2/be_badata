@@ -20,7 +20,9 @@ public enum UserException implements BaseException {
     PURCHASE_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, 2007, "구매 내역이 존재하지 않습니다."),
     COIN_NOT_FOUND(HttpStatus.NOT_FOUND, 2008, "보유한 코인 정보가 존재하지 않습니다."),
     FOLLOWING_NOT_FOUND(HttpStatus.NOT_FOUND, 2009, "팔로잉한 게시글이 없습니다."),
-    LIKES_POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, 2010, "찜한 거래 물품이 존재하지 않습니다.");
+    LIKES_POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, 2010, "찜한 거래 물품이 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2011, "유저 정보를 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final int code;
