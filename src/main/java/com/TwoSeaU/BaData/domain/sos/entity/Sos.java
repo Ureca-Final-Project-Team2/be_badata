@@ -26,18 +26,18 @@ public class Sos {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "reporter_id", nullable = false)
-	private User reporterUser;
+	@JoinColumn(name = "requester_id", nullable = false)
+	private User requester;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "reported_id", nullable = false)
-	private User reportedUser;
+	@JoinColumn(name = "responder_id", nullable = false)
+	private User responder;
 
-	public static Sos of(final User reporterUser, final User reportedUser) {
+	public static Sos of(final User requester, final User responder) {
 
 		return Sos.builder()
-			.reporterUser(reporterUser)
-			.reportedUser(reportedUser)
+			.requester(requester)
+			.responder(responder)
 			.build();
 	}
 }
