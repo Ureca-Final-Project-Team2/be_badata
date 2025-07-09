@@ -56,5 +56,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: 🔧 실행 권한 부여
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
         run: ./gradlew clean build -x test
