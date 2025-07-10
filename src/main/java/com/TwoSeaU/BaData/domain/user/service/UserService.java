@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.user.service;
 
 import org.springframework.stereotype.Service;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
@@ -20,5 +21,12 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return DataResponse.of(user.getDataAmount());
+	}
+
+	public CoinResponse getCoin(String username) {
+		 User user = userRepository.findByUsername(username)
+			 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return CoinResponse.of(user.getCoin());
 	}
 }
