@@ -2,7 +2,6 @@ package com.TwoSeaU.BaData.domain.auth.controller;
 
 
 import com.TwoSeaU.BaData.domain.auth.controller.swagger.AuthApi;
-import com.TwoSeaU.BaData.domain.auth.dto.response.CheckNewUserResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueServiceTokenResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.domain.auth.service.AuthService;

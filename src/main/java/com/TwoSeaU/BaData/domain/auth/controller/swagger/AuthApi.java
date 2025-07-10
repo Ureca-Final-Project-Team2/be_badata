@@ -1,6 +1,5 @@
 package com.TwoSeaU.BaData.domain.auth.controller.swagger;
 
-import com.TwoSeaU.BaData.domain.auth.dto.response.CheckNewUserResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
