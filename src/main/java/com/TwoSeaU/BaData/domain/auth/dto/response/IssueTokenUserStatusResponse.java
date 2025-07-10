@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class IssueTokenUserStatusResponse {
 
     private IssueServiceTokenResponse issueServiceTokenResponse;
-    private boolean isNewUser;
+    private LoginUserResponse loginUserResponse;
 
-    public static IssueTokenUserStatusResponse of(final IssueServiceTokenResponse issueServiceTokenResponse, final boolean isNewUser){
+    public static IssueTokenUserStatusResponse of(final IssueServiceTokenResponse issueServiceTokenResponse, final LoginUserResponse loginUserResponse){
 
-        return new IssueTokenUserStatusResponse(issueServiceTokenResponse,isNewUser);
+        return new IssueTokenUserStatusResponse(issueServiceTokenResponse,loginUserResponse);
     }
 }
