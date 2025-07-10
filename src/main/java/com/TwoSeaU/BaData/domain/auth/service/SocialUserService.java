@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.auth.service;
 
+import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.domain.auth.jwt.ServiceTokenProvider;
 import com.TwoSeaU.BaData.domain.auth.dto.oauth2.request.GetOAuth2UserProfileRequest;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueTokenUserStatusResponse;
@@ -53,7 +54,7 @@ public class SocialUserService {
         IssueServiceTokenResponse issueServiceTokenResponse = serviceTokenProvider.createTokenByUserProperty(user.getUsername(),user.getRole().name());
         saveRefreshTokenAtRedis(user.getUsername(), issueServiceTokenResponse);
 
-        return IssueTokenUserStatusResponse.of(issueServiceTokenResponse,isNewUser);
+        return IssueTokenUserStatusResponse.of(issueServiceTokenResponse, LoginUserResponse.from(user,isNewUser));
     }
 
     private void saveRefreshTokenAtRedis(String key, IssueServiceTokenResponse issueServiceTokenResponse){

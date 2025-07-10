@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.auth.controller.swagger;
 
 import com.TwoSeaU.BaData.domain.auth.dto.response.CheckNewUserResponse;
+import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,11 +45,14 @@ public interface AuthApi {
                                             name = "정상 응답 예시",
                                             value = """
                                                     {
-                                                        "code": 20000,
-                                                        "message": null,
-                                                        "content": {
-                                                            "newUser": false
-                                                        }
+                                                      "code": 20000,
+                                                      "message": null,
+                                                      "content": {
+                                                        "email": "dionisos198@gmail.com",
+                                                        "name": "이진우",
+                                                        "profileImageUrl": "http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg",
+                                                        "newUser": true
+                                                      }
                                                     }
                                                     """
                                     )
@@ -75,7 +79,7 @@ public interface AuthApi {
             }
     )
     @GetMapping("/token/issue")
-    ResponseEntity<ApiResponse<CheckNewUserResponse>> getServiceToken(
+    ResponseEntity<ApiResponse<LoginUserResponse>> getServiceToken(
             @Parameter(description = "소셜 로그인 후 받은 code") @RequestParam("code") String code,
             @Parameter(description = "소셜 로그인 제공자 (예: kakao)") @RequestParam("provider") String provider
     );

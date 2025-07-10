@@ -4,6 +4,7 @@ package com.TwoSeaU.BaData.domain.auth.controller;
 import com.TwoSeaU.BaData.domain.auth.controller.swagger.AuthApi;
 import com.TwoSeaU.BaData.domain.auth.dto.response.CheckNewUserResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueServiceTokenResponse;
+import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.domain.auth.service.AuthService;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueTokenUserStatusResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -30,7 +31,7 @@ public class AuthController implements AuthApi {
     private static final String refreshTokenHeader = "refreshToken";
 
     @GetMapping("/token/issue")
-    public ResponseEntity<ApiResponse<CheckNewUserResponse>> getServiceToken(@RequestParam("code") final String code,
+    public ResponseEntity<ApiResponse<LoginUserResponse>> getServiceToken(@RequestParam("code") final String code,
                                                                       @RequestParam("provider") final String provider){
 
         // 토큰 생성
@@ -46,7 +47,7 @@ public class AuthController implements AuthApi {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(accessTokenHeader, issueTokenUserStatusResponse.getIssueServiceTokenResponse().getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(ApiResponse.success(CheckNewUserResponse.of(issueTokenUserStatusResponse.isNewUser())));
+                .body(ApiResponse.success(issueTokenUserStatusResponse.getLoginUserResponse()));
     }
 
     @GetMapping("/token/reissue")
