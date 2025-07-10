@@ -12,7 +12,7 @@ on:
       - develop
 
 jobs:
-  build-and-deploy:
+  CI/CD :
     runs-on: ubuntu-latest
 
     services:
@@ -31,13 +31,13 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout source code
+      - name: 소스 코드 Checkout
         uses: actions/checkout@v4
 
-      - name: Start Redis
+      - name: Redis 실행
         uses: supercharge/redis-github-action@1.6.0
 
-      - name: Set environment variables from secrets
+      - name: .env 설정
         run: |
           echo "SPRING_PROFILES_ACTIVE=ci" >> $GITHUB_ENV
           echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_ENV
@@ -56,8 +56,33 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🔧 실행 권한 부여
+      - name: 실행 권한 부여
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
+      - name: 빌드 테스트
         run: ./gradlew clean build -x test
+
+      - name: Docker Hub 로그인
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build 후 Docker image push
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/badata:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/badata:latest
+
+      - name: EC2 배포
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu
+              
+            echo "기존 컨테이너 중지 및 제거"
+            docker stop badata_be || true
+            docker rm badata_be || true
+              
+            echo "새로운 이미지 빌드"
+            docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
+            docker run --env-file ~/be_badata/.env -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
