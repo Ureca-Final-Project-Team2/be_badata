@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
 import com.TwoSeaU.BaData.domain.user.service.UserService;
@@ -23,5 +24,10 @@ public class UserController {
 	@GetMapping("/data")
 	public ResponseEntity<ApiResponse<DataResponse>> getData(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getData(user.getUsername())));
+	}
+
+	@GetMapping("/coin")
+	public ResponseEntity<ApiResponse<CoinResponse>> getCoin(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getCoin(user.getUsername())));
 	}
 }

@@ -43,6 +43,7 @@ public class SocialUserService {
                     socialType+getOAuth2UserProfileRequest.getId(),
                     null,
                     150,
+                    0,
                     Role.GENERAL,
                     socialType,
                     getOAuth2UserProfileRequest.getEmail(),
