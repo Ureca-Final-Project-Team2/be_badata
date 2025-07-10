@@ -42,6 +42,7 @@ public class SocialUserService {
                     getOAuth2UserProfileRequest.getNickName(),
                     socialType+getOAuth2UserProfileRequest.getId(),
                     null,
+                    150,
                     Role.GENERAL,
                     socialType,
                     getOAuth2UserProfileRequest.getEmail(),

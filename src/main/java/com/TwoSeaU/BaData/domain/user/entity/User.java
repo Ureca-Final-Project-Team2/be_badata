@@ -33,6 +33,8 @@ public class User {
 
     private String password;
 
+    private Integer dataAmount;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -46,6 +48,7 @@ public class User {
     public static User of(final String nickName,
                           final String userName,
                           final String password,
+                          final Integer dataAmount,
                           final Role role,
                           final SocialType socialType,
                           final String email,
@@ -55,6 +58,7 @@ public class User {
                 .nickName(nickName)
                 .username(userName)
                 .password(password)
+                .dataAmount(dataAmount)
                 .role(role)
                 .socialType(socialType)
                 .email(email)
