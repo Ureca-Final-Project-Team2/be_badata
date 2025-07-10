@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.entity;
 
+import com.TwoSeaU.BaData.global.common.BaseEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
 @Table(name = "user_likes")
-public class UserLikes {
+public class UserLikes extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
