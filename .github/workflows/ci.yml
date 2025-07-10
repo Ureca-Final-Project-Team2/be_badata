@@ -12,7 +12,7 @@ on:
       - develop
 
 jobs:
-  build test and deploy :
+  CI_CD :
     runs-on: ubuntu-latest
 
     services:
