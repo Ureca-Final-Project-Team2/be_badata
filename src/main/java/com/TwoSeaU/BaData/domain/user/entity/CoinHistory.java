@@ -35,9 +35,9 @@ public class CoinHistory {
 	@Enumerated(EnumType.STRING)
 	private CoinSource coinSource;
 
-	private int amount;
+	private Integer amount;
 
-	public static CoinHistory of(final User user, final CoinSource coinSource, final int amount) {
+	public static CoinHistory of(final User user, final CoinSource coinSource, final Integer amount) {
 
 		return CoinHistory.builder()
 			.user(user)
