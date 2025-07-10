@@ -36,9 +36,9 @@ public class DeviceReservation extends BaseEntity {
     private StoreDevice storeDevice;
 
     @Column(nullable = false)
-    private int reservationCount;
+    private Integer reservationCount;
 
-    public DeviceReservation of(final Reservation reservation, final StoreDevice storeDevice,final int reservationCount){
+    public DeviceReservation of(final Reservation reservation, final StoreDevice storeDevice,final Integer reservationCount){
 
         return DeviceReservation
                 .builder()

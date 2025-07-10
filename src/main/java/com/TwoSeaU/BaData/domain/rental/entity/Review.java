@@ -39,11 +39,11 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    private int rating;
+    private Integer rating;
 
     private String imageUrl;
 
-    public static Review of(final Store store, final Reservation reservation, final String content, final int rating,
+    public static Review of(final Store store, final Reservation reservation, final String content, final Integer rating,
                             final String imageUrl){
 
         return Review.builder()
