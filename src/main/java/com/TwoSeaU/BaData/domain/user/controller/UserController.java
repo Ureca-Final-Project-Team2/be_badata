@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
@@ -46,5 +47,10 @@ public class UserController {
 	@GetMapping("/purchases")
 	public ResponseEntity<ApiResponse<GetAllPurchasesResponse>> getAllPurchases(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllPurchasesResponse(user.getUsername())));
+	}
+
+	@GetMapping("/likes/posts")
+	public ResponseEntity<ApiResponse<GetAllLikesPostsResponse>> getAllLikesPosts(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllLikesPosts(user.getUsername())));
 	}
 }
