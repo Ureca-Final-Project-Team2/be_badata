@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -40,5 +41,10 @@ public class UserController {
 	@GetMapping("/reports/pending")
 	public ResponseEntity<ApiResponse<GetAllReportResponse>> getPendingReports(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getPendingReports(user.getUsername())));
+	}
+
+	@GetMapping("/purchases")
+	public ResponseEntity<ApiResponse<GetAllPurchasesResponse>> getAllPurchases(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllPurchasesResponse(user.getUsername())));
 	}
 }
