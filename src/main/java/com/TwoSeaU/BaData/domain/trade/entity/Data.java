@@ -1,8 +1,10 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
+import com.TwoSeaU.BaData.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,11 +20,11 @@ public class Data extends Post {
 
     private Integer capacity;
 
-    public static Data of(final MobileCarrier mobileCarrier, final Integer capacity) {
-
-        return Data.builder()
-                .mobileCarrier(mobileCarrier)
-                .capacity(capacity)
-                .build();
+    public Data(User user, String title, String comment, Integer price,
+                LocalDateTime deadLine, String postImage, Boolean isSold,
+                MobileCarrier mobileCarrier, Integer capacity) {
+        super(user, title, comment, price, deadLine, postImage, isSold);
+        this.mobileCarrier = mobileCarrier;
+        this.capacity = capacity;
     }
 }
