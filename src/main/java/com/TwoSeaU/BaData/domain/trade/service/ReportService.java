@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 import com.TwoSeaU.BaData.domain.trade.dto.response.SaveReportResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.Report;
+import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.ReportRepository;
@@ -10,8 +11,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import jakarta.security.auth.message.AuthException;
-import jakarta.servlet.http.HttpSession;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class ReportService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        Report savedReport = reportRepository.save(Report.of(post, user));
+        Report savedReport = reportRepository.save(Report.of(post, user, ReportStatus.QUESTION));
 
         return SaveReportResponse.of(savedReport.getId());
     }

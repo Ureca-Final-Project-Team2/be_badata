@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 
@@ -29,5 +30,15 @@ public class UserController {
 	@GetMapping("/coin")
 	public ResponseEntity<ApiResponse<CoinResponse>> getCoin(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getCoin(user.getUsername())));
+	}
+
+	@GetMapping("/reports/complete")
+	public ResponseEntity<ApiResponse<GetAllReportResponse>> getCompleteReports(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getCompleteReports(user.getUsername())));
+	}
+
+	@GetMapping("/reports/pending")
+	public ResponseEntity<ApiResponse<GetAllReportResponse>> getPendingReports(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getPendingReports(user.getUsername())));
 	}
 }
