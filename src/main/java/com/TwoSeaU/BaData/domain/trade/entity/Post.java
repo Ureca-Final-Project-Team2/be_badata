@@ -35,4 +35,14 @@ public abstract class Post extends BaseEntity {
     private String postImage;
 
     private Boolean isSold;
+
+    public Post(User seller, String title, String comment, Integer price, LocalDateTime deadLine, String postImage, Boolean isSold) {
+        this.seller = seller;
+        this.title = title;
+        this.comment = comment;
+        this.price = price;
+        this.deadLine = deadLine;
+        this.postImage = postImage;
+        this.isSold = isSold;
+    }
 }
