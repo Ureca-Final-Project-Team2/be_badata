@@ -5,28 +5,23 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreSearchRequest {
 
-    private boolean isOpeningNow;
-    private double swLat;
-    private double swLng;
-    private double neLat;
-    private double neLng;
-    private LocalDateTime rentalStartDate;
-    private LocalDateTime rentalEndDate;
-    private double reviewRating;
-    private double minPrice;
-    private double maxPrice;
-    private List<Integer> dataCapacity;
-    private boolean is5G;
-    private List<Integer> maxSupportConnection;
-
-
-
+    private final Boolean isOpeningNow;
+    private final Double swLat;
+    private final Double swLng;
+    private final Double neLat;
+    private final Double neLng;
+    private final LocalDateTime rentalStartDate;
+    private final LocalDateTime rentalEndDate;
+    private final Double reviewRating;
+    private final Integer minPrice;
+    private final Integer maxPrice;
+    private final List<Integer> dataCapacity;
+    private final Boolean is5G;
+    private final List<Integer> maxSupportConnection;
 
 }

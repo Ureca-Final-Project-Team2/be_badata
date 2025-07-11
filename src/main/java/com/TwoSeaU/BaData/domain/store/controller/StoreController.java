@@ -1,11 +1,13 @@
 package com.TwoSeaU.BaData.domain.store.controller;
 
+import com.TwoSeaU.BaData.domain.store.dto.ShowStoreMapResponse;
 import com.TwoSeaU.BaData.domain.store.dto.StoreResponse;
 import com.TwoSeaU.BaData.domain.store.dto.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.service.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +22,12 @@ public class StoreController {
     public List<StoreResponse> getStoreResponse(){
 
         return storeService.findList();
+    }
+
+    @GetMapping("/map")
+    public List<ShowStoreMapResponse> getStoreMapResponse(@ModelAttribute StoreSearchRequest storeSearchRequest){
+
+        return storeService.getStoreMapResponse(storeSearchRequest);
     }
 
 }
