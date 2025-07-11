@@ -103,7 +103,7 @@ public class UserService {
 			.map(postLikes -> {
 				Post post = postRepository.findById(postLikes.getPost().getId())
 					.orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
-				Long postLikesCount = postLikesRepository.countByPostId(post.getId());
+				int postLikesCount = postLikesRepository.countByPostId(post.getId());
 
 				return GetLikesPostResponse.from(post, postLikesCount);
 			})
