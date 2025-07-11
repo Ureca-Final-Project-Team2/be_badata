@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
+import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -25,10 +26,14 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public static Report of(final Post post, final User user) {
+    @Enumerated(EnumType.STRING)
+    private ReportStatus reportStatus;
+
+    public static Report of(final Post post, final User user, final ReportStatus reportStatus) {
         return Report.builder()
                 .post(post)
                 .user(user)
+                .reportStatus(reportStatus)
                 .build();
     }
 }
