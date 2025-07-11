@@ -48,6 +48,12 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private LocalTime endTime;
 
+    @Column(nullable = false)
+    private Double reviewRating;
+
+    @Column(nullable = false)
+    private Integer reviewCount;
+
     public static Store of(final String name, final Point position,final String phoneNumber, final String detailAddress,
                             final Integer availableDevice, final String storeImage, final LocalTime startTime, final LocalTime endTime){
 
@@ -60,6 +66,8 @@ public class Store extends BaseEntity {
                 .storeImage(storeImage)
                 .startTime(startTime)
                 .endTime(endTime)
+                .reviewCount(0)
+                .reviewRating(0.0)
                 .build();
     }
 
