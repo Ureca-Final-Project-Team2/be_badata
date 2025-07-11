@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.entity;
 
 import com.TwoSeaU.BaData.domain.user.enums.CoinSource;
+import com.TwoSeaU.BaData.global.common.BaseEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
 @Table(name = "coin_history")
-public class CoinHistory {
+public class CoinHistory extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
