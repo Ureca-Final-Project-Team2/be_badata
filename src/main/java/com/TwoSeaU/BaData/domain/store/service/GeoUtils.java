@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.store.service;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.WKTReader;
@@ -46,6 +47,11 @@ public class GeoUtils {
         Polygon polygon = geometryFactory.createPolygon(coords);
         polygon.setSRID(4326);
         return polygon;
+    }
+
+    public static Point makeByCoordinate(double longtitude,double latitude){
+
+        return geometryFactory.createPoint(new Coordinate(longtitude, latitude));
     }
 
 

@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/trades/posts").permitAll()
                                 .requestMatchers("/api/v1/trades/posts/{userId}").permitAll()
                                 .requestMatchers("/api/v1/trades/posts/deadline").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/tmp","/api/v1/stores/map").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/tmp","/api/v1/stores/map","/api/v1/stores").permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter,

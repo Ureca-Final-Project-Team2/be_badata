@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreDeviceRepository extends JpaRepository<StoreDevice,Long>,StoreDeviceCustomRepository {
 
+
 }

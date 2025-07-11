@@ -4,9 +4,15 @@ import static com.TwoSeaU.BaData.domain.rental.entity.QDeviceReservation.deviceR
 import static com.TwoSeaU.BaData.domain.rental.entity.QReservation.reservation;
 import static com.TwoSeaU.BaData.domain.store.entity.QStore.store;
 import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
+import com.TwoSeaU.BaData.domain.store.dto.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.StoreSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.StoreWithRemainDto;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.service.GeoUtils;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -16,29 +22,85 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 
 
 @RequiredArgsConstructor
 public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomRepository{
 
     private final JPAQueryFactory queryFactory;
+    private static final String review_count="reviewCount";
+    public static final String distance = "distance";
 
     @Override
-    public List<Store> findStoresInBoundingBox(final StoreSearchRequest storeSearchRequest){
+    public List<Store> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest){
 
         return queryFactory.select(storeDevice.store)
+                .from(storeDevice)
+                .where(minPriceGoe(storeMapSearchRequest.getMinPrice()))
+                .where(maxPriceLoe(storeMapSearchRequest.getMaxPrice()))
+                .where(inDataCapacity(storeMapSearchRequest.getDataCapacity()))
+                .where(is5GEq(storeMapSearchRequest.getIs5G()))
+                .where(availableDuringPeriod(storeMapSearchRequest.getRentalStartDate(),
+                        storeMapSearchRequest.getRentalEndDate()))
+                .where(inMaxSupportConnection(storeMapSearchRequest.getMaxSupportConnection()))
+                .where(isOpeningNow(storeMapSearchRequest.getIsOpeningNow()))
+                .where(filterReviewRating(storeMapSearchRequest.getReviewRating()))
+                .where(availableInBoundingBox(storeMapSearchRequest.getSwLng(),
+                        storeMapSearchRequest.getSwLat(),
+                        storeMapSearchRequest.getNeLng(), storeMapSearchRequest.getNeLat()))
+                .fetch();
+
+    }
+
+    @Override
+    public Slice<StoreWithRemainDto> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
+
+        List<StoreWithRemainDto> content = queryFactory
+                .select(Projections.constructor(StoreWithRemainDto.class,
+                                storeDevice.store,
+                                Expressions.numberTemplate(Double.class,
+                                "ST_DistanceSphere({0}, ST_MakePoint({1}, {2}))",
+                                store.position,
+                                storeSearchRequest.getCenterLng(),
+                                storeSearchRequest.getCenterLat()),
+                                storeDevice.count.subtract(
+                                        JPAExpressions
+                                                .select(deviceReservation.reservationCount.sum().coalesce(0))
+                                                .from(deviceReservation)
+                                                .join(deviceReservation.reservation, reservation)
+                                                .where(
+                                                        deviceReservation.storeDevice.eq(storeDevice),
+                                                        reservation.rentalStartDate.loe(storeSearchRequest.getRentalEndDate()),
+                                                        reservation.rentalEndDate.goe(storeSearchRequest.getRentalStartDate())
+                                                )
+                                ).sum()))
                 .from(storeDevice)
                 .where(minPriceGoe(storeSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(storeSearchRequest.getMaxPrice()))
                 .where(inDataCapacity(storeSearchRequest.getDataCapacity()))
                 .where(is5GEq(storeSearchRequest.getIs5G()))
-                .where(availableDuringPeriod(storeSearchRequest.getRentalStartDate(),storeSearchRequest.getRentalEndDate()))
+                .where(availableDuringPeriod(storeSearchRequest.getRentalStartDate(), storeSearchRequest.getRentalEndDate()))
                 .where(inMaxSupportConnection(storeSearchRequest.getMaxSupportConnection()))
                 .where(isOpeningNow(storeSearchRequest.getIsOpeningNow()))
                 .where(filterReviewRating(storeSearchRequest.getReviewRating()))
-                .where(availableInBoundingBox(storeSearchRequest.getSwLng(),storeSearchRequest.getSwLat(),
-                        storeSearchRequest.getNeLng(), storeSearchRequest.getNeLat()))
+                .groupBy(storeDevice.store)
+                .orderBy(storeSort(pageable, storeSearchRequest))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
+
+        boolean hasNext = content.size() > pageable.getPageSize();
+
+        if (hasNext) {
+            content.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
 
     }
 
@@ -116,6 +178,41 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         );
 
         return intersectsExpression;
+    }
+
+    private OrderSpecifier<?> storeSort(final Pageable pageable, final StoreSearchRequest storeSearchRequest){
+
+        if(!pageable.getSort().isEmpty()){
+
+            for(Sort.Order order: pageable.getSort()){
+                Order direction  = order.getDirection().isAscending()? Order.ASC:Order.DESC;
+
+                switch (order.getProperty()){
+
+                    case review_count:
+                        return new OrderSpecifier(direction,store.reviewCount);
+
+                    case distance:
+
+                        if(storeSearchRequest.getCenterLng() == null || storeSearchRequest.getCenterLat() == null){
+                            return new OrderSpecifier(Order.DESC,store.id);
+                        }
+
+                        return new OrderSpecifier<>(
+                                direction,
+                                Expressions.numberTemplate(Double.class,
+                                        "ST_DistanceSphere({0}, {1})",
+                                        store.position,
+                                        Expressions.constant(GeoUtils.makeByCoordinate(storeSearchRequest.getCenterLng(),
+                                                                                       storeSearchRequest.getCenterLat()))
+                                )
+                        );
+
+                }
+            }
+        }
+
+        return new OrderSpecifier(Order.DESC,store.id);
     }
 
 }
