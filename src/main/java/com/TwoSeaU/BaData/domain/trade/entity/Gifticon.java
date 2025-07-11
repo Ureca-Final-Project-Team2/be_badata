@@ -1,6 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
-import com.TwoSeaU.BaData.global.common.BaseEntity;
+import com.TwoSeaU.BaData.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,14 +24,13 @@ public class Gifticon extends Post{
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
-    public static Gifticon of(final LocalDateTime issueDate, final String couponNumber,
-                              final String partner, final GifticonCategory category) {
-
-        return Gifticon.builder()
-                .issueDate(issueDate)
-                .couponNumber(couponNumber)
-                .partner(partner)
-                .category(category)
-                .build();
+    public Gifticon(User user, String title, String comment, Integer price,
+                LocalDateTime deadLine, String postImage, Boolean isSold,
+                    LocalDateTime issueDate, String couponNumber, String partner, GifticonCategory category) {
+        super(user, title, comment, price, deadLine, postImage, isSold);
+        this.issueDate = issueDate;
+        this.couponNumber = couponNumber;
+        this.partner = partner;
+        this.category = category;
     }
 }

@@ -2,6 +2,8 @@ package com.TwoSeaU.BaData.domain.user.entity;
 
 import com.TwoSeaU.BaData.domain.user.enums.Role;
 import com.TwoSeaU.BaData.domain.user.enums.SocialType;
+import com.TwoSeaU.BaData.global.common.BaseEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Builder(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 @Getter
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +36,8 @@ public class User {
     private String password;
 
     private Integer dataAmount;
+
+    private Integer coin;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -49,6 +53,7 @@ public class User {
                           final String userName,
                           final String password,
                           final Integer dataAmount,
+                          final Integer coin,
                           final Role role,
                           final SocialType socialType,
                           final String email,
@@ -59,6 +64,7 @@ public class User {
                 .username(userName)
                 .password(password)
                 .dataAmount(dataAmount)
+                .coin(coin)
                 .role(role)
                 .socialType(socialType)
                 .email(email)
