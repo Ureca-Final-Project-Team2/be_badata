@@ -4,11 +4,19 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.TwoSeaU.BaData.domain.trade.entity.Payment;
+import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
+import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.ReportRepository;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
@@ -22,6 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 	private final ReportRepository reportRepository;
+	private final PaymentRepository paymentRepository;
+	private final PostRepository postRepository;
+	private final PostLikesRepository postLikesRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -59,5 +70,24 @@ public class UserService {
 			.toList();
 
 		return GetAllReportResponse.of(pendingReports);
+	}
+
+	public GetAllPurchasesResponse getAllPurchasesResponse(String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		List<Payment> paymentList = paymentRepository.findAllByUserId(user.getId());
+
+		List<GetPurchaseResponse> getPurchaseResponseList = paymentList.stream()
+			.map(payment -> {
+				Post post = postRepository.findById(payment.getPost().getId())
+					.orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+				Long postLikes = postLikesRepository.countByPostId(post.getId());
+
+				return GetPurchaseResponse.from(post, payment, postLikes);
+			})
+			.toList();
+
+		return GetAllPurchasesResponse.of(getPurchaseResponseList);
 	}
 }
