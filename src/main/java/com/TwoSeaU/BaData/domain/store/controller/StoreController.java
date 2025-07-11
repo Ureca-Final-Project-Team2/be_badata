@@ -7,9 +7,11 @@ import com.TwoSeaU.BaData.domain.store.dto.StoreResponse;
 import com.TwoSeaU.BaData.domain.store.dto.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.service.StoreService;
+import com.TwoSeaU.BaData.global.response.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,15 +31,15 @@ public class StoreController {
     }
 
     @GetMapping("/map")
-    public List<ShowStoreMapResponse> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest){
+    public ResponseEntity<ApiResponse<List<ShowStoreMapResponse>>> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest){
 
-        return storeService.getStoreMapResponse(storeMapSearchRequest);
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest)));
     }
 
     @GetMapping
-    public ShowStoreWithMetaResponse getStoresResponse(@ModelAttribute StoreSearchRequest storeSearchRequest, Pageable pageable){
+    public ResponseEntity<ApiResponse<ShowStoreWithMetaResponse>> getStoresResponse(@ModelAttribute StoreSearchRequest storeSearchRequest, Pageable pageable){
 
-        return storeService.getStoresResponse(storeSearchRequest,pageable);
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoresResponse(storeSearchRequest,pageable)));
     }
 
 }
