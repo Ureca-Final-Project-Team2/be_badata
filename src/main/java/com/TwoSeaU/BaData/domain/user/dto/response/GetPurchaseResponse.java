@@ -22,11 +22,11 @@ public class GetPurchaseResponse {
 	private String partner;
 	private String title;
 	private Integer price;
-	private Long postLikes;
+	private int postLikes;
 	private String postImage;
 	private Boolean isSold;
 
-	public static GetPurchaseResponse from(final Post post, final Payment payment, final Long postLikes) {
+	public static GetPurchaseResponse from(final Post post, final Payment payment, final int postLikes) {
 		return GetPurchaseResponse.builder()
 			.paymentId(payment.getId())
 			.postId(post.getId())
