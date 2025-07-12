@@ -1,6 +1,6 @@
 package com.TwoSeaU.BaData.domain.store.repository;
 
-import com.TwoSeaU.BaData.domain.store.dto.StoreWithDistanceProjection;
+import com.TwoSeaU.BaData.domain.store.dto.response.StoreWithDistanceProjection;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
