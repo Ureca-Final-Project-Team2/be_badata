@@ -14,8 +14,10 @@ spring:
     open-in-view: false
     properties:
       hibernate:
+        hibernate.format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_batch_fetch_size: 10
+    show-sql: true
 
   security:
     oauth2:

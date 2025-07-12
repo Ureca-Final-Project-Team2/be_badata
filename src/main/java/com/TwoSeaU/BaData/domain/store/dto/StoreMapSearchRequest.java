@@ -8,11 +8,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class StoreSearchRequest {
+public class StoreMapSearchRequest {
 
-    private final Double centerLat;
-    private final Double centerLng;
     private final Boolean isOpeningNow;
+    private final Double swLat;
+    private final Double swLng;
+    private final Double neLat;
+    private final Double neLng;
     private final LocalDateTime rentalStartDate;
     private final LocalDateTime rentalEndDate;
     private final Double reviewRating;
