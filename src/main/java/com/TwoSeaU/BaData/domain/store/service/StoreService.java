@@ -1,18 +1,18 @@
 package com.TwoSeaU.BaData.domain.store.service;
 
-import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
-
-import com.TwoSeaU.BaData.domain.store.dto.ShowStoreMapResponse;
-import com.TwoSeaU.BaData.domain.store.dto.ShowStoreResponse;
-import com.TwoSeaU.BaData.domain.store.dto.ShowStoreWithMetaResponse;
-import com.TwoSeaU.BaData.domain.store.dto.StoreResponse;
-import com.TwoSeaU.BaData.domain.store.dto.StoreMapSearchRequest;
-import com.TwoSeaU.BaData.domain.store.dto.StoreSearchRequest;
-import com.TwoSeaU.BaData.domain.store.dto.StoreWithRemainDto;
-import com.TwoSeaU.BaData.domain.store.entity.Store;
+import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowDeviceInfoResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreMapResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithMetaResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.StoreResponse;
+import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.response.StoreWithRemainDto;
+import com.TwoSeaU.BaData.domain.store.exception.StoreException;
 import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
-import com.querydsl.core.Tuple;
+import com.TwoSeaU.BaData.global.response.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +47,17 @@ public class StoreService {
         return ShowStoreWithMetaResponse.of(storesWithSlice.getContent().stream().map(storeWithRemainDto -> {
             return ShowStoreResponse.from(storeWithRemainDto.getStore(), storeWithRemainDto.getDistance(), storeWithRemainDto.getRemainingCount());
         }).toList(),storesWithSlice.hasNext());
+
+    }
+
+    public List<ShowDeviceInfoResponse> getStoreDeviceResponse(final DeviceSearchRequest deviceSearchRequest, final Long storeId){
+
+        if(!storeRepository.existsById(storeId)){
+            throw new GeneralException(StoreException.CANT_FIND_STORE);
+        }
+
+        return storeDeviceRepository.findProperDevicesByStore(deviceSearchRequest,storeId)
+                .stream().map(ShowDeviceInfoResponse::from).toList();
 
     }
 
