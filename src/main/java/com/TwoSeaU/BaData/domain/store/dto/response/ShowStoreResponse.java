@@ -1,7 +1,6 @@
-package com.TwoSeaU.BaData.domain.store.dto;
+package com.TwoSeaU.BaData.domain.store.dto.response;
 
 import com.TwoSeaU.BaData.domain.store.entity.Store;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

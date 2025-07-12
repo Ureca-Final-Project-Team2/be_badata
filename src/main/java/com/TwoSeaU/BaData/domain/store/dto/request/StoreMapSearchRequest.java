@@ -1,4 +1,4 @@
-package com.TwoSeaU.BaData.domain.store.dto;
+package com.TwoSeaU.BaData.domain.store.dto.request;
 
 import java.time.LocalDateTime;
 import java.util.List;
