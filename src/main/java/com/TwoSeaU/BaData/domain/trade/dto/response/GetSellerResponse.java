@@ -14,7 +14,7 @@ public class GetSellerResponse {
     public static GetSellerResponse from(final User user) {
         return GetSellerResponse.builder()
                 .userId(user.getId())
-                .username(user.getUsername())
+                .username(user.getNickName())
                 .build();
     }
 }
