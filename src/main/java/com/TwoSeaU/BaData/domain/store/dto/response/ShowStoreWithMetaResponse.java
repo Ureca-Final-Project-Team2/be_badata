@@ -1,4 +1,4 @@
-package com.TwoSeaU.BaData.domain.store.dto;
+package com.TwoSeaU.BaData.domain.store.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
