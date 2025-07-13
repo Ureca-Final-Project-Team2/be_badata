@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/v1/auth/token/issue").permitAll()
                                 .requestMatchers("/api/v1/trades/posts").permitAll()
-                                .requestMatchers("/api/v1/trades/posts/{userId}").permitAll()
+                                .requestMatchers("/api/v1/trades/posts/{userId}", "/api/v1/trades/{postId}/post").permitAll()
                                 .requestMatchers("/api/v1/trades/posts/deadline").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores").permitAll()
                                 .anyRequest().authenticated())
