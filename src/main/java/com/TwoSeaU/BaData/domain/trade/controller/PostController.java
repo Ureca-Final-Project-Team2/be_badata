@@ -20,22 +20,23 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<PostsResponse>> getPosts(@RequestParam(required = false) String query) {
+    public ResponseEntity<ApiResponse<PostsResponse>> getPosts(
+            @RequestParam(required = false) String query, @AuthenticationPrincipal User user) {
         if (query != null && !query.isEmpty()) {
-            return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query)));
+            return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query, user)));
         }
 
-        return ResponseEntity.ok().body(ApiResponse.success(postService.findAllPosts()));
+        return ResponseEntity.ok().body(ApiResponse.success(postService.findAllPosts(user)));
     }
 
     @GetMapping("/posts/{userId}")
-    public ResponseEntity<ApiResponse<UserPostsResponse>> getPostsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId)));
+    public ResponseEntity<ApiResponse<UserPostsResponse>> getPostsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId, user)));
     }
 
     @GetMapping("/posts/deadline")
-    public ResponseEntity<ApiResponse<PostsResponse>> getPostsByDeadLine() {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine()));
+    public ResponseEntity<ApiResponse<PostsResponse>> getPostsByDeadLine(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine(user)));
     }
 
     @PostMapping("/posts/gifticon")

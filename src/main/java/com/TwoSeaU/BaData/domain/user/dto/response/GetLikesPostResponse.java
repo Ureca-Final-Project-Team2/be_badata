@@ -20,11 +20,11 @@ public class GetLikesPostResponse {
 	private String partner;
 	private String title;
 	private Integer price;
-	private Long postLikes;
+	private int postLikes;
 	private String postImage;
 	private Boolean isSold;
 
-	public static GetLikesPostResponse from(final Post post, final Long postLikes) {
+	public static GetLikesPostResponse from(final Post post, final int postLikes) {
 		return GetLikesPostResponse.builder()
 			.postId(post.getId())
 			.postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)

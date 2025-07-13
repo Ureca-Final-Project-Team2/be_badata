@@ -19,16 +19,23 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private String postImage;
     private PostCategory postCategory;
+    private String gifticonCategory;
+    private Integer likesCount;
+    private Boolean isLiked;
 
-    public static PostResponse from(final Post post) {
+    public static PostResponse from(final Post post, final Integer likesCount, final Boolean isLiked) {
+
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
+                .partner(post instanceof Gifticon gifticon ? gifticon.getPartner() : null)
                 .price(post.getPrice())
                 .createdAt(post.getCreatedAt())
                 .postImage(post.getPostImage())
                 .postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
-                .partner(post instanceof Gifticon gifticon ? gifticon.getPartner() : null)
+                .gifticonCategory(post instanceof Gifticon gifticon ? gifticon.getCategory().getCategoryName() : null)
+                .likesCount(likesCount)
+                .isLiked(isLiked)
                 .build();
     }
 }

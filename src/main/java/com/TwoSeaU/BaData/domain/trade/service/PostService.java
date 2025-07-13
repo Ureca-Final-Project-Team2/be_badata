@@ -9,33 +9,43 @@ import com.TwoSeaU.BaData.domain.trade.dto.response.UserPostsResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
+import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
-import com.TwoSeaU.BaData.domain.trade.repository.DataRepository;
-import com.TwoSeaU.BaData.domain.trade.repository.GifticonCategoryRepository;
-import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
-import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.*;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
     private final DataRepository dataRepository;
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
+    private final PostLikesRepository postLikesRepository;
 
-    public PostsResponse findAllPosts() {
-        List<PostResponse> allPosts = postRepository.findByIsSoldOrderByCreatedAtDesc(false)
+    public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
+        Optional<Long> optionalUserId = userRepository.findByUsername(userdetails.getUsername())
+                .map(User::getId);
+
+        List<PostResponse> allPosts = posts
                 .stream()
-                .map(PostResponse::from)
+                .map(post -> PostResponse.from(
+                        post,
+                        postLikesRepository.countByPostId(post.getId()),
+                        userdetails == null ? false : postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
+                ))
                 .toList();
 
         return PostsResponse.builder()
@@ -43,44 +53,33 @@ public class PostService {
                 .build();
     }
 
-    public UserPostsResponse getPostsByUserId(Long userId) {
-        List<PostResponse> soldingPosts = postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId)
-                .stream()
-                .map(PostResponse::from)
-                .toList();
 
-        List<PostResponse> soldedPosts = postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, userId)
-                .stream()
-                .map(PostResponse::from)
-                .toList();
+    public PostsResponse findAllPosts(UserDetails userdetails) {
 
-        return UserPostsResponse.builder()
-                .soldingPostsResponse(soldingPosts)
-                .soldedPostsResponse(soldedPosts)
-                .build();
+        return postsToPostResponse(postRepository.findByIsSoldOrderByCreatedAtDesc(false), userdetails);
     }
 
-    public PostsResponse getPostsByDeadLine() {
-        List<PostResponse> allPosts = postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2))
-                .stream()
-                .map(PostResponse::from)
-                .toList();
 
-        return PostsResponse.builder()
-                .postsResponse(allPosts)
-                .build();
+    public UserPostsResponse getPostsByUserId(Long userId, UserDetails userdetails) {
+
+        return UserPostsResponse.of(
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId), userdetails),
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, userId), userdetails));
     }
 
-    public PostsResponse searchPosts(String query) {
-        List<PostResponse> allPosts = postRepository.findByTitleContaining(query)
-                .stream()
-                .map(PostResponse::from)
-                .toList();
 
-        return PostsResponse.builder()
-                .postsResponse(allPosts)
-                .build();
+    public PostsResponse getPostsByDeadLine(UserDetails userdetails) {
+
+        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
+
     }
+
+
+    public PostsResponse searchPosts(String query, UserDetails userdetails) {
+
+        return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
+    }
+
 
     public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, String username) {
 
@@ -109,6 +108,7 @@ public class PostService {
                 .postId(savedGifticon.getId())
                 .build();
     }
+
 
     public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, String username) {
 

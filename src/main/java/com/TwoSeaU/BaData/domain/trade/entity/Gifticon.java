@@ -20,7 +20,7 @@ public class Gifticon extends Post{
 
     private String partner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
