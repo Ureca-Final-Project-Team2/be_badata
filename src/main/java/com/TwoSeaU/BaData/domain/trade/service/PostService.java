@@ -34,8 +34,14 @@ public class PostService {
     private final PostLikesRepository postLikesRepository;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
-        Optional<Long> optionalUserId = userRepository.findByUsername(userdetails.getUsername())
-                .map(User::getId);
+        Optional<Long> optionalUserId;
+
+        if(userdetails != null) {
+            optionalUserId = userRepository.findByUsername(userdetails.getUsername()).map(User::getId);
+        }
+        else {
+            optionalUserId = null;
+        }
 
         List<PostResponse> allPosts = posts
                 .stream()
