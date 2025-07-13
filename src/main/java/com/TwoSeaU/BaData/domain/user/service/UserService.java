@@ -9,6 +9,8 @@ import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.domain.trade.repository.DataRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
@@ -18,9 +20,11 @@ import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllSalesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
@@ -36,6 +40,8 @@ public class UserService {
 	private final PaymentRepository paymentRepository;
 	private final PostRepository postRepository;
 	private final PostLikesRepository postLikesRepository;
+	private final GifticonRepository gifticonRepository;
+	private final DataRepository dataRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -110,5 +116,28 @@ public class UserService {
 			.toList();
 
 		return GetAllLikesPostsResponse.of(getLikesPostResponseList);
+	}
+
+	private <T extends Post> List<GetSaleResponse> toSaleResponses(List<T> posts) {
+		return posts.stream()
+			.map(post -> {
+				int postLikes = postLikesRepository.countByPostId(post.getId());
+				return GetSaleResponse.from(post, postLikes);
+			})
+			.toList();
+	}
+
+	public GetAllSalesResponse getAllSales(String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		List<GetSaleResponse> allInProgressPosts = toSaleResponses(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
+		List<GetSaleResponse> allCompletedPosts = toSaleResponses(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
+		List<GetSaleResponse> gifticonInProgressPosts = toSaleResponses(gifticonRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
+		List<GetSaleResponse> gifticonCompletedPosts = toSaleResponses(gifticonRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
+		List<GetSaleResponse> dataInProgressPosts = toSaleResponses(dataRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
+		List<GetSaleResponse> dataCompletedPosts = toSaleResponses(dataRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
+
+		return GetAllSalesResponse.of(allInProgressPosts, allCompletedPosts, gifticonInProgressPosts, gifticonCompletedPosts, dataInProgressPosts, dataCompletedPosts);
 	}
 }

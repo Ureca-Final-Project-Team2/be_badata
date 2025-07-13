@@ -13,6 +13,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetAllSalesResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 
@@ -52,5 +53,10 @@ public class UserController {
 	@GetMapping("/likes/posts")
 	public ResponseEntity<ApiResponse<GetAllLikesPostsResponse>> getAllLikesPosts(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllLikesPosts(user.getUsername())));
+	}
+
+	@GetMapping("/sales")
+	public ResponseEntity<ApiResponse<GetAllSalesResponse>> getAllSales(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllSales(user.getUsername())));
 	}
 }
