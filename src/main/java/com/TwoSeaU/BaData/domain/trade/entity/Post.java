@@ -45,4 +45,9 @@ public abstract class Post extends BaseEntity {
         this.postImage = postImage;
         this.isSold = isSold;
     }
+
+    public void update(final String comment, final Integer price) {
+        this.comment = comment;
+        this.price = price;
+    }
 }
