@@ -2,10 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.SavePostResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.UserPostsResponse;
+import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
@@ -132,5 +129,35 @@ public class PostService {
         return SavePostResponse.builder()
                 .postId(savedData.getId())
                 .build();
+    }
+
+    public GetPostDetailResponse getPost(Long postId, UserDetails user) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
+
+        int likesCount = postLikesRepository.countByPostId(postId);
+        boolean isLiked = false;
+
+        if(user != null) {
+            User loginUser = userRepository.findByUsername(user.getUsername())
+                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+            isLiked = postLikesRepository.existsByUserIdAndPostId(loginUser.getId(), postId);
+        }
+
+        if (post instanceof Gifticon) {
+            GetGifticonDetailResponse getGifticonDetailResponse =
+                    GetGifticonDetailResponse.from((Gifticon) post, likesCount, isLiked);
+            return GetPostDetailResponse.of(seller, getGifticonDetailResponse);
+        }
+        else if (post instanceof Data) {
+            GetDataDetailResponse getDataDetailResponse =
+                    GetDataDetailResponse.from((Data) post, likesCount, isLiked);
+            return GetPostDetailResponse.of(seller, getDataDetailResponse);
+        }
+        else {
+            throw new GeneralException(TradeException.POST_NOT_FOUND);
+        }
     }
 }

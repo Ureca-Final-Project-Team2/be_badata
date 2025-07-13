@@ -2,9 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.controller;
 
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.SavePostResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.UserPostsResponse;
+import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +35,11 @@ public class PostController {
     @GetMapping("/posts/deadline")
     public ResponseEntity<ApiResponse<PostsResponse>> getPostsByDeadLine(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine(user)));
+    }
+
+    @GetMapping("{postId}/post")
+    public ResponseEntity<ApiResponse<GetPostDetailResponse>> getPostDetail(@PathVariable Long postId, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPost(postId, user)));
     }
 
     @PostMapping("/posts/gifticon")
