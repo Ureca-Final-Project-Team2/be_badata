@@ -194,13 +194,11 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        post.update(
+        post.updateCommentAndPrice(
                 updatePostRequest.getComment(),
                 updatePostRequest.getPrice()
         );
 
-        Post savedPost = postRepository.save(post);
-
-        return SavePostResponse.of(savedPost.getId());
+        return SavePostResponse.of(post.getId());
     }
 }
