@@ -79,12 +79,7 @@ public class RentalService {
 
         validateCancelReservation(loginUser, reservation);
 
-        List<DeviceReservation> deviceReservations = deviceReservationRepository.findByReservationId(reservationId);
-
-        deviceReservations.forEach(deviceReservation -> {
-            deviceReservationRepository.delete(deviceReservation);
-        });
-
+        deviceReservationRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
 
         return reservation.getId();
