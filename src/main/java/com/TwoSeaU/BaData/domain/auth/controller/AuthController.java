@@ -1,7 +1,5 @@
 package com.TwoSeaU.BaData.domain.auth.controller;
 
-
-import com.TwoSeaU.BaData.domain.auth.controller.swagger.AuthApi;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueServiceTokenResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.LoginUserResponse;
 import com.TwoSeaU.BaData.domain.auth.service.AuthService;
@@ -23,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-public class AuthController implements AuthApi {
+public class AuthController {
 
     private final AuthService authService;
     private static final String accessTokenHeader = "accessToken";
@@ -31,7 +29,7 @@ public class AuthController implements AuthApi {
 
     @GetMapping("/token/issue")
     public ResponseEntity<ApiResponse<LoginUserResponse>> getServiceToken(@RequestParam("code") final String code,
-                                                                      @RequestParam("provider") final String provider){
+                                                                          @RequestParam("provider") final String provider){
 
         // 토큰 생성
         IssueTokenUserStatusResponse issueTokenUserStatusResponse = authService.getServiceToken(code,provider);
@@ -65,12 +63,6 @@ public class AuthController implements AuthApi {
                 .header(accessTokenHeader, issueServiceTokenResponse.getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .body(ApiResponse.success(null));
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<ApiResponse<String>> test(){
-
-        return ResponseEntity.ok(ApiResponse.success("LOGIN SUCCESS"));
     }
 
     private ResponseCookie makeResponseCookie(String refreshToken,Long refreshTokenValidationTime){
