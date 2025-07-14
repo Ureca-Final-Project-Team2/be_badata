@@ -23,7 +23,7 @@ public class StoreLikeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long likeStore(final String username,final Long storeId){
+    public Long likeStore(final String username, final Long storeId){
 
         final Store store = storeRepository.findById(storeId).orElseThrow(()->new GeneralException(
                 StoreException.CANT_FIND_STORE));

@@ -71,11 +71,11 @@ public class RentalService {
     }
 
     @Transactional
-    public Long deleteReserveRental(final Long reservationId,final String username){
+    public Long deleteReserveRental(final Long reservationId, final String username){
 
-        final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(UserException.COIN_NOT_FOUND));
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()->new GeneralException(RentalException.CANT_NOT_FIND_RENTAL));
+        final Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()->new GeneralException(RentalException.RESERVATION_NOT_FOUND));
 
         validateCancelReservation(loginUser, reservation);
 
