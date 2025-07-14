@@ -1,8 +1,10 @@
 package com.TwoSeaU.BaData.domain.rental.entity;
 
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
+import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
+import com.TwoSeaU.BaData.global.response.GeneralException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,6 +47,10 @@ public class Reservation extends BaseEntity {
     private ReservationStatus status;
 
     public static Reservation of(final User user, final LocalDateTime rentalStartDate, final LocalDateTime rentalEndDate){
+
+        if (rentalStartDate.isAfter(rentalEndDate)) {
+            throw new GeneralException(RentalException.CANT_END_DATE_BEFORE_THAN_START_DATE);
+        }
 
         return Reservation.builder()
                 .user(user)
