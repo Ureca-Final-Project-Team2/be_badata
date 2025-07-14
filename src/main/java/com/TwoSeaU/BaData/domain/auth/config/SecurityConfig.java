@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,6 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -37,9 +39,10 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/v1/auth/token/issue").permitAll()
                                 .requestMatchers("/api/v1/trades/posts").permitAll()
-                                .requestMatchers("/api/v1/trades/posts/{userId}").permitAll()
+                                .requestMatchers("/api/v1/trades/posts/{userId}", "/api/v1/trades/{postId}/post").permitAll()
                                 .requestMatchers("/api/v1/trades/posts/deadline").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores").permitAll()
+                                .requestMatchers("/api/v1/trades/partners/{categoryId}").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices").permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter,

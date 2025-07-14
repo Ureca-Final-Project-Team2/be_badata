@@ -2,9 +2,9 @@ package com.TwoSeaU.BaData.domain.store.controller;
 
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowDeviceInfoResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreDetailResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreMapResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithMetaResponse;
-import com.TwoSeaU.BaData.domain.store.dto.response.StoreResponse;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.service.StoreService;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,12 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreController {
 
     private final StoreService storeService;
-
-    @GetMapping("/tmp")
-    public List<StoreResponse> getStoreResponse(){
-
-        return storeService.findList();
-    }
 
     @GetMapping("/map")
     public ResponseEntity<ApiResponse<List<ShowStoreMapResponse>>> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest){
@@ -49,6 +44,14 @@ public class StoreController {
             DeviceSearchRequest deviceSearchRequest, @PathVariable("storeId") Long storeId){
 
         return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDeviceResponse(deviceSearchRequest,storeId)));
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<ShowStoreDetailResponse>> getStoreDetailResponse(@PathVariable("storeId") Long storeId,
+                                                                                       @RequestParam("centerLat") Double centerLat,
+                                                                                       @RequestParam("centerLng") Double centerLng){
+
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng)));
     }
 
 

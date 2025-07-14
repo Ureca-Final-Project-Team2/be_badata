@@ -16,6 +16,6 @@ public class SaveDataPostRequest {
     private LocalDateTime deadLine;
     private Integer capacity;
     private Integer price;
-    private String commnent;
+    private String comment;
     private MultipartFile file;
 }

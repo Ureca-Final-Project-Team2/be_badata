@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
@@ -33,8 +34,14 @@ public class PostService {
     private final PostLikesRepository postLikesRepository;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
-        Optional<Long> optionalUserId = userRepository.findByUsername(userdetails.getUsername())
-                .map(User::getId);
+        Optional<Long> optionalUserId;
+
+        if(userdetails != null) {
+            optionalUserId = userRepository.findByUsername(userdetails.getUsername()).map(User::getId);
+        }
+        else {
+            optionalUserId = null;
+        }
 
         List<PostResponse> allPosts = posts
                 .stream()
@@ -159,5 +166,45 @@ public class PostService {
         else {
             throw new GeneralException(TradeException.POST_NOT_FOUND);
         }
+    }
+
+    public DeletePostResponse deletePost(Long postId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (!post.getSeller().getId().equals(user.getId())) {
+            throw new GeneralException(TradeException.POST_ACCESS_DENIED);
+        }
+
+        postRepository.delete(post);
+
+        return DeletePostResponse.of(postId);
+    }
+
+    public SavePostResponse modifyPost(Long postId, UpdatePostRequest updatePostRequest, String username) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsSold()) {
+            throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
+        }
+
+        if (!post.getSeller().getId().equals(user.getId())) {
+            throw new GeneralException(TradeException.POST_ACCESS_DENIED);
+        }
+
+        post.updateCommentAndPrice(
+                updatePostRequest.getComment(),
+                updatePostRequest.getPrice()
+        );
+
+        return SavePostResponse.of(post.getId());
     }
 }
