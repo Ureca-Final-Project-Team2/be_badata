@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class PartnerController {
     private final PartnerService partnerService;
 
-    @GetMapping("/partners/{category}")
-    public ResponseEntity<ApiResponse<GetPartnerResponse>> getPartners(@PathVariable Long category) {
-        return ResponseEntity.ok().body(ApiResponse.success(partnerService.getPartners(category)));
+    @GetMapping("/partners/{categoryId}")
+    public ResponseEntity<ApiResponse<GetPartnerResponse>> getPartners(@PathVariable Long categoryId) {
+        return ResponseEntity.ok().body(ApiResponse.success(partnerService.getPartners(categoryId)));
     }
 }
