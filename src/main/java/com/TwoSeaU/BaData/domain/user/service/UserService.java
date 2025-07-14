@@ -123,6 +123,6 @@ public class UserService {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		return postRepository.getAllSalesByCursor(postCategory, isSold, cursor, 5, user.getId());
+		return postRepository.getAllSalesByCursor(postCategory, isSold, cursor, size, user.getId());
 	}
 }
