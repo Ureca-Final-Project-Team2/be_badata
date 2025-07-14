@@ -76,7 +76,7 @@ public class RentalService {
             Long availableCount = deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(
                     reserveDeviceRequest.getStoreDeviceId(),
                     reserveRentalRequest.getRentalStartDate(),
-                    reserveRentalRequest.getRentalEndDate());
+                    reserveRentalRequest.getRentalEndDate()).orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE_DEVICE));
 
             if(availableCount<reserveDeviceRequest.getCount()){
                 throw new GeneralException(RentalException.ALREADY_RENTAL_EXIST_SAME_PERIOD);

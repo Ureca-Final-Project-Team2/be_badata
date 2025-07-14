@@ -57,7 +57,7 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
     WHERE sd.id = :storeDeviceId
     GROUP BY sd.count
     """)
-    Long findAvailableCountsByStoreDeviceIdAndPeriod(
+    Optional<Long> findAvailableCountsByStoreDeviceIdAndPeriod(
             @Param("storeDeviceId") Long storeDeviceId,
             @Param("rentalStartDate") LocalDateTime rentalStartDate,
             @Param("rentalEndDate") LocalDateTime rentalEndDate
