@@ -29,7 +29,7 @@ public class StoreLikeService {
                 StoreException.CANT_FIND_STORE));
 
         final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(
-                UserException.COIN_NOT_FOUND));
+                UserException.USER_NOT_FOUND));
 
         return storeLikesRepository.findByUserAndStore(loginUser, store)
                 .map(storeLikes -> {
