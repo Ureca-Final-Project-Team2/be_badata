@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
+import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.DataRepository;
@@ -20,7 +21,6 @@ import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllSalesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
@@ -28,6 +28,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 
 import lombok.RequiredArgsConstructor;
@@ -118,26 +119,10 @@ public class UserService {
 		return GetAllLikesPostsResponse.of(getLikesPostResponseList);
 	}
 
-	private <T extends Post> List<GetSaleResponse> toSaleResponses(List<T> posts) {
-		return posts.stream()
-			.map(post -> {
-				int postLikes = postLikesRepository.countByPostId(post.getId());
-				return GetSaleResponse.from(post, postLikes);
-			})
-			.toList();
-	}
-
-	public GetAllSalesResponse getAllSales(String username) {
+	public CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		List<GetSaleResponse> allInProgressPosts = toSaleResponses(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
-		List<GetSaleResponse> allCompletedPosts = toSaleResponses(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
-		List<GetSaleResponse> gifticonInProgressPosts = toSaleResponses(gifticonRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
-		List<GetSaleResponse> gifticonCompletedPosts = toSaleResponses(gifticonRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
-		List<GetSaleResponse> dataInProgressPosts = toSaleResponses(dataRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, user.getId()));
-		List<GetSaleResponse> dataCompletedPosts = toSaleResponses(dataRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, user.getId()));
-
-		return GetAllSalesResponse.of(allInProgressPosts, allCompletedPosts, gifticonInProgressPosts, gifticonCompletedPosts, dataInProgressPosts, dataCompletedPosts);
+		return postRepository.getAllSalesByCursor(postCategory, isSold, cursor, 5, user.getId());
 	}
 }
