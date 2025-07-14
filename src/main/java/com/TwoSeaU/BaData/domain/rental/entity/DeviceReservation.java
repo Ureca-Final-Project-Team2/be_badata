@@ -38,7 +38,7 @@ public class DeviceReservation extends BaseEntity {
     @Column(nullable = false)
     private Integer reservationCount;
 
-    public DeviceReservation of(final Reservation reservation, final StoreDevice storeDevice,final Integer reservationCount){
+    public static DeviceReservation of(final Reservation reservation, final StoreDevice storeDevice,final Integer reservationCount){
 
         return DeviceReservation
                 .builder()
