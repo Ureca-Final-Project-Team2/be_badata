@@ -5,15 +5,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -52,5 +56,16 @@ public class UserController {
 	@GetMapping("/likes/posts")
 	public ResponseEntity<ApiResponse<GetAllLikesPostsResponse>> getAllLikesPosts(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllLikesPosts(user.getUsername())));
+	}
+
+	@GetMapping("/sales")
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetSaleResponse>>> getAllSalesByCursor(
+		@RequestParam(required = false) PostCategory postCategory,
+		@RequestParam(defaultValue = "false") Boolean isSold,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user
+	) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllSalesByCursor(postCategory, isSold, cursor, size, user.getUsername())));
 	}
 }

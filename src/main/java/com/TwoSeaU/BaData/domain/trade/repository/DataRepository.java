@@ -12,4 +12,5 @@ public interface DataRepository extends JpaRepository<Data, Long> {
     List<Data> findBySellerId(Long sellerId);
     List<Data> findByDeadLineBefore(LocalDateTime time);
     List<Data> findByTitleContaining(String query);
+    List<Data> findByIsSoldAndSellerIdOrderByCreatedAtDesc(Boolean isSold, Long sellerId);
 }
