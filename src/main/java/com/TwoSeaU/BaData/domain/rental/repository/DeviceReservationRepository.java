@@ -2,6 +2,8 @@ package com.TwoSeaU.BaData.domain.rental.repository;
 
 import com.TwoSeaU.BaData.domain.rental.dto.projection.AvailableDeviceProjection;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
+import com.TwoSeaU.BaData.domain.store.entity.Device;
+import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,5 +64,7 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
             @Param("rentalStartDate") LocalDateTime rentalStartDate,
             @Param("rentalEndDate") LocalDateTime rentalEndDate
     );
+
+    List<DeviceReservation> findByReservationId(final Long reservationId);
 
 }

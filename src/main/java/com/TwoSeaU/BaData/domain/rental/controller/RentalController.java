@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,13 @@ public class RentalController {
         return ResponseEntity.ok(ApiResponse.success(rentalService.reserveRental(reserveRentalRequest,
                 user.getUsername())));
 
+    }
+
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<ApiResponse<Long>> deleteReserveRental(@PathVariable("reservationId") Long reservationId,
+                                                                 @AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok(ApiResponse.success(rentalService.deleteReserveRental(reservationId,user.getUsername())));
     }
 
 }
