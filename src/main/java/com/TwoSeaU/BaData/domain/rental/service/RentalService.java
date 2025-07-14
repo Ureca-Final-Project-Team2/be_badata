@@ -4,6 +4,7 @@ import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveRentalRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservationDeviceInfoResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
+import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
@@ -67,6 +68,35 @@ public class RentalService {
         });
 
         return reservation.getId();
+    }
+
+    @Transactional
+    public Long deleteReserveRental(final Long reservationId, final String username){
+
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(UserException.USER_NOT_FOUND));
+
+        final Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()->new GeneralException(RentalException.RESERVATION_NOT_FOUND));
+
+        validateCancelReservation(loginUser, reservation);
+
+        deviceReservationRepository.deleteByReservationId(reservationId);
+        reservationRepository.delete(reservation);
+
+        return reservation.getId();
+    }
+
+    private void validateCancelReservation(final User loginUser, final Reservation reservation) {
+
+        if(!reservation.getUser().getId().equals(loginUser.getId())){
+
+            throw new GeneralException(RentalException.CANT_CANCEL_RESERVED_USERS);
+        }
+
+        if(reservation.getStatus().equals(ReservationStatus.BURROWING) ||
+                reservation.getStatus().equals(ReservationStatus.COMPLETE)){
+
+            throw new GeneralException(RentalException.CANT_CANCEL_ALREADY_RENTAL);
+        }
     }
 
     private void validateRentalCondition(final ReserveRentalRequest reserveRentalRequest){

@@ -2,11 +2,14 @@ package com.TwoSeaU.BaData.domain.rental.repository;
 
 import com.TwoSeaU.BaData.domain.rental.dto.projection.AvailableDeviceProjection;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
+import com.TwoSeaU.BaData.domain.store.entity.Device;
+import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -62,5 +65,9 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
             @Param("rentalStartDate") LocalDateTime rentalStartDate,
             @Param("rentalEndDate") LocalDateTime rentalEndDate
     );
+
+    @Modifying
+    @Query("DELETE FROM DeviceReservation dr WHERE dr.reservation.id = :reservationId")
+    void deleteByReservationId(@Param("reservationId") Long reservationId);
 
 }
