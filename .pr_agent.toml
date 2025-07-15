@@ -1,0 +1,7 @@
+[config]
+response_language = "ko-KR"
+model = "gpt-4-turbo-2024-04-09"
+fallback_models = ["gpt-4", "gpt-3.5-turbo"]
+use_repo_settings_file = true
+patch_extension_skip_types = [".md", ".txt"]
+ignore_pr_title = ["^\\[Auto\\]", "^Auto", "^\\[Skip\\]", "^Skip"]

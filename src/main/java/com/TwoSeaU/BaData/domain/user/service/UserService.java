@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
+import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.domain.trade.repository.DataRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
@@ -21,9 +24,11 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 
 import lombok.RequiredArgsConstructor;
@@ -110,5 +115,12 @@ public class UserService {
 			.toList();
 
 		return GetAllLikesPostsResponse.of(getLikesPostResponseList);
+	}
+
+	public CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return postRepository.getAllSalesByCursor(postCategory, isSold, cursor, size, user.getId());
 	}
 }

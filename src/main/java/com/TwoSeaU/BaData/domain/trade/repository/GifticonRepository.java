@@ -12,4 +12,5 @@ public interface GifticonRepository extends JpaRepository<Gifticon,Long> {
     List<Gifticon> findBySellerId(Long sellerId);
     List<Gifticon> findByDeadLineBefore(LocalDateTime time);
     List<Gifticon> findByTitleContaining(String query);
+    List<Gifticon> findByIsSoldAndSellerIdOrderByCreatedAtDesc(boolean isSold, Long sellerId);
 }
