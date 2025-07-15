@@ -41,8 +41,6 @@ public class UserService {
 	private final PaymentRepository paymentRepository;
 	private final PostRepository postRepository;
 	private final PostLikesRepository postLikesRepository;
-	private final GifticonRepository gifticonRepository;
-	private final DataRepository dataRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
