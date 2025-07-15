@@ -42,6 +42,10 @@ public class RentalController {
     public ResponseEntity<ApiResponse<Long>> reserveRental(@RequestBody @Valid ReserveRentalRequest reserveRentalRequest,
                                                            @AuthenticationPrincipal User user){
 
+        if(user == null){
+            System.out.println("오류 발생입니다");
+        }
+
         return ResponseEntity.ok(ApiResponse.success(rentalService.reserveRental(reserveRentalRequest,
                 user.getUsername())));
 
