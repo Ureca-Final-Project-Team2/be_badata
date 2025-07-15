@@ -20,7 +20,7 @@ public class PaymentController {
 
     @PostMapping("/create/{postId}")
     public ResponseEntity<ApiResponse<CreatePaymentResponse>> createOrder(@PathVariable Long postId, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(paymentService.processPaymentBefore(postId, user.getUsername())));
+        return ResponseEntity.ok().body(ApiResponse.success(paymentService.createOrder(postId, user.getUsername())));
     }
 
     @PostMapping("/order/payment/{impUid}/{postId}")

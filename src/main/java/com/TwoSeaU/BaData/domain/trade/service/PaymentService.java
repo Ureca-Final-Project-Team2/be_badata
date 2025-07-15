@@ -33,7 +33,7 @@ public class PaymentService {
     private final PostRepository postRepository;
     private final IamportClient iamportClient;
 
-    public CreatePaymentResponse processPaymentBefore(Long postId, String username) {
+    public CreatePaymentResponse createOrder(Long postId, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
@@ -50,7 +50,7 @@ public class PaymentService {
         return CreatePaymentResponse.of(payment.getMerchantUid());
     }
 
-    public GetValidatePaymentResponse processPaymentDone(String impUid, Long postId, String username) throws IamportResponseException, IOException {
+    public GetValidatePaymentResponse validateIamport(String impUid, Long postId, String username) throws IamportResponseException, IOException {
         if(!iamportClient.paymentByImpUid(impUid).getResponse().getStatus().equals("paid")) {
             throw new GeneralException(TradeException.PAYMENT_FAILED);
         }
