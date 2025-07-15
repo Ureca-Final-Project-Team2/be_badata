@@ -1,4 +1,4 @@
-package com.TwoSeaU.BaData.domain.sos.dto;
+package com.TwoSeaU.BaData.domain.sos.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,12 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SaveSosResponse {
+public class RespondSosResponse {
 	private Long sosId;
+	private Boolean isSuccess;
 
-	public static SaveSosResponse of(Long sosId) {
-		return SaveSosResponse.builder()
+	public static RespondSosResponse of(final Long sosId, final Boolean isSuccess) {
+		return RespondSosResponse.builder()
 			.sosId(sosId)
+			.isSuccess(isSuccess)
 			.build();
 	}
 }
