@@ -25,6 +25,6 @@ public class PaymentController {
 
     @PostMapping("/order/payment/{impUid}/{postId}")
     public ResponseEntity<ApiResponse<GetValidatePaymentResponse>> validateIamport(@PathVariable String impUid, @PathVariable Long postId, @AuthenticationPrincipal User user) throws IamportResponseException, IOException {
-        return ResponseEntity.ok().body(ApiResponse.success(paymentService.processPaymentDone(impUid, postId, user.getUsername())));
+        return ResponseEntity.ok().body(ApiResponse.success(paymentService.validateIamport(impUid, postId, user.getUsername())));
     }
 }
