@@ -4,14 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
-import com.TwoSeaU.BaData.domain.trade.repository.DataRepository;
-import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
@@ -25,6 +24,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
@@ -41,6 +41,7 @@ public class UserService {
 	private final PaymentRepository paymentRepository;
 	private final PostRepository postRepository;
 	private final PostLikesRepository postLikesRepository;
+	private final SosRepository sosRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -122,5 +123,12 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return postRepository.getAllSalesByCursor(postCategory, isSold, cursor, size, user.getId());
+	}
+
+	public CursorPageResponse<GetSosResponse> getAllSosByCursor(Long cursor, int size, String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return sosRepository.getAllSosResponse(cursor, size, user.getId());
 	}
 }
