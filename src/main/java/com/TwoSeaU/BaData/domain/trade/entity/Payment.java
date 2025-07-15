@@ -31,13 +31,28 @@ public class Payment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    private BigDecimal merchantUid;
+    private String merchantUid;
 
     @Enumerated(EnumType.STRING)
     private PayMethod payMethod;
 
-    private double amount;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    public static Payment of(User user, Post post, String merchantUid, PayMethod payMethod, BigDecimal amount) {
+        return Payment.builder()
+                .user(user)
+                .post(post)
+                .merchantUid(merchantUid)
+                .payMethod(payMethod)
+                .amount(amount)
+                .paymentStatus(PaymentStatus.PENDING)
+                .build();
+    }
+
+    public void updatePaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }

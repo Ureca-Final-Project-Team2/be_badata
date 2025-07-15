@@ -49,6 +49,9 @@ public class ServiceTokenProvider implements InitializingBean {
 
     // Authentication 객체를 통하여 토큰 생성
     public IssueServiceTokenResponse createToken(Authentication authentication) {
+
+        log.info("timelog: {}",this.refreshTokenValidationTime);
+
         String authorities = authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
