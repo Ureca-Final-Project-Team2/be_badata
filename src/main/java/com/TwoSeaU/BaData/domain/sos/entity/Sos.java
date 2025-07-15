@@ -1,7 +1,11 @@
 package com.TwoSeaU.BaData.domain.sos.entity;
 
+import java.util.Objects;
+
+import com.TwoSeaU.BaData.domain.sos.exception.SosException;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
+import com.TwoSeaU.BaData.global.response.GeneralException;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,5 +45,18 @@ public class Sos extends BaseEntity {
 		return Sos.builder()
 			.requester(requester)
 			.build();
+	}
+
+	public Boolean respond(final User responder) {
+		if(this.responder != null) {
+			throw new GeneralException(SosException.ALREADY_RESPONDER_EXIST);
+		}
+
+		if(Objects.equals(this.requester.getId(), responder.getId())) {
+			throw new GeneralException(SosException.CANNOT_RESPOND_TO_OWN_SOS);
+		}
+
+		this.responder = responder;
+		return true;
 	}
 }
