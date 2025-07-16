@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MobileCarrier {
-    LG, SKT, SK;
+    UPLUS, SKT, KT;
 }
