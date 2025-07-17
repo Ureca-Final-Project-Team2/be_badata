@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.rental.entity;
 
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import com.TwoSeaU.BaData.global.response.GeneralException;
@@ -37,6 +38,10 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
+
     @Column(nullable = false)
     private LocalDateTime rentalStartDate;
 
@@ -46,7 +51,7 @@ public class Reservation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    public static Reservation of(final User user, final LocalDateTime rentalStartDate, final LocalDateTime rentalEndDate){
+    public static Reservation of(final User user, final Store store, final LocalDateTime rentalStartDate, final LocalDateTime rentalEndDate){
 
         if (rentalStartDate.isAfter(rentalEndDate)) {
             throw new GeneralException(RentalException.CANT_END_DATE_BEFORE_THAN_START_DATE);
@@ -57,6 +62,7 @@ public class Reservation extends BaseEntity {
                 .rentalStartDate(rentalStartDate)
                 .rentalEndDate(rentalEndDate)
                 .status(ReservationStatus.PENDING)
+                .store(store)
                 .build();
     }
 

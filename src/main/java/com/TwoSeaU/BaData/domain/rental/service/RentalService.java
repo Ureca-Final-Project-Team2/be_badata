@@ -9,6 +9,7 @@ import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.store.entity.Device;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
 import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
@@ -55,7 +56,12 @@ public class RentalService {
         final User user = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(
                 UserException.COIN_NOT_FOUND));
 
-        final Reservation reservation = Reservation.of(user,reserveRentalRequest.getRentalStartDate(),reserveRentalRequest.getRentalEndDate());
+        final Store store = storeRepository.findById(reserveRentalRequest.getStoreId()).orElseThrow(()-> new GeneralException(
+                StoreException.CANT_FIND_STORE));
+
+        final Reservation reservation = Reservation.of(user,store,reserveRentalRequest.getRentalStartDate(),
+                reserveRentalRequest.getRentalEndDate());
+
         reservationRepository.save(reservation);
 
         reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
@@ -102,6 +108,13 @@ public class RentalService {
     private void validateRentalCondition(final ReserveRentalRequest reserveRentalRequest){
 
         reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
+
+            final StoreDevice storeDevice = storeDeviceRepository.findById(reserveDeviceRequest.getStoreDeviceId())
+                    .orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE_DEVICE));
+
+            if(!storeDevice.getStore().getId().equals(reserveRentalRequest.getStoreId())){
+                throw new GeneralException(RentalException.DONT_MATCH_STORE_DEVICE_STORE);
+            }
 
             Long availableCount = deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(
                     reserveDeviceRequest.getStoreDeviceId(),
