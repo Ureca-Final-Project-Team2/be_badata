@@ -25,7 +25,9 @@ public enum TradeException implements BaseException {
     EXPIRED_POST_MODIFY(HttpStatus.BAD_REQUEST, 3013, "마감 기한이 지난 게시글은 수정할 수 없습니다."),
     NOT_LIKED_POST(HttpStatus.BAD_REQUEST, 3014, "찜한 적 없는 게시글입니다."),
     NOT_FOUND_GIFTICON_CATEGORY(HttpStatus.NOT_FOUND, 3015, "찾을 수 없는 카테고리입니다."),
-    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3016, "결제 정보를 찾을 수 없습니다.");
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3016, "결제 정보를 찾을 수 없습니다."),
+    ELA_IMAGE_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3017, "ELA 이미지 처리에 실패했습니다."),
+    SUSPICIOUS_IMAGE_DETECTED(HttpStatus.BAD_REQUEST, 3018, "조작이 감지되었습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
