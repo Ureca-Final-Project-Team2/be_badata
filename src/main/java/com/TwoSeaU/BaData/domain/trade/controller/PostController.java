@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,13 +45,17 @@ public class PostController {
     }
 
     @PostMapping("/posts/gifticon")
-    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@RequestBody SaveGifticonPostRequest saveGifticonPostRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
+    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@RequestPart(value = "dto") SaveGifticonPostRequest saveGifticonPostRequest,
+                                                                            @RequestPart(value = "file") MultipartFile file,
+                                                                            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, file, user.getUsername())));
     }
 
     @PostMapping("/posts/data")
-    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@RequestBody SaveDataPostRequest saveDataPostRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, user.getUsername())));
+    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@RequestPart(value = "dto") SaveDataPostRequest saveDataPostRequest,
+                                                                        @RequestPart(value = "file") MultipartFile file,
+                                                                        @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, file, user.getUsername())));
     }
 
     @DeleteMapping("/{postId}/post")

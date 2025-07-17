@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
+import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
@@ -18,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
+    private final ELAService elaService;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
         Optional<Long> optionalUserId;
@@ -85,12 +88,19 @@ public class PostService {
     }
 
 
-    public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, String username) {
+    public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, MultipartFile file, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY));
+
+
+        ELAResult result = elaService.analyzeImage(file);
+
+        if (result.isManipulated()) {
+            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
+        }
 
         Gifticon gifticon = new Gifticon(
                 user,
@@ -114,10 +124,16 @@ public class PostService {
     }
 
 
-    public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, String username) {
+    public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, MultipartFile file, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
+
+        if (result.isManipulated()) {
+            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
+        }
 
         Data data = new Data(
                 user,
