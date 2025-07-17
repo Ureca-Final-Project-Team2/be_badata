@@ -4,8 +4,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -30,13 +29,13 @@ public abstract class Post extends BaseEntity {
 
     private Integer price;
 
-    private LocalDateTime deadLine;
+    private LocalDate deadLine;
 
     private String postImage;
 
     private Boolean isSold;
 
-    public Post(User seller, String title, String comment, Integer price, LocalDateTime deadLine, String postImage, Boolean isSold) {
+    public Post(User seller, String title, String comment, Integer price, LocalDate deadLine, String postImage, Boolean isSold) {
         this.seller = seller;
         this.title = title;
         this.comment = comment;

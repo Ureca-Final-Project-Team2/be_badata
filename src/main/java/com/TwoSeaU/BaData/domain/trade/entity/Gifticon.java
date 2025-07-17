@@ -3,7 +3,7 @@ package com.TwoSeaU.BaData.domain.trade.entity;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,7 +25,7 @@ public class Gifticon extends Post{
     private GifticonCategory category;
 
     public Gifticon(User user, String title, String comment, Integer price,
-                LocalDateTime deadLine, String postImage, Boolean isSold,
+                    LocalDate deadLine, String postImage, Boolean isSold,
                     LocalDateTime issueDate, String couponNumber, String partner, GifticonCategory category) {
         super(user, title, comment, price, deadLine, postImage, isSold);
         this.issueDate = issueDate;

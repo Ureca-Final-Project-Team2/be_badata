@@ -2,7 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.dto.response;
 
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import lombok.*;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +14,7 @@ public class GetGifticonDetailResponse {
     private String title;
     private String comment;
     private Integer price;
-    private LocalDateTime deadLine;
+    private LocalDate deadLine;
     private String postImage;
     private Boolean isSold;
     private LocalDateTime createdAt;
