@@ -21,11 +21,13 @@ public class GetSosResponse {
 	private Boolean isSuccess;
 
 	public static GetSosResponse from(final Sos sos) {
+		boolean hasResponder = sos.getResponder() != null;
+
 		return GetSosResponse.builder()
 			.sosId(sos.getId())
-			.responderId(sos.getResponder() != null ? sos.getResponder().getId() : null)
+			.responderId(hasResponder ? sos.getResponder().getId() : null)
 			.createdAt(sos.getCreatedAt())
-			.isSuccess(sos.getResponder() != null)
+			.isSuccess(hasResponder)
 			.build();
 	}
 }
