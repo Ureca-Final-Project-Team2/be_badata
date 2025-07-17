@@ -23,5 +23,7 @@ public class ReserveRentalRequest {
     @NotNull(message = "대여 종료일은 필수입니다.")
     private LocalDateTime rentalEndDate;
 
+    @NotNull(message = "가맹점 아이디를 입력해 주세요")
+    private Long storeId;
 
 }
