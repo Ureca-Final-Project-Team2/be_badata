@@ -16,6 +16,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -67,5 +68,13 @@ public class UserController {
 		@AuthenticationPrincipal User user
 	) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllSalesByCursor(postCategory, isSold, cursor, size, user.getUsername())));
+	}
+
+	@GetMapping("/sos")
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetSosResponse>>> getAllSosByCursor(
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllSosByCursor(cursor, size, user.getUsername())));
 	}
 }
