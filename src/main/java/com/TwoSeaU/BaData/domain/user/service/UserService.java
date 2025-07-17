@@ -20,13 +20,16 @@ import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.enums.FollowType;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.UserLikesRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
@@ -42,6 +45,7 @@ public class UserService {
 	private final PostRepository postRepository;
 	private final PostLikesRepository postLikesRepository;
 	private final SosRepository sosRepository;
+	private final UserLikesRepository userLikesRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -130,5 +134,17 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return sosRepository.getAllSosResponse(cursor, size, user.getId());
+	}
+
+	public CursorPageResponse<GetFollowsResponse> getFollowsResponse(FollowType followType, Long cursor, int size, String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		if(followType == FollowType.FOLLOWERS) {
+			return userLikesRepository.getAllFollowersResponse(cursor, size, user.getId());
+		}
+		else {
+			return userLikesRepository.getAllFollowingsResponse(cursor, size, user.getId());
+		}
 	}
 }
