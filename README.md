@@ -1,4 +1,4 @@
-# 📡 BADATA: BADATA 소개 
+# 📡 BADATA: 백엔드 소개 
 
 ## 🛠 기술적 특징
 
