@@ -129,7 +129,7 @@ public class PostService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
+        ELAResult result = elaService.analyzeImage(file);
 
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
