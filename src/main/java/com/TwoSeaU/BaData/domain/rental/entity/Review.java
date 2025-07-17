@@ -32,10 +32,6 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private Reservation reservation;
-
     @Column(nullable = false)
     private String content;
 
@@ -43,12 +39,11 @@ public class Review extends BaseEntity {
 
     private String imageUrl;
 
-    public static Review of(final Store store, final Reservation reservation, final String content, final Integer rating,
+    public static Review of(final Store store, final String content, final Integer rating,
                             final String imageUrl){
 
         return Review.builder()
                 .store(store)
-                .reservation(reservation)
                 .content(content)
                 .rating(rating)
                 .imageUrl(imageUrl)
