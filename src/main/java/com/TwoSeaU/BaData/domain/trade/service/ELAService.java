@@ -43,21 +43,28 @@ public class ELAService {
 
     private BufferedImage recompressJPEG(BufferedImage image) throws IOException {
         File tempFile = File.createTempFile("ela_temp", ".jpg");
-        tempFile.deleteOnExit();
 
-        ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-        ImageWriteParam param = writer.getDefaultWriteParam();
-        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        param.setCompressionQuality((float) QUALITY_FACTOR);
+        try {
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality((float) QUALITY_FACTOR);
 
-        // 이미지 저장
-        try (ImageOutputStream ios = ImageIO.createImageOutputStream(tempFile)) {
-            writer.setOutput(ios);
-            writer.write(null, new javax.imageio.IIOImage(image, null, null), param);
+            try (ImageOutputStream ios = ImageIO.createImageOutputStream(tempFile)) {
+                writer.setOutput(ios);
+                writer.write(null, new javax.imageio.IIOImage(image, null, null), param);
+            }
+
+            writer.dispose();
+
+            return ImageIO.read(tempFile);
         }
-        writer.dispose();
-
-        return ImageIO.read(tempFile);
+        catch (Exception e) {
+            throw new GeneralException(TradeException.ELA_IMAGE_PROCESSING_FAILED);
+        }
+        finally {
+            tempFile.deleteOnExit();
+        }
     }
 
     private BufferedImage calculateDifference(BufferedImage original, BufferedImage recompressed) {
