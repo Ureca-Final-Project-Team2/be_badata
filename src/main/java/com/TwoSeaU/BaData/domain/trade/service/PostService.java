@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
+import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
@@ -32,6 +33,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
+    private final ELAService elaService;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
         Optional<Long> optionalUserId;
@@ -92,6 +94,12 @@ public class PostService {
         GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY));
 
+        ELAResult result = elaService.analyzeImage(saveGifticonPostRequest.getFile());
+
+        if (result.isManipulated()) {
+            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
+        }
+
         Gifticon gifticon = new Gifticon(
                 user,
                 saveGifticonPostRequest.getTitle(),
@@ -118,6 +126,12 @@ public class PostService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
+
+        if (result.isManipulated()) {
+            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
+        }
 
         Data data = new Data(
                 user,

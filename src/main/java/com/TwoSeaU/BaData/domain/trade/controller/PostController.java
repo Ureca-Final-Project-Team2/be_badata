@@ -7,6 +7,7 @@ import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -43,13 +44,15 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.getPost(postId, user)));
     }
 
-    @PostMapping("/posts/gifticon")
-    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@RequestBody SaveGifticonPostRequest saveGifticonPostRequest, @AuthenticationPrincipal User user) {
+    @PostMapping(path = "/posts/gifticon", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@ModelAttribute SaveGifticonPostRequest saveGifticonPostRequest,
+                                                                            @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
     }
 
-    @PostMapping("/posts/data")
-    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@RequestBody SaveDataPostRequest saveDataPostRequest, @AuthenticationPrincipal User user) {
+    @PostMapping(path = "/posts/data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@ModelAttribute SaveDataPostRequest saveDataPostRequest,
+                                                                        @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, user.getUsername())));
     }
 
