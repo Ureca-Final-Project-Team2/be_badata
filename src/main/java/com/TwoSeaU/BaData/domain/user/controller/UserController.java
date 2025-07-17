@@ -86,6 +86,6 @@ public class UserController {
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getFollowsResponse(followType, cursor, size, user.getUsername())));
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getFollowsResponseByCursor(followType, cursor, size, user.getUsername())));
 	}
 }

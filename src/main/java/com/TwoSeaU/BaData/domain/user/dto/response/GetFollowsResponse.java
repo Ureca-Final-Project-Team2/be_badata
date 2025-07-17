@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 public class GetFollowsResponse {
 	private Long id;
 	private Long userId;
-	private String username;
+	private String nickname;
 	private String profileImageUrl;
 
 	public static GetFollowsResponse from(final User user, final Long userLikesId) {
 		return GetFollowsResponse.builder()
 			.id(userLikesId)
 			.userId(user.getId())
-			.username(user.getNickName())
+			.nickname(user.getNickName())
 			.profileImageUrl(user.getProfileImageUrl())
 			.build();
 	}

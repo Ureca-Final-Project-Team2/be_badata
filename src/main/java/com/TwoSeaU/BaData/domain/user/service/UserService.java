@@ -136,7 +136,7 @@ public class UserService {
 		return sosRepository.getAllSosResponse(cursor, size, user.getId());
 	}
 
-	public CursorPageResponse<GetFollowsResponse> getFollowsResponse(FollowType followType, Long cursor, int size, String username) {
+	public CursorPageResponse<GetFollowsResponse> getFollowsResponseByCursor(final FollowType followType, final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 

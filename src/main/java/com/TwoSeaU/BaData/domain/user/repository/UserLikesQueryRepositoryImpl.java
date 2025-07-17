@@ -21,10 +21,10 @@ import lombok.RequiredArgsConstructor;
 public class UserLikesQueryRepositoryImpl implements UserLikesQueryRepository{
 
 	private final JPAQueryFactory queryFactory;
-	private final UserRepository userRepository;
 
-	@Override
-	public CursorPageResponse<GetFollowsResponse> getAllFollowersResponse(Long cursor, int size, Long userId) {
+	private CursorPageResponse<GetFollowsResponse> getFollowsResponseInternal(
+		final Long cursor, final int size, final Long userId, final Boolean isFollowers) {
+
 		QUserLikes quserLikes = QUserLikes.userLikes;
 		BooleanBuilder where = new BooleanBuilder();
 
@@ -32,9 +32,14 @@ public class UserLikesQueryRepositoryImpl implements UserLikesQueryRepository{
 			where.and(quserLikes.id.lt(cursor));
 		}
 
-		where.and(quserLikes.followingUser.id.eq(userId));
+		if(isFollowers) {
+			where.and(quserLikes.followingUser.id.eq(userId));
+		} else {
+			where.and(quserLikes.followerUser.id.eq(userId));
+		}
 
 		List<UserLikes> qUserLikesList = queryFactory.selectFrom(quserLikes)
+			.leftJoin(isFollowers ? quserLikes.followerUser : quserLikes.followingUser).fetchJoin()
 			.where(where)
 			.orderBy(quserLikes.id.desc())
 			.limit(size + 1)
@@ -43,49 +48,30 @@ public class UserLikesQueryRepositoryImpl implements UserLikesQueryRepository{
 		boolean hasNext = qUserLikesList.size() > size;
 		if(hasNext) qUserLikesList.remove(size);
 
-		List<GetFollowsResponse> getFollowersResponseList = qUserLikesList.stream()
+		List<GetFollowsResponse> responseList = qUserLikesList.stream()
 			.map(userLikes -> {
-				User follower = userRepository.findById(userLikes.getFollowerUser().getId())
-					.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-				return GetFollowsResponse.from(follower, userLikes.getId());
+				User user = isFollowers ? userLikes.getFollowerUser() : userLikes.getFollowingUser();
+				if (user == null) {
+					throw new GeneralException(UserException.USER_NOT_FOUND);
+				}
+				return GetFollowsResponse.from(user, userLikes.getId());
 			})
 			.toList();
 
-		Long nextCursor = getFollowersResponseList.isEmpty() ? null : qUserLikesList.get(qUserLikesList.size() - 1).getId();
+		Long nextCursor = responseList.isEmpty() ? null : qUserLikesList.get(qUserLikesList.size() - 1).getId();
 
-		return CursorPageResponse.of(getFollowersResponseList, nextCursor, hasNext);
+		return CursorPageResponse.of(responseList, nextCursor, hasNext);
 	}
 
 	@Override
-	public CursorPageResponse<GetFollowsResponse> getAllFollowingsResponse(Long cursor, int size, Long userId) {
-		QUserLikes quserLikes = QUserLikes.userLikes;
-		BooleanBuilder where = new BooleanBuilder();
+	public CursorPageResponse<GetFollowsResponse> getAllFollowersResponse(final Long cursor, final int size, final Long userId) {
 
-		if(cursor != null) {
-			where.and(quserLikes.id.lt(cursor));
-		}
+		return getFollowsResponseInternal(cursor, size, userId, true);
+	}
 
-		where.and(quserLikes.followerUser.id.eq(userId));
+	@Override
+	public CursorPageResponse<GetFollowsResponse> getAllFollowingsResponse(final Long cursor, final int size, final Long userId) {
 
-		List<UserLikes> qUserLikesList = queryFactory.selectFrom(quserLikes)
-			.where(where)
-			.orderBy(quserLikes.id.desc())
-			.limit(size + 1)
-			.fetch();
-
-		boolean hasNext = qUserLikesList.size() > size;
-		if(hasNext) qUserLikesList.remove(size);
-
-		List<GetFollowsResponse> getFollowingsResponseList = qUserLikesList.stream()
-			.map(userLikes -> {
-				User following = userRepository.findById(userLikes.getFollowingUser().getId())
-					.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-				return GetFollowsResponse.from(following, userLikes.getId());
-			})
-			.toList();
-
-		Long nextCursor = getFollowingsResponseList.isEmpty() ? null : qUserLikesList.get(qUserLikesList.size() - 1).getId();
-
-		return CursorPageResponse.of(getFollowingsResponseList, nextCursor, hasNext);
+		return getFollowsResponseInternal(cursor, size, userId, false);
 	}
 }
