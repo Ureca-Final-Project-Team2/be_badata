@@ -19,7 +19,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -88,15 +87,14 @@ public class PostService {
     }
 
 
-    public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, MultipartFile file, String username) {
+    public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY));
 
-
-        ELAResult result = elaService.analyzeImage(file);
+        ELAResult result = elaService.analyzeImage(saveGifticonPostRequest.getFile());
 
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
@@ -124,12 +122,12 @@ public class PostService {
     }
 
 
-    public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, MultipartFile file, String username) {
+    public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        ELAResult result = elaService.analyzeImage(file);
+        ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
 
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
