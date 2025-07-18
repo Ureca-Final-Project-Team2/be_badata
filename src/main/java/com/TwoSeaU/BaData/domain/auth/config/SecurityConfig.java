@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/trades/posts/{userId}", "/api/v1/trades/{postId}/post").permitAll()
                                 .requestMatchers("/api/v1/trades/posts/deadline").permitAll()
                                 .requestMatchers("/api/v1/trades/partners/{categoryId}").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies"
+                                ,"/api/v1/{storeId}/reviews").permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter,

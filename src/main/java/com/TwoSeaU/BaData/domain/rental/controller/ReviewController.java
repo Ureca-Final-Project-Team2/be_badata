@@ -37,4 +37,11 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(reviewService.createReview(createReviewRequest,user.getUsername())));
     }
 
+    @GetMapping("/api/v1/{storeId}/reviews")
+    public ResponseEntity<ApiResponse<ShowReviewWithMetaResponse>> getReviewsResponse(final Long storeId, final
+    Pageable pageable){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewsResponse(storeId, pageable)));
+    }
+
 }

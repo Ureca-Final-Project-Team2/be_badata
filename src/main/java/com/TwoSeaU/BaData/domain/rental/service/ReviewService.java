@@ -1,6 +1,8 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewResponse;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.QuickReply;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
@@ -15,6 +17,8 @@ import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,5 +66,13 @@ public class ReviewService {
         if(alreadyExistReview){
             throw new GeneralException(RentalException.CANT_WRITE_REVIEW_IN_SAME_RESERVATION);
         }
+    }
+
+    public ShowReviewWithMetaResponse getReviewsResponse(final Long storeId, final Pageable pageable){
+
+        Slice<Review> reviewSlice = reviewRepository.getReviewSlice(storeId, pageable);
+
+        return ShowReviewWithMetaResponse.of(reviewSlice.getContent().stream()
+                .map(ShowReviewResponse::from).toList(), reviewSlice.hasNext());
     }
 }
