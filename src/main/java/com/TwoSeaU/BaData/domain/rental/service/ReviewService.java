@@ -38,9 +38,7 @@ public class ReviewService {
         final Reservation reservation = reservationRepository.findById(createReviewRequest.getReservationId())
                         .orElseThrow(()->new GeneralException(RentalException.RESERVATION_NOT_FOUND));
 
-        if(!loginUser.getId().equals(reservation.getUser().getId())){
-            throw new GeneralException(RentalException.CANT_END_DATE_BEFORE_THAN_START_DATE);
-        }
+        checkWriteReview(loginUser, reservation);
 
         final Review review = reviewRepository.save(Review.of(reservation, createReviewRequest.getComment(),createReviewRequest.getRating(),"www.image.url"));
 
@@ -51,5 +49,18 @@ public class ReviewService {
         reservation.getStore().adjustReviewRatingByAdd(review);
 
         return review.getId();
+    }
+
+    private void checkWriteReview(final User loginUser, final Reservation reservation){
+
+        if(!loginUser.getId().equals(reservation.getUser().getId())){
+            throw new GeneralException(RentalException.CANT_ACCESS_TO_OTHER_RESERVATION);
+        }
+
+        boolean alreadyExistReview = reviewRepository.existsByReservationId(reservation.getId());
+
+        if(alreadyExistReview){
+            throw new GeneralException(RentalException.CANT_WRITE_REVIEW_IN_SAME_RESERVATION);
+        }
     }
 }
