@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.entity;
 
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
+import com.TwoSeaU.BaData.domain.trade.enums.ReportType;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -29,11 +30,18 @@ public class Report extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
 
-    public static Report of(final Post post, final User user, final ReportStatus reportStatus) {
+    @Enumerated(EnumType.ORDINAL)
+    private ReportType reportTypeCode;
+
+    private String reportReason;
+
+    public static Report of(final Post post, final User user, final ReportStatus reportStatus, final ReportType reportTypeCode, final String reportReason) {
         return Report.builder()
                 .post(post)
                 .user(user)
                 .reportStatus(reportStatus)
+                .reportTypeCode(reportTypeCode)
+                .reportReason(reportReason)
                 .build();
     }
 }

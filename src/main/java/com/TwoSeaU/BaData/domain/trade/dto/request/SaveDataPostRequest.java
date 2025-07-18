@@ -2,14 +2,12 @@ package com.TwoSeaU.BaData.domain.trade.dto.request;
 
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,6 +25,7 @@ public class SaveDataPostRequest {
     private Integer capacity;
 
     @NotNull(message = "가격은 필수 작성입니다.")
+    @PositiveOrZero(message = "가격은 양수여야 합니다.")
     private Integer price;
 
     @NotNull(message = "상세 설명은 필수 작성입니다.")
