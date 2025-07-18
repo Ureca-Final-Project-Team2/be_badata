@@ -11,12 +11,15 @@ import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
+import com.TwoSeaU.BaData.domain.user.entity.SearchHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -26,6 +29,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
@@ -33,6 +37,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
+    private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
@@ -82,6 +87,16 @@ public class PostService {
 
 
     public PostsResponse searchPosts(String query, UserDetails userdetails) {
+        if(userdetails != null) {
+            User user = userRepository.findByUsername(userdetails.getUsername())
+                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+            try {
+                searchHistoryRepository.save(SearchHistory.of(user, query));
+            } catch (Exception e) {
+                log.info("검색 기록 저장에 실패: {}", e.getMessage());
+            }
+        }
 
         return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
     }
