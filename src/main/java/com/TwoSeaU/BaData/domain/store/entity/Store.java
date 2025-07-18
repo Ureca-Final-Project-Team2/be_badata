@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.store.entity;
 
+import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,6 +70,15 @@ public class Store extends BaseEntity {
                 .reviewCount(0)
                 .reviewRating(0.0)
                 .build();
+    }
+
+    public void adjustReviewRatingByAdd(final Review review){
+
+        double beforeRatingSum = this.reviewRating * this.reviewCount;
+        double afterRatingSum = beforeRatingSum + review.getRating();
+
+        this.reviewCount ++;
+        this.reviewRating = afterRatingSum / this.reviewCount;
     }
 
 }
