@@ -35,14 +35,15 @@ public class StoreLikesQueryRepositoryImpl implements StoreLikesQueryRepository 
 
 		where.and(qStoreLikes.user.id.eq(userId));
 
-		List<StoreLikes> qStoreLikesList = queryFactory.selectFrom(qStoreLikes)
+		List<StoreLikes> fetchedList = queryFactory.selectFrom(qStoreLikes)
 			.where(where)
 			.orderBy(qStoreLikes.id.desc())
 			.limit(size + 1)
 			.fetch();
 
-		boolean hasNext = qStoreLikesList.size() > size;
-		if(hasNext) qStoreLikesList.remove(size);
+		boolean hasNext = fetchedList.size() > size;
+		List<StoreLikes> qStoreLikesList = hasNext
+			? fetchedList.subList(0, size) : fetchedList;
 
 		List<GetLikesStoreResponse> responseList = qStoreLikesList.stream()
 			.map(storeLikes -> {
