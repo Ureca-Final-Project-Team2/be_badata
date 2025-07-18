@@ -34,17 +34,17 @@ public class PaymentService {
     private final IamportClient iamportClient;
 
     public CreatePaymentResponse createOrder(final Long postId, final String username) {
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if(post.getIsSold()){
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
-        Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD, new BigDecimal(post.getPrice()));
+        final Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD, new BigDecimal(post.getPrice()));
         paymentRepository.save(payment);
 
         return CreatePaymentResponse.of(payment.getMerchantUid());
@@ -55,17 +55,17 @@ public class PaymentService {
             throw new GeneralException(TradeException.PAYMENT_FAILED);
         }
 
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if(post.getIsSold()){
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
-        Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
+        final Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
 
         payment.updatePaymentStatus(PaymentStatus.PAID);
@@ -75,10 +75,10 @@ public class PaymentService {
     }
 
     private String generateMerchantUid() {
-        String uniqueString = UUID.randomUUID().toString().replace("-", "");
-        LocalDateTime today = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDay = today.format(formatter).replace("-", "");
+        final String uniqueString = UUID.randomUUID().toString().replace("-", "");
+        final LocalDateTime today = LocalDateTime.now();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final String formattedDay = today.format(formatter).replace("-", "");
 
         return formattedDay +'-'+ uniqueString;
     }

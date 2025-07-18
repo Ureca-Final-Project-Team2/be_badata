@@ -50,7 +50,7 @@ public class PostService {
             optionalUserId = null;
         }
 
-        List<PostResponse> allPosts = posts
+        final List<PostResponse> allPosts = posts
                 .stream()
                 .map(post -> PostResponse.from(
                         post,
@@ -88,7 +88,7 @@ public class PostService {
 
     public PostsResponse searchPosts(final String query, final UserDetails userdetails) {
         if(userdetails != null) {
-            User user = userRepository.findByUsername(userdetails.getUsername())
+            final User user = userRepository.findByUsername(userdetails.getUsername())
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
             try {
@@ -104,18 +104,18 @@ public class PostService {
 
     public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
 
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-        GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())
+        final GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY));
 
-        ELAResult result = elaService.analyzeImage(saveGifticonPostRequest.getFile());
+        final ELAResult result = elaService.analyzeImage(saveGifticonPostRequest.getFile());
 
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
 
-        Gifticon gifticon = new Gifticon(
+        final Gifticon gifticon = new Gifticon(
                 user,
                 saveGifticonPostRequest.getTitle(),
                 saveGifticonPostRequest.getComment(),
@@ -129,7 +129,7 @@ public class PostService {
                 category
         );
 
-        Gifticon savedGifticon = gifticonRepository.save(gifticon);
+        final Gifticon savedGifticon = gifticonRepository.save(gifticon);
 
         return SavePostResponse.builder()
                 .postId(savedGifticon.getId())
@@ -139,16 +139,16 @@ public class PostService {
 
     public SavePostResponse createDataPost(final SaveDataPostRequest saveDataPostRequest, final String username) {
 
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
+        final ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
 
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
 
-        Data data = new Data(
+        final Data data = new Data(
                 user,
                 saveDataPostRequest.getTitle(),
                 null,
@@ -160,7 +160,7 @@ public class PostService {
                 saveDataPostRequest.getCapacity()
         );
 
-        Data savedData = dataRepository.save(data);
+        final Data savedData = dataRepository.save(data);
 
         return SavePostResponse.builder()
                 .postId(savedData.getId())
@@ -168,27 +168,27 @@ public class PostService {
     }
 
     public GetPostDetailResponse getPost(final Long postId, final UserDetails user) {
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
+        final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
-        int likesCount = postLikesRepository.countByPostId(postId);
+        final int likesCount = postLikesRepository.countByPostId(postId);
         boolean isLiked = false;
 
         if(user != null) {
-            User loginUser = userRepository.findByUsername(user.getUsername())
+            final User loginUser = userRepository.findByUsername(user.getUsername())
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
             isLiked = postLikesRepository.existsByUserIdAndPostId(loginUser.getId(), postId);
         }
 
         if (post instanceof Gifticon) {
-            GetGifticonDetailResponse getGifticonDetailResponse =
+            final GetGifticonDetailResponse getGifticonDetailResponse =
                     GetGifticonDetailResponse.from((Gifticon) post, likesCount, isLiked);
             return GetPostDetailResponse.of(seller, getGifticonDetailResponse);
         }
         else if (post instanceof Data) {
-            GetDataDetailResponse getDataDetailResponse =
+            final GetDataDetailResponse getDataDetailResponse =
                     GetDataDetailResponse.from((Data) post, likesCount, isLiked);
             return GetPostDetailResponse.of(seller, getDataDetailResponse);
         }
@@ -198,10 +198,10 @@ public class PostService {
     }
 
     public DeletePostResponse deletePost(final Long postId, final String username) {
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (!post.getSeller().getId().equals(user.getId())) {
@@ -215,10 +215,10 @@ public class PostService {
 
     public SavePostResponse modifyPost(final Long postId, final UpdatePostRequest updatePostRequest, final String username) {
 
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (post.getIsSold()) {

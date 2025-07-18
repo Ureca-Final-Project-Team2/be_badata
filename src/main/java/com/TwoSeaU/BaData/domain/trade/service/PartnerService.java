@@ -21,7 +21,7 @@ public class PartnerService {
             throw new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY);
         }
 
-        List<Partner> partners = partnerRepository.findByCategoryId(categoryId);
+        final List<Partner> partners = partnerRepository.findByCategoryId(categoryId);
 
         return GetPartnerResponse.from(partners);
     }

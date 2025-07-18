@@ -24,21 +24,21 @@ public class LikeService {
 
     @Transactional
     public SavePostLikesResponse createLike(final Long postId, final String username) {
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        PostLikes p = postLikesRepository.save(PostLikes.of(post, user));
+        final PostLikes p = postLikesRepository.save(PostLikes.of(post, user));
         return SavePostLikesResponse.of(p.getId());
     }
 
     @Transactional
     public DeletePostLikesResponse deleteLike(final Long postId, final String username) {
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        PostLikes postLikes = postLikesRepository.findByUserIdAndPostId(user.getId(), postId)
+        final PostLikes postLikes = postLikesRepository.findByUserIdAndPostId(user.getId(), postId)
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_LIKED_POST));
 
         postLikesRepository.delete(postLikes);

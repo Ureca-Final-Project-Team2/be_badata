@@ -24,15 +24,15 @@ public class ELAService {
 
     public ELAResult analyzeImage(final MultipartFile file) {
         try {
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            final BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-            BufferedImage recompressedImage = recompressJPEG(originalImage);
+            final BufferedImage recompressedImage = recompressJPEG(originalImage);
 
-            BufferedImage differenceImage = calculateDifference(originalImage, recompressedImage);
+            final BufferedImage differenceImage = calculateDifference(originalImage, recompressedImage);
 
-            List<SuspiciousRegion> suspiciousRegions = detectSuspiciousRegions(differenceImage);
+            final List<SuspiciousRegion> suspiciousRegions = detectSuspiciousRegions(differenceImage);
 
-            double manipulationScore = calculateManipulationScore(differenceImage);
+            final double manipulationScore = calculateManipulationScore(differenceImage);
 
             return new ELAResult(suspiciousRegions, manipulationScore);
 
@@ -42,7 +42,7 @@ public class ELAService {
     }
 
     private BufferedImage recompressJPEG(final BufferedImage image) throws IOException {
-        File tempFile = File.createTempFile("ela_temp", ".jpg");
+        final File tempFile = File.createTempFile("ela_temp", ".jpg");
 
         try {
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
@@ -68,9 +68,9 @@ public class ELAService {
     }
 
     private BufferedImage calculateDifference(final BufferedImage original, final BufferedImage recompressed) {
-        int width = original.getWidth();
-        int height = original.getHeight();
-        BufferedImage difference = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        final int width = original.getWidth();
+        final int height = original.getHeight();
+        final BufferedImage difference = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -91,11 +91,11 @@ public class ELAService {
     }
 
     private List<SuspiciousRegion> detectSuspiciousRegions(final BufferedImage difference) {
-        List<SuspiciousRegion> regions = new ArrayList<>();
-        int width = difference.getWidth();
-        int height = difference.getHeight();
+        final List<SuspiciousRegion> regions = new ArrayList<>();
+        final int width = difference.getWidth();
+        final int height = difference.getHeight();
 
-        int blockSize = 8;
+        final int blockSize = 8;
         for (int y = 0; y < height - blockSize; y += blockSize) {
             for (int x = 0; x < width - blockSize; x += blockSize) {
                 double avgDifference = calculateBlockAverage(difference, x, y, blockSize);
@@ -125,8 +125,8 @@ public class ELAService {
     }
 
     private double calculateManipulationScore(final BufferedImage difference) {
-        int width = difference.getWidth();
-        int height = difference.getHeight();
+        final int width = difference.getWidth();
+        final int height = difference.getHeight();
         int modifiedPixels = 0;
 
         for (int y = 0; y < height; y++) {

@@ -23,13 +23,13 @@ public class ReportService {
     private final UserRepository userRepository;
 
     public SaveReportResponse createReport(final Long postId, final String username) {
-        User user = userRepository.findByUsername(username)
+        final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(postId)
+        final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        Report savedReport = reportRepository.save(Report.of(post, user, ReportStatus.QUESTION));
+        final Report savedReport = reportRepository.save(Report.of(post, user, ReportStatus.QUESTION));
 
         return SaveReportResponse.of(savedReport.getId());
     }
