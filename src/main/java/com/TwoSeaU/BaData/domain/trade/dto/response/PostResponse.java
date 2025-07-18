@@ -4,7 +4,7 @@ import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import lombok.*;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,6 +20,7 @@ public class PostResponse {
     private String postImage;
     private PostCategory postCategory;
     private String gifticonCategory;
+    private LocalDate deadLine;
     private Integer likesCount;
     private Boolean isLiked;
 
@@ -34,6 +35,7 @@ public class PostResponse {
                 .postImage(post.getPostImage())
                 .postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
                 .gifticonCategory(post instanceof Gifticon gifticon ? gifticon.getCategory().getCategoryName() : null)
+                .deadLine(post.getDeadLine())
                 .likesCount(likesCount)
                 .isLiked(isLiked)
                 .build();

@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,7 +21,7 @@ public class SaveDataPostRequest {
     private MobileCarrier mobileCarrier;
 
     @NotNull(message = "유효기간은 필수 입력입니다.")
-    private LocalDateTime deadLine;
+    private LocalDate deadLine;
 
     @NotNull(message = "데이터 용량은 필수 입력입니다.")
     private Integer capacity;

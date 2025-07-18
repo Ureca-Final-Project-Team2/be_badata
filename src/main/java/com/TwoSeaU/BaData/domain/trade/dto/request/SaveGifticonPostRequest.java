@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,7 +24,7 @@ public class SaveGifticonPostRequest {
     private String couponNumber;
 
     @NotNull(message = "유효 기간은 필수입니다.")
-    private LocalDateTime deadLine;
+    private LocalDate deadLine;
 
     @NotNull(message = "발급일은 필수입니다.")
     private LocalDateTime issueDate;
