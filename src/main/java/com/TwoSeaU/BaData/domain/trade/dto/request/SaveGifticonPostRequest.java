@@ -1,6 +1,8 @@
 package com.TwoSeaU.BaData.domain.trade.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +32,7 @@ public class SaveGifticonPostRequest {
     private LocalDateTime issueDate;
 
     @NotNull(message = "가격은 필수 작성입니다.")
+    @PositiveOrZero(message = "가격은 양수여야 합니다.")
     private Integer price;
 
     @NotNull(message = "상세 설명은 필수 작성입니다.")
