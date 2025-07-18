@@ -51,13 +51,13 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 switch (order.getProperty()){
 
                     case review_rating:
-                        return new OrderSpecifier(direction,review.rating);
+                        return new OrderSpecifier(direction, review.rating);
 
                 }
             }
         }
 
-        return new OrderSpecifier(Order.DESC,store.id);
+        return new OrderSpecifier(Order.DESC, store.id);
     }
 
 
