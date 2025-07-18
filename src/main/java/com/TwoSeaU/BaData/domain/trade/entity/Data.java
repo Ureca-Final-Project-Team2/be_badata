@@ -20,9 +20,9 @@ public class Data extends Post {
 
     private Integer capacity;
 
-    public Data(User user, String title, String comment, Integer price,
-                LocalDate deadLine, String postImage, Boolean isSold,
-                MobileCarrier mobileCarrier, Integer capacity) {
+    public Data(final User user, final String title, final String comment, final Integer price,
+                final LocalDate deadLine, final String postImage, final Boolean isSold,
+                final MobileCarrier mobileCarrier, final Integer capacity) {
         super(user, title, comment, price, deadLine, postImage, isSold);
         this.mobileCarrier = mobileCarrier;
         this.capacity = capacity;

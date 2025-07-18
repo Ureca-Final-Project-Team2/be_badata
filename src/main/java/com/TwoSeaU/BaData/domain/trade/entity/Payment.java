@@ -41,7 +41,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    public static Payment of(User user, Post post, String merchantUid, PayMethod payMethod, BigDecimal amount) {
+    public static Payment of(final User user, final Post post, final String merchantUid,
+                             final PayMethod payMethod, final BigDecimal amount) {
         return Payment.builder()
                 .user(user)
                 .post(post)
@@ -52,7 +53,7 @@ public class Payment {
                 .build();
     }
 
-    public void updatePaymentStatus(PaymentStatus paymentStatus) {
+    public void updatePaymentStatus(final PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
 }

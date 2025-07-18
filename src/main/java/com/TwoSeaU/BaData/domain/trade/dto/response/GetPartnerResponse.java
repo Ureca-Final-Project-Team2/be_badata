@@ -11,7 +11,7 @@ import java.util.List;
 public class GetPartnerResponse {
     private List<String> partnerNames;
 
-    public static GetPartnerResponse from(List<Partner> partners) {
+    public static GetPartnerResponse from(final List<Partner> partners) {
         return GetPartnerResponse.builder()
                 .partnerNames(partners.stream()
                         .map(Partner::getPartner)

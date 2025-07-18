@@ -16,12 +16,12 @@ public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
 
-    public GetPartnerResponse getPartners(Long categoryId) {
+    public GetPartnerResponse getPartners(final Long categoryId) {
         if(!gifticonCategoryRepository.existsById(categoryId)) {
             throw new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY);
         }
 
-        List<Partner> partners = partnerRepository.findByCategoryId(categoryId);
+        final List<Partner> partners = partnerRepository.findByCategoryId(categoryId);
 
         return GetPartnerResponse.from(partners);
     }
