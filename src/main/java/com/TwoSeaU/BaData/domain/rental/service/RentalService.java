@@ -1,7 +1,9 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveRentalRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowRentalResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservationDeviceInfoResponse;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservedDeviceResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
@@ -74,6 +76,28 @@ public class RentalService {
         });
 
         return reservation.getId();
+    }
+
+    public ShowRentalResponse getReservedDeviceByReservationId(final Long reservationId, final String username){
+
+        // 예약 조회
+        final Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()-> new GeneralException(RentalException.RESERVATION_NOT_FOUND));
+
+        // 로그인한 유저 조회
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(UserException.USER_NOT_FOUND));
+
+        if(!reservation.getUser().getId().equals(loginUser.getId())){
+            throw new GeneralException(RentalException.CANT_ACCESS_TO_OTHER_RESERVATION);
+        }
+
+        // 특정 예약에 대한 장치 가져오기
+        final List<ShowReservedDeviceResponse> reservedStoreDevice = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(reservationId).stream().map(deviceReservation -> {
+            final StoreDevice storeDevice = deviceReservation.getStoreDevice();
+            return ShowReservedDeviceResponse.from(storeDevice, deviceReservation);
+        }).toList();
+
+        return ShowRentalResponse.of(reservation.getStore().getName(), reservedStoreDevice);
+
     }
 
     @Transactional

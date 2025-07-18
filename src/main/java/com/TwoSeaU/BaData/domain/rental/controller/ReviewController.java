@@ -1,0 +1,39 @@
+package com.TwoSeaU.BaData.domain.rental.controller;
+
+import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
+import com.TwoSeaU.BaData.domain.rental.service.ReviewService;
+import com.TwoSeaU.BaData.global.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class ReviewController {
+
+    private final ReviewService reviewService;
+
+    @PostMapping(value = "/api/v1/reviews",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Long>> createReview(@ModelAttribute CreateReviewRequest createReviewRequest,
+                                                          @AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewService.createReview(createReviewRequest,user.getUsername())));
+    }
+
+    @GetMapping("/api/v1/{storeId}/reviews")
+    public ResponseEntity<ApiResponse<ShowReviewWithMetaResponse>> getReviewsResponse(@PathVariable("storeId") final Long storeId, final
+    Pageable pageable){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewsResponse(storeId, pageable)));
+    }
+
+}

@@ -233,7 +233,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
             }
         }
 
-        return new OrderSpecifier(Order.DESC,store.id);
+        return new OrderSpecifier(Order.DESC, store.id);
     }
 
 }

@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.rental.repository;
 
 import com.TwoSeaU.BaData.domain.rental.dto.projection.AvailableDeviceProjection;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
+import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.store.entity.Device;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import java.time.LocalDate;
@@ -69,5 +70,8 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
     @Modifying
     @Query("DELETE FROM DeviceReservation dr WHERE dr.reservation.id = :reservationId")
     void deleteByReservationId(@Param("reservationId") Long reservationId);
+
+    @Query("select dr from DeviceReservation dr join fetch dr.storeDevice sd join fetch sd.device where dr.reservation.id = :reservationId")
+    List<DeviceReservation> findByReservationIdWithFetchStoreDeviceAndDevice(final Long reservationId);
 
 }

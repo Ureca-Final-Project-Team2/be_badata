@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.rental.controller;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveRentalRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowRentalResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservationDeviceInfoResponse;
 import com.TwoSeaU.BaData.domain.rental.service.RentalService;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowDeviceInfoResponse;
@@ -52,6 +53,13 @@ public class RentalController {
                                                                  @AuthenticationPrincipal User user){
 
         return ResponseEntity.ok(ApiResponse.success(rentalService.deleteReserveRental(reservationId,user.getUsername())));
+    }
+
+    @GetMapping("/reservations/{reservationId}/devices")
+    public ResponseEntity<ApiResponse<ShowRentalResponse>> getReservedDeviceByReservationId(@PathVariable("reservationId") Long reservationId,
+                                                                                            @AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok(ApiResponse.success(rentalService.getReservedDeviceByReservationId(reservationId, user.getUsername())));
     }
 
 }
