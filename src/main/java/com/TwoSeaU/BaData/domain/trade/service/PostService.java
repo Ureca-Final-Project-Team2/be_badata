@@ -19,6 +19,7 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
@@ -89,7 +91,11 @@ public class PostService {
             User user = userRepository.findByUsername(userdetails.getUsername())
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-            searchHistoryRepository.save(SearchHistory.of(user, query));
+            try {
+                searchHistoryRepository.save(SearchHistory.of(user, query));
+            } catch (Exception e) {
+                log.info("검색 기록 저장에 실패: {}", e.getMessage());
+            }
         }
 
         return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
