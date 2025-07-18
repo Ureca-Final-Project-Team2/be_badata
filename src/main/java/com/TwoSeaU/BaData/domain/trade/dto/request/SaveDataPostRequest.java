@@ -2,7 +2,6 @@ package com.TwoSeaU.BaData.domain.trade.dto.request;
 
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
