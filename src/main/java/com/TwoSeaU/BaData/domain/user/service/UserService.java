@@ -3,8 +3,10 @@ package com.TwoSeaU.BaData.domain.user.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
+import com.TwoSeaU.BaData.domain.store.repository.StoreLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
@@ -22,6 +24,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
@@ -38,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 	private final UserRepository userRepository;
 	private final ReportRepository reportRepository;
@@ -46,6 +50,7 @@ public class UserService {
 	private final PostLikesRepository postLikesRepository;
 	private final SosRepository sosRepository;
 	private final UserLikesRepository userLikesRepository;
+	private final StoreLikesRepository storeLikesRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -146,5 +151,12 @@ public class UserService {
 		else {
 			return userLikesRepository.getAllFollowingsResponse(cursor, size, user.getId());
 		}
+	}
+
+	public CursorPageResponse<GetLikesStoreResponse> getAllLikesStoresByCursor(final Long cursor, final int size, final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return storeLikesRepository.getAllLikesStoresResponseByCursor(cursor, size, user.getId());
 	}
 }
