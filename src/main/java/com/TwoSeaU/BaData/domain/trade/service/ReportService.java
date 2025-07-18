@@ -30,13 +30,13 @@ public class ReportService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        if(saveReportRequest.getReportType() == ReportType.ETC){
+        if (saveReportRequest.getReportType() == ReportType.ETC){
             if (saveReportRequest.getComment() == null || saveReportRequest.getComment().isEmpty()) {
                 throw new GeneralException(TradeException.REPORT_COMMENT_REQUIRED);
             }
         }
 
-        if(reportRepository.existsByUserIdAndPostId(user.getId(), post.getId())) {
+        if (reportRepository.existsByUserIdAndPostId(user.getId(), post.getId())) {
             throw new GeneralException(TradeException.REPORT_ALREADY_SUBMITTED);
         }
 
