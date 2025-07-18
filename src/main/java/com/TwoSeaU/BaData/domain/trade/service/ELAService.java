@@ -141,7 +141,7 @@ public class ELAService {
         }
 
         if (modifiedPixels > 0) {
-            double modifiedRatio = (double) modifiedPixels / (width * height);
+            final double modifiedRatio = (double) modifiedPixels / (width * height);
             return Math.min(100, 50 + (modifiedRatio * 1000));
         }
 
