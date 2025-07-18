@@ -1,13 +1,10 @@
 package com.TwoSeaU.BaData.domain.rental.controller;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
-import com.TwoSeaU.BaData.domain.rental.dto.response.ShowRentalResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.MDC;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +30,7 @@ public class ReviewController {
     }
 
     @GetMapping("/api/v1/{storeId}/reviews")
-    public ResponseEntity<ApiResponse<ShowReviewWithMetaResponse>> getReviewsResponse(final Long storeId, final
+    public ResponseEntity<ApiResponse<ShowReviewWithMetaResponse>> getReviewsResponse(@PathVariable("storeId") final Long storeId, final
     Pageable pageable){
 
         return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewsResponse(storeId, pageable)));
