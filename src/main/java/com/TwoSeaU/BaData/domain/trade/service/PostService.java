@@ -11,8 +11,10 @@ import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
+import com.TwoSeaU.BaData.domain.user.entity.SearchHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import jakarta.transaction.Transactional;
@@ -33,6 +35,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
+    private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
 
     public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
@@ -82,6 +85,12 @@ public class PostService {
 
 
     public PostsResponse searchPosts(String query, UserDetails userdetails) {
+        if(userdetails != null) {
+            User user = userRepository.findByUsername(userdetails.getUsername())
+                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+            searchHistoryRepository.save(SearchHistory.of(user, query));
+        }
 
         return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
     }
