@@ -40,7 +40,7 @@ public class PostService {
     private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
 
-    public PostsResponse postsToPostResponse(List<Post> posts, UserDetails userdetails) {
+    public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
         Optional<Long> optionalUserId;
 
         if(userdetails != null) {
@@ -65,13 +65,13 @@ public class PostService {
     }
 
 
-    public PostsResponse findAllPosts(UserDetails userdetails) {
+    public PostsResponse findAllPosts(final UserDetails userdetails) {
 
         return postsToPostResponse(postRepository.findByIsSoldOrderByCreatedAtDesc(false), userdetails);
     }
 
 
-    public UserPostsResponse getPostsByUserId(Long userId, UserDetails userdetails) {
+    public UserPostsResponse getPostsByUserId(final Long userId, final UserDetails userdetails) {
 
         return UserPostsResponse.of(
                 postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId), userdetails),
@@ -79,14 +79,14 @@ public class PostService {
     }
 
 
-    public PostsResponse getPostsByDeadLine(UserDetails userdetails) {
+    public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
         return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
 
     }
 
 
-    public PostsResponse searchPosts(String query, UserDetails userdetails) {
+    public PostsResponse searchPosts(final String query, final UserDetails userdetails) {
         if(userdetails != null) {
             User user = userRepository.findByUsername(userdetails.getUsername())
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
@@ -102,7 +102,7 @@ public class PostService {
     }
 
 
-    public SavePostResponse createGifticonPost(SaveGifticonPostRequest saveGifticonPostRequest, String username) {
+    public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
@@ -137,7 +137,7 @@ public class PostService {
     }
 
 
-    public SavePostResponse createDataPost(SaveDataPostRequest saveDataPostRequest, String username) {
+    public SavePostResponse createDataPost(final SaveDataPostRequest saveDataPostRequest, final String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
@@ -167,7 +167,7 @@ public class PostService {
                 .build();
     }
 
-    public GetPostDetailResponse getPost(Long postId, UserDetails user) {
+    public GetPostDetailResponse getPost(final Long postId, final UserDetails user) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
@@ -197,7 +197,7 @@ public class PostService {
         }
     }
 
-    public DeletePostResponse deletePost(Long postId, String username) {
+    public DeletePostResponse deletePost(final Long postId, final String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
@@ -213,7 +213,7 @@ public class PostService {
         return DeletePostResponse.of(postId);
     }
 
-    public SavePostResponse modifyPost(Long postId, UpdatePostRequest updatePostRequest, String username) {
+    public SavePostResponse modifyPost(final Long postId, final UpdatePostRequest updatePostRequest, final String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));

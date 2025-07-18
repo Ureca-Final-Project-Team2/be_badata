@@ -24,9 +24,9 @@ public class Gifticon extends Post{
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
-    public Gifticon(User user, String title, String comment, Integer price,
-                    LocalDate deadLine, String postImage, Boolean isSold,
-                    LocalDateTime issueDate, String couponNumber, String partner, GifticonCategory category) {
+    public Gifticon(final User user, String title, final String comment, final Integer price,
+                    final LocalDate deadLine, final String postImage, final Boolean isSold,
+                    final LocalDateTime issueDate, final String couponNumber, final String partner, final GifticonCategory category) {
         super(user, title, comment, price, deadLine, postImage, isSold);
         this.issueDate = issueDate;
         this.couponNumber = couponNumber;

@@ -22,7 +22,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public SaveReportResponse createReport(Long postId, String username) {
+    public SaveReportResponse createReport(final Long postId, final String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 

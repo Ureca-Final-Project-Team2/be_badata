@@ -23,7 +23,7 @@ public class LikeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public SavePostLikesResponse createLike(Long postId, String username) {
+    public SavePostLikesResponse createLike(final Long postId, final String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
@@ -34,7 +34,7 @@ public class LikeService {
     }
 
     @Transactional
-    public DeletePostLikesResponse deleteLike(Long postId, String username) {
+    public DeletePostLikesResponse deleteLike(final Long postId, final String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 

@@ -35,7 +35,8 @@ public abstract class Post extends BaseEntity {
 
     private Boolean isSold;
 
-    public Post(User seller, String title, String comment, Integer price, LocalDate deadLine, String postImage, Boolean isSold) {
+    public Post(final User seller, final String title, final String comment, final Integer price,
+                final LocalDate deadLine, final String postImage, final Boolean isSold) {
         this.seller = seller;
         this.title = title;
         this.comment = comment;

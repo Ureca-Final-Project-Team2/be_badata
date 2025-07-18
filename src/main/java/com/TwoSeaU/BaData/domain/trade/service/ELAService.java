@@ -22,7 +22,7 @@ public class ELAService {
     private static final double QUALITY_FACTOR = 0.90;
     private static final int SUSPICIOUS_THRESHOLD = 1;
 
-    public ELAResult analyzeImage(MultipartFile file) {
+    public ELAResult analyzeImage(final MultipartFile file) {
         try {
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
@@ -41,7 +41,7 @@ public class ELAService {
         }
     }
 
-    private BufferedImage recompressJPEG(BufferedImage image) throws IOException {
+    private BufferedImage recompressJPEG(final BufferedImage image) throws IOException {
         File tempFile = File.createTempFile("ela_temp", ".jpg");
 
         try {
@@ -67,7 +67,7 @@ public class ELAService {
         }
     }
 
-    private BufferedImage calculateDifference(BufferedImage original, BufferedImage recompressed) {
+    private BufferedImage calculateDifference(final BufferedImage original, final BufferedImage recompressed) {
         int width = original.getWidth();
         int height = original.getHeight();
         BufferedImage difference = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -90,7 +90,7 @@ public class ELAService {
         return difference;
     }
 
-    private List<SuspiciousRegion> detectSuspiciousRegions(BufferedImage difference) {
+    private List<SuspiciousRegion> detectSuspiciousRegions(final BufferedImage difference) {
         List<SuspiciousRegion> regions = new ArrayList<>();
         int width = difference.getWidth();
         int height = difference.getHeight();
@@ -109,7 +109,7 @@ public class ELAService {
         return regions;
     }
 
-    private double calculateBlockAverage(BufferedImage image, int startX, int startY, int blockSize) {
+    private double calculateBlockAverage(final BufferedImage image, final int startX, final int startY, final int blockSize) {
         double sum = 0;
         int count = 0;
 
@@ -124,7 +124,7 @@ public class ELAService {
         return count > 0 ? sum / count : 0;
     }
 
-    private double calculateManipulationScore(BufferedImage difference) {
+    private double calculateManipulationScore(final BufferedImage difference) {
         int width = difference.getWidth();
         int height = difference.getHeight();
         int modifiedPixels = 0;
