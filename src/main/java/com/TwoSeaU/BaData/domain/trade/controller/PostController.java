@@ -6,6 +6,7 @@ import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,13 +46,13 @@ public class PostController {
     }
 
     @PostMapping(path = "/posts/gifticon", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@ModelAttribute SaveGifticonPostRequest saveGifticonPostRequest,
+    public ResponseEntity<ApiResponse<SavePostResponse>> createGifticonPost(@Valid @ModelAttribute SaveGifticonPostRequest saveGifticonPostRequest,
                                                                             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
     }
 
     @PostMapping(path = "/posts/data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@ModelAttribute SaveDataPostRequest saveDataPostRequest,
+    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@Valid @ModelAttribute SaveDataPostRequest saveDataPostRequest,
                                                                         @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, user.getUsername())));
     }
@@ -62,7 +63,7 @@ public class PostController {
     }
 
     @PatchMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<SavePostResponse>> modifyPost(@PathVariable Long postId, @RequestBody UpdatePostRequest updatePostRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<SavePostResponse>> modifyPost(@PathVariable Long postId, @Valid @RequestBody UpdatePostRequest updatePostRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.modifyPost(postId, updatePostRequest, user.getUsername())));
     }
 }
