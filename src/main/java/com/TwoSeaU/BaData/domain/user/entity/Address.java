@@ -1,7 +1,5 @@
 package com.TwoSeaU.BaData.domain.user.entity;
 
-import com.TwoSeaU.BaData.domain.user.enums.Role;
-import com.TwoSeaU.BaData.domain.user.enums.SocialType;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
