@@ -47,4 +47,18 @@ public class AddressService {
 
     }
 
+    @Transactional
+    public Long deleteAddress(final String username, final Long addressId){
+
+        final Address address = addressRepository.findById(addressId).orElseThrow(() -> new GeneralException(UserException.ADDRESS_NOT_FOUND));
+
+        if(!address.getUser().getUsername().equals(username)){
+            throw new GeneralException(UserException.CANT_DELETE_OTHER_ADDRESS);
+        }
+
+        addressRepository.delete(address);
+
+        return addressId;
+    }
+
 }
