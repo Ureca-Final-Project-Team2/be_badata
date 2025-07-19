@@ -3,7 +3,10 @@ package com.TwoSeaU.BaData.domain.rental.controller;
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewService;
+import com.TwoSeaU.BaData.domain.rental.service.ReviewUploadFacade;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
+import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -20,13 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ReviewController {
 
+    private final ReviewUploadFacade reviewUploadFacade;
     private final ReviewService reviewService;
 
     @PostMapping(value = "/api/v1/reviews",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Long>> createReview(@ModelAttribute CreateReviewRequest createReviewRequest,
+    public ResponseEntity<ApiResponse<Long>> createReview(@ModelAttribute @Valid CreateReviewRequest createReviewRequest,
                                                           @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(reviewService.createReview(createReviewRequest,user.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success(reviewUploadFacade.uploadReviewWithImage(createReviewRequest, user.getUsername())));
     }
 
     @GetMapping("/api/v1/{storeId}/reviews")

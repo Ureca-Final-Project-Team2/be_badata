@@ -16,6 +16,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -34,7 +35,7 @@ public class ReviewService {
     private final QuickReplyRepository quickReplyRepository;
 
     @Transactional
-    public Long createReview(final CreateReviewRequest createReviewRequest, final String username){
+    public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
 
         final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(
                 UserException.USER_NOT_FOUND));
@@ -44,15 +45,21 @@ public class ReviewService {
 
         checkWriteReview(loginUser, reservation);
 
-        final Review review = reviewRepository.save(Review.of(reservation, createReviewRequest.getComment(),createReviewRequest.getRating(),"www.image.url"));
+        final Review review = reviewRepository.save(Review.of(reservation, createReviewRequest.getComment(),createReviewRequest.getRating(), imageUrl));
 
-        final QuickReply quickReply = quickReplyRepository.findById(createReviewRequest.getQuickReplyId()).orElseThrow(()->new GeneralException(RentalException.CANT_FIND_QUICK_REPLY));
-
-        reviewQuickReplyRepository.save(ReviewQuickReply.of(review, quickReply));
+        saveQuickReply(createReviewRequest.getQuickReplyIds(), review);
 
         reservation.getStore().adjustReviewRatingByAdd(review);
 
         return review.getId();
+    }
+
+    private void saveQuickReply(final List<Long> quickReplyIds, final Review review){
+
+        quickReplyIds.forEach(quickReplyId->{
+            final QuickReply quickReply = quickReplyRepository.findById(quickReplyId).orElseThrow(()->new GeneralException(RentalException.CANT_FIND_QUICK_REPLY));
+            reviewQuickReplyRepository.save(ReviewQuickReply.of(review, quickReply));
+        });
     }
 
     private void checkWriteReview(final User loginUser, final Reservation reservation){
