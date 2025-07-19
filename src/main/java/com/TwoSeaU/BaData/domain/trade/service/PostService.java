@@ -210,7 +210,6 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        s3ImageService.deleteImage(post.getPostImage());
         postRepository.delete(post);
 
         return DeletePostResponse.of(postId);
