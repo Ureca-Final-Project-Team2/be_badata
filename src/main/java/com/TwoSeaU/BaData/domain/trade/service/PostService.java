@@ -117,13 +117,15 @@ public class PostService {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
 
+        final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
+
         final Gifticon gifticon = new Gifticon(
                 user,
                 saveGifticonPostRequest.getTitle(),
                 saveGifticonPostRequest.getComment(),
                 saveGifticonPostRequest.getPrice(),
                 saveGifticonPostRequest.getDeadLine(),
-                s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename()),
+                imageUrl,
                 false,
                 saveGifticonPostRequest.getIssueDate(),
                 saveGifticonPostRequest.getCouponNumber(),
