@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,12 @@ public class ReviewController {
     Pageable pageable){
 
         return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewsResponse(storeId, pageable)));
+    }
+
+    @DeleteMapping("/api/v1/{reviewId}")
+    public ResponseEntity<ApiResponse<Long>> deleteReview(@PathVariable("reviewId") final Long reviewId, @AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewService.deleteReview(reviewId,user.getUsername())));
     }
 
 }

@@ -12,10 +12,12 @@ import com.TwoSeaU.BaData.domain.rental.repository.QuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewRepository;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewQuickReplyRepository reviewQuickReplyRepository;
     private final QuickReplyRepository quickReplyRepository;
+    private final S3ImageService s3ImageService;
 
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
@@ -54,6 +57,25 @@ public class ReviewService {
         return review.getId();
     }
 
+    @Transactional
+    public Long deleteReview(final Long reviewId, final String username){
+
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
+        final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
+        final Store store = review.getReservation().getStore();
+
+        store.adjustReviewRatingByRemove(review);
+
+        checkReviewOwner(loginUser, review);
+
+        reviewQuickReplyRepository.deleteByReviewId(reviewId);
+        reviewRepository.deleteById(reviewId);
+
+        s3ImageService.deleteImage(review.getImageUrl());
+
+        return reviewId;
+    }
+
     private void saveQuickReply(final List<Long> quickReplyIds, final Review review){
 
         quickReplyIds.forEach(quickReplyId->{
@@ -72,6 +94,13 @@ public class ReviewService {
 
         if(alreadyExistReview){
             throw new GeneralException(RentalException.CANT_WRITE_REVIEW_IN_SAME_RESERVATION);
+        }
+    }
+
+    private void checkReviewOwner(final User loginUser, final Review review){
+
+        if(!loginUser.getId().equals(review.getReservation().getUser().getId())){
+            throw new GeneralException(RentalException.CANT_ACCESS_TO_OTHER_REVIEW);
         }
     }
 
