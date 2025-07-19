@@ -1,0 +1,57 @@
+name: "Test request"
+description: "단위/통합 테스트 코드 작성을 위한 양식입니다. 생성된 이슈는 Jira와 연동됩니다."
+labels: [test]
+title: "[TEST] 이슈 이름을 작성해주세요"
+body:
+  - type: dropdown
+    id: issuetype
+    attributes:
+      label: "🔖 이슈 유형 (Jira Issue Type)"
+      description: "Jira 상에서 사용할 이슈 타입을 선택해주세요"
+      options:
+        - Task
+        - Sub-task
+        - Story
+        - Epic
+    validations:
+      required: true
+
+  - type: input
+    id: parentKey
+    attributes:
+      label: "🎟️ 상위 작업 (Ticket Number)"
+      description: "연결할 상위 Jira 티켓 키(BADA-00) 를 입력해주세요"
+      placeholder: "BADA-00"
+    validations:
+      required: true
+
+  - type: input
+    id: branch
+    attributes:
+      label: "🌳 브랜치명 (Branch)"
+      description: "영어로 브랜치명을 작성해주세요"
+      placeholder: "test/BADA-00-New_Test"
+    validations:
+      required: true
+
+  - type: textarea
+    id: target
+    attributes:
+      label: "🧪 테스트 대상"
+      description: "어떤 기능, API, 또는 클래스에 대한 테스트인지 작성해주세요."
+      placeholder: "예: UserService 테스트를 수행합니다."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ To-do"
+      description: "테스트 수행을 위한 세부 작업 목록을 작성해주세요."
+      value: |
+        - [ ] todo 1
+        - [ ] todo 2
+        - [ ] todo 3
+        - [ ] todo 4
+    validations:
+      required: true
