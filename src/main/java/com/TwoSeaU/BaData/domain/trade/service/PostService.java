@@ -211,6 +211,7 @@ public class PostService {
         }
 
         postRepository.delete(post);
+        s3ImageService.deleteImage(post.getPostImage());
 
         return DeletePostResponse.of(postId);
     }
