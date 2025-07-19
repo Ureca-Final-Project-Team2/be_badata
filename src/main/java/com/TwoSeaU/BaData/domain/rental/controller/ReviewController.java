@@ -43,13 +43,13 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewsResponse(storeId, pageable)));
     }
 
-    @DeleteMapping("/api/v1/{reviewId}")
+    @DeleteMapping("/api/v1/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<Long>> deleteReview(@PathVariable("reviewId") final Long reviewId, @AuthenticationPrincipal User user){
 
         return ResponseEntity.ok(ApiResponse.success(reviewService.deleteReview(reviewId,user.getUsername())));
     }
 
-    @PatchMapping(value = "/api/v1/{reviewId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/api/v1/reviews/{reviewId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Long>> updateReview(@PathVariable("reviewId") final Long reviewId,
                                                           @AuthenticationPrincipal User user,
                                                           @ModelAttribute @Valid UpdateReviewRequest updateReviewRequest){
