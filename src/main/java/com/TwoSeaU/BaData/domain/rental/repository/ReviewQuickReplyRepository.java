@@ -1,7 +1,9 @@
 package com.TwoSeaU.BaData.domain.rental.repository;
 
+import com.TwoSeaU.BaData.domain.rental.entity.QuickReply;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.rental.entity.ReviewQuickReply;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,4 +18,8 @@ public interface ReviewQuickReplyRepository extends JpaRepository<ReviewQuickRep
 
     @Query("select rqr From ReviewQuickReply rqr join fetch rqr.quickReply where rqr.review=:review")
     List<ReviewQuickReply> findByReviewWithFetchQuickReply(final Review review);
+
+    @Query("select count(*) from ReviewQuickReply rqr join rqr.review rv join rv.reservation r where r.store=:store and rqr.quickReply=:quickReply")
+    int countByQuickReplyAndStore(final Store store, final QuickReply quickReply);
+
 }
