@@ -152,7 +152,7 @@ public class ReviewService {
                 StoreException.CANT_FIND_STORE));
 
         final List<ShowCountPerQuickReplyResponse> showCountPerQuickReplyResponses = quickReplyRepository.findAll().stream().map(quickReply -> {
-            int countByQuickReply = reviewQuickReplyRepository.countByQuickReplyAndStore(store, quickReply);
+            int countByQuickReply = reviewQuickReplyRepository.countByStoreAndQuickReply(store, quickReply);
             return ShowCountPerQuickReplyResponse.of(quickReply.getName(), countByQuickReply);
         }).toList();
 

@@ -20,6 +20,6 @@ public interface ReviewQuickReplyRepository extends JpaRepository<ReviewQuickRep
     List<ReviewQuickReply> findByReviewWithFetchQuickReply(final Review review);
 
     @Query("select count(*) from ReviewQuickReply rqr join rqr.review rv join rv.reservation r where r.store=:store and rqr.quickReply=:quickReply")
-    int countByQuickReplyAndStore(final Store store, final QuickReply quickReply);
+    int countByStoreAndQuickReply(final Store store, final QuickReply quickReply);
 
 }
