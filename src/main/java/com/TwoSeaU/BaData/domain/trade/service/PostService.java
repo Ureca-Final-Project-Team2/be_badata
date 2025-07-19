@@ -17,6 +17,7 @@ import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class PostService {
     private final PostLikesRepository postLikesRepository;
     private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
+    private final S3ImageService s3ImageService;
 
     public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
         Optional<Long> optionalUserId;
@@ -121,7 +123,7 @@ public class PostService {
                 saveGifticonPostRequest.getComment(),
                 saveGifticonPostRequest.getPrice(),
                 saveGifticonPostRequest.getDeadLine(),
-                "no image",
+                s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename()),
                 false,
                 saveGifticonPostRequest.getIssueDate(),
                 saveGifticonPostRequest.getCouponNumber(),
