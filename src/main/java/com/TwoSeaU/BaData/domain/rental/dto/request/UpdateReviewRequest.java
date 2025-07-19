@@ -12,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreateReviewRequest {
-
-    @NotNull(message = "예약 ID는 필수입니다.")
-    private Long reservationId;
+public class UpdateReviewRequest {
 
     private List<Long> quickReplyIds;
 

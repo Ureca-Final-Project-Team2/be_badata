@@ -81,4 +81,29 @@ public class Store extends BaseEntity {
         this.reviewRating = afterRatingSum / this.reviewCount;
     }
 
+    public void adjustReviewRatingByRemove(final Review review) {
+
+        double beforeRatingSum = this.reviewRating * this.reviewCount;
+        double afterRatingSum = beforeRatingSum - review.getRating();
+
+        this.reviewCount--;
+
+        if(this.reviewCount < 0){
+            reviewCount = 0;
+        }
+
+        if (this.reviewCount == 0) {
+            this.reviewRating = 0.0;
+        } else {
+            this.reviewRating = afterRatingSum / this.reviewCount;
+        }
+
+    }
+
+    public void changeReviewRatingAndRecalculatingAverage(Integer beforeRating, Integer afterRating) {
+        double beforeRatingSum = this.reviewRating * this.reviewCount;
+        double afterRatingSum = beforeRatingSum - beforeRating + afterRating;
+        this.reviewRating = afterRatingSum / reviewCount;
+    }
+
 }

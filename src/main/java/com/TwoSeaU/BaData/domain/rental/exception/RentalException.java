@@ -20,7 +20,9 @@ public enum RentalException implements BaseException {
     DONT_MATCH_REVIEW_RESERVATION_OWNER(HttpStatus.BAD_REQUEST,4010,"리뷰 요청 주체가 예약을 진행한 주체가 아닙니다"),
     CANT_FIND_QUICK_REPLY(HttpStatus.NOT_FOUND, 4011, "해당 퀵 리플라이를 찾을 수 없습니다"),
     CANT_ACCESS_TO_OTHER_RESERVATION(HttpStatus.FORBIDDEN, 4012, "다른 사람의 예약 정보는 접근할 수 없습니다"),
-    CANT_WRITE_REVIEW_IN_SAME_RESERVATION(HttpStatus.BAD_REQUEST, 4013, "이미 해당 예약에 리뷰를 작성하였습니다");
+    CANT_WRITE_REVIEW_IN_SAME_RESERVATION(HttpStatus.BAD_REQUEST, 4013, "이미 해당 예약에 리뷰를 작성하였습니다"),
+    CANT_ACCESS_TO_OTHER_REVIEW(HttpStatus.FORBIDDEN, 4014, "다른 사람의 리뷰에는 접근할 수 없습니다"),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND , 4015, "해당 리뷰를 찾을 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final int code;
