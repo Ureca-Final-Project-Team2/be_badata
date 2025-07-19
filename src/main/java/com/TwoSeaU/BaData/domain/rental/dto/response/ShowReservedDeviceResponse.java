@@ -24,12 +24,13 @@ public class ShowReservedDeviceResponse {
     public static ShowReservedDeviceResponse from(final StoreDevice storeDevice,final
             DeviceReservation deviceReservation, final Reservation reservation){
 
-        int days = (int) ChronoUnit.DAYS.between(reservation.getRentalStartDate(), reservation.getRentalEndDate());
+        long daysBetween = ChronoUnit.DAYS.between(reservation.getRentalStartDate(), reservation.getRentalEndDate());
+        int days = Math.max(1, (int) daysBetween);
 
         return ShowReservedDeviceResponse.builder()
                 .deviceName(storeDevice.getDevice().getName())
                 .dataCapacity(storeDevice.getDataCapacity())
-                .price(storeDevice.getPrice()*days)
+                .price(storeDevice.getPrice() * days)
                 .count(deviceReservation.getReservationCount())
                 .build();
     }
