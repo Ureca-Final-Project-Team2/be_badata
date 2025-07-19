@@ -15,7 +15,7 @@ public class GetAddressResponse {
 
     private Long addressId;
     private String detailAddress;
-    private double longtitude;
+    private double longitude;
     private double latitude;
 
     public static GetAddressResponse from(final Address address){
@@ -23,7 +23,7 @@ public class GetAddressResponse {
         return GetAddressResponse.builder()
                 .addressId(address.getId())
                 .detailAddress(address.getDetailAddress())
-                .longtitude(address.getLocation().getX())
+                .longitude(address.getLocation().getX())
                 .latitude(address.getLocation().getY())
                 .build();
     }
