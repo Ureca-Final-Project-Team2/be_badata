@@ -1,6 +1,8 @@
 package com.TwoSeaU.BaData.domain.rental.repository;
 
+import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.rental.entity.ReviewQuickReply;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,4 +13,7 @@ public interface ReviewQuickReplyRepository extends JpaRepository<ReviewQuickRep
     @Modifying
     @Query("DELETE FROM ReviewQuickReply rqr WHERE rqr.review.id =:reviewId")
     void deleteByReviewId(@Param("reviewId") Long reviewId);
+
+    @Query("select rqr From ReviewQuickReply rqr join fetch rqr.quickReply where rqr.review=:review")
+    List<ReviewQuickReply> findByReviewWithFetchQuickReply(final Review review);
 }
