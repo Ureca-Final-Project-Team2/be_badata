@@ -63,11 +63,12 @@ public class ReviewService {
 
         final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
         final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
+
+        checkReviewOwner(loginUser, review);
+
         final Store store = review.getReservation().getStore();
 
         store.adjustReviewRatingByRemove(review);
-
-        checkReviewOwner(loginUser, review);
 
         reviewQuickReplyRepository.deleteByReviewId(reviewId);
         reviewRepository.deleteById(reviewId);
@@ -80,9 +81,10 @@ public class ReviewService {
 
         final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
         final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
-        final Store store = review.getReservation().getStore();
 
         checkReviewOwner(loginUser, review);
+
+        final Store store = review.getReservation().getStore();
 
         store.changeReviewRatingAndRecalculatingAverage(review.getRating(),updateReviewRequest.getRating());
 
