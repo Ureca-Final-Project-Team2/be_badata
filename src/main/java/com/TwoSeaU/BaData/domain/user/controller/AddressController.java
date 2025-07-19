@@ -33,8 +33,8 @@ public class AddressController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<GetAddressSliceResponse>> getAddressSliceResponse(@AuthenticationPrincipal User user,final
-            Pageable pageable){
+    public ResponseEntity<ApiResponse<GetAddressSliceResponse>> getAddressSliceResponse(@AuthenticationPrincipal User user,
+                                                                                        final Pageable pageable){
 
         return ResponseEntity.ok(ApiResponse.success(addressService.getAddressSliceResponse(user.getUsername(), pageable)));
     }
