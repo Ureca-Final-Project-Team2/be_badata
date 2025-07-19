@@ -100,4 +100,10 @@ public class Store extends BaseEntity {
 
     }
 
+    public void changeReviewRatingAndRecalculatingAverage(Integer beforeRating, Integer afterRating) {
+        double beforeRatingSum = this.reviewRating * this.reviewCount;
+        double afterRatingSum = beforeRatingSum - beforeRating + afterRating;
+        this.reviewRating = afterRatingSum / reviewCount;
+    }
+
 }

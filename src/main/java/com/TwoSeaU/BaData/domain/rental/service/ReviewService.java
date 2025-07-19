@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.QuickReply;
@@ -71,11 +72,28 @@ public class ReviewService {
         reviewQuickReplyRepository.deleteByReviewId(reviewId);
         reviewRepository.deleteById(reviewId);
 
-        s3ImageService.deleteImage(review.getImageUrl());
-
         return reviewId;
     }
 
+    @Transactional
+    public Long changeReview(final Long reviewId, final UpdateReviewRequest updateReviewRequest, final String username, final String imageUrl){
+
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
+        final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
+        final Store store = review.getReservation().getStore();
+
+        checkReviewOwner(loginUser, review);
+
+        store.changeReviewRatingAndRecalculatingAverage(review.getRating(),updateReviewRequest.getRating());
+
+        reviewQuickReplyRepository.deleteByReviewId(reviewId);
+        saveQuickReply(updateReviewRequest.getQuickReplyIds(), review);
+
+        review.changeContentAndRatingAndImageUrl(updateReviewRequest.getComment(),
+                updateReviewRequest.getRating(), imageUrl);
+
+        return reviewId;
+    }
     private void saveQuickReply(final List<Long> quickReplyIds, final Review review){
 
         quickReplyIds.forEach(quickReplyId->{

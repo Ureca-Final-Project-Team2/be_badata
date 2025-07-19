@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.rental.controller;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewService;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewUploadFacade;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +47,15 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<Long>> deleteReview(@PathVariable("reviewId") final Long reviewId, @AuthenticationPrincipal User user){
 
         return ResponseEntity.ok(ApiResponse.success(reviewService.deleteReview(reviewId,user.getUsername())));
+    }
+
+    @PatchMapping(value = "/api/v1/{reviewId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Long>> updateReview(@PathVariable("reviewId") final Long reviewId,
+                                                          @AuthenticationPrincipal User user,
+                                                          @ModelAttribute @Valid UpdateReviewRequest updateReviewRequest){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewUploadFacade.changeReviewWithImage(reviewId, updateReviewRequest,
+                user.getUsername())));
     }
 
 }

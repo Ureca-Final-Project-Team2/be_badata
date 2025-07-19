@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,15 @@ public class ReviewUploadFacade {
                                                                                                  createReviewRequest.getFile().getOriginalFilename());
 
         return reviewService.createReview(createReviewRequest, username, imageUrl);
+    }
+
+    public Long changeReviewWithImage(final Long reviewId, final UpdateReviewRequest updateReviewRequest, final String username){
+
+        final String imageUrl = updateReviewRequest.getFile()==null ? null : s3ImageService.saveImage(updateReviewRequest.getFile(),
+                reviewDirectory,
+                updateReviewRequest.getFile().getOriginalFilename());
+
+        return reviewService.changeReview(reviewId, updateReviewRequest, username, imageUrl);
     }
 
 }
