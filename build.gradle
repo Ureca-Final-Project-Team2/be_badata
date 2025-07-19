@@ -65,6 +65,9 @@ dependencies {
 
 	//portone
 	implementation group: 'com.github.iamport', name: 'iamport-rest-client-java', version: '0.2.22'
+
+	//s3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
 }
 
 tasks.named('test') {
