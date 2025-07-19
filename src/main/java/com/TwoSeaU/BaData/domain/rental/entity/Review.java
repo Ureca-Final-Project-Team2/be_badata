@@ -50,4 +50,11 @@ public class Review extends BaseEntity {
                 .build();
     }
 
+    public void changeContentAndRatingAndImageUrl(final String content, final Integer rating, final String imageUrl){
+
+        this.content = content;
+        this.rating = rating;
+        this.imageUrl = imageUrl;
+    }
+
 }
