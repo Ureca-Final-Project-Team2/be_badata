@@ -48,6 +48,9 @@ public class Reservation extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime rentalEndDate;
 
+    @Column(nullable = false)
+    private Integer price;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
@@ -63,6 +66,7 @@ public class Reservation extends BaseEntity {
                 .rentalEndDate(rentalEndDate)
                 .status(ReservationStatus.PENDING)
                 .store(store)
+                .price(10)
                 .build();
     }
 
