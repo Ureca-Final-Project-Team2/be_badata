@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AddressCreateRequest {
 
-    @NotBlank(message = "상세 주소는 빈 값이 될 수 없습니다")
+    @NotBlank(message = "상세 주소는 빈 값이 될 수 없습니다.")
     private String detailAddress;
 
     @DecimalMin(value = "-90.0", message = "위도는 -90 이상이어야 합니다.")
