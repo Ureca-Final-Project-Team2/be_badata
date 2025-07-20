@@ -3,6 +3,8 @@ package com.TwoSeaU.BaData.domain.rental.repository;
 import static com.TwoSeaU.BaData.domain.rental.entity.QReservation.reservation;
 import static com.TwoSeaU.BaData.domain.rental.entity.QReview.review;
 import static com.TwoSeaU.BaData.domain.store.entity.QStore.store;
+import static com.TwoSeaU.BaData.domain.user.entity.QUser.user;
+
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -23,8 +25,9 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     public Slice<Review> getReviewSlice(final Long storeId, final Pageable pageable) {
 
         List<Review> content = queryFactory.selectFrom(review)
-                .join(review.reservation, reservation)
-                .leftJoin(reservation.store, store)
+                .join(review.reservation, reservation).fetchJoin()
+                .leftJoin(reservation.store, store).fetchJoin()
+                .join(reservation.user, user).fetchJoin()
                 .where(review.reservation.store.id.eq(storeId))
                 .orderBy(reviewSort(pageable))
                 .offset(pageable.getOffset())
