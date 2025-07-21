@@ -32,7 +32,4 @@ public class SaveDataPostRequest {
 
     @NotNull(message = "상세 설명은 필수 작성입니다.")
     private String comment;
-
-    @NotNull(message = "쿠폰 이미지 등록은 필수입니다.")
-    private MultipartFile file;
 }

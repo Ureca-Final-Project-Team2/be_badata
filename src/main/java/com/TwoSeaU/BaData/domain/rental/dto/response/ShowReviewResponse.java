@@ -3,6 +3,8 @@ package com.TwoSeaU.BaData.domain.rental.dto.response;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +19,13 @@ public class ShowReviewResponse {
 
     private Long reviewId;
 
-    private Long userId;
+    private Long writerId;
+
+    private String name;
+
+    private String userImageUrl;
+
+    private String reviewImageUrl;
 
     private String comment;
 
@@ -25,17 +33,23 @@ public class ShowReviewResponse {
 
     private Integer rating;
 
-    private String imageUrl;
+    private Integer countOfVisit;
 
-    public static ShowReviewResponse from(final Review review){
+    private List<String> quickReplyNames = new ArrayList<>();
+
+    public static ShowReviewResponse from(final Review review, final Integer countOfVisit, final List<String> quickReplyName){
 
         return ShowReviewResponse.builder()
                 .reviewId(review.getId())
-                .userId(review.getReservation().getUser().getId())
+                .writerId(review.getReservation().getUser().getId())
+                .name(review.getReservation().getUser().getNickName())
+                .userImageUrl(review.getReservation().getUser().getProfileImageUrl())
+                .reviewImageUrl(review.getImageUrl())
                 .comment(review.getContent())
                 .createdAt(review.getCreatedAt())
-                .imageUrl(review.getImageUrl())
                 .rating(review.getRating())
+                .countOfVisit(countOfVisit)
+                .quickReplyNames(quickReplyName)
                 .build();
     }
 

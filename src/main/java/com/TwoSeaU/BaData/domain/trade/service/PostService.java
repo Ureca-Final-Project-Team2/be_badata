@@ -146,19 +146,13 @@ public class PostService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
-
-        if (result.isManipulated()) {
-            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
-        }
-
         final Data data = new Data(
                 user,
                 saveDataPostRequest.getTitle(),
-                null,
+                saveDataPostRequest.getComment(),
                 saveDataPostRequest.getPrice(),
                 saveDataPostRequest.getDeadLine(),
-                "no image",
+                null,
                 false,
                 saveDataPostRequest.getMobileCarrier(),
                 saveDataPostRequest.getCapacity()

@@ -2,6 +2,8 @@ package com.TwoSeaU.BaData.domain.rental.service;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowCountPerQuickReplyResponse;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.QuickReply;
@@ -14,6 +16,8 @@ import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewRepository;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
+import com.TwoSeaU.BaData.domain.store.exception.StoreException;
+import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
@@ -36,8 +40,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewQuickReplyRepository reviewQuickReplyRepository;
     private final QuickReplyRepository quickReplyRepository;
-    private final S3ImageService s3ImageService;
-
+    private final StoreRepository storeRepository;
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
 
@@ -129,6 +132,34 @@ public class ReviewService {
         Slice<Review> reviewSlice = reviewRepository.getReviewSlice(storeId, pageable);
 
         return ShowReviewWithMetaResponse.of(reviewSlice.getContent().stream()
-                .map(ShowReviewResponse::from).toList(), reviewSlice.hasNext());
+                .map(review -> {
+
+
+                    final User user = review.getReservation().getUser();
+                    final Integer countOfVisit = reservationRepository.countByReservationAndStore(review.getReservation().getStore(), user);
+
+                    final List<String> quickReplyName = reviewQuickReplyRepository.findByReviewWithFetchQuickReply(review).stream().map(reviewQuickReply->{
+                        return reviewQuickReply.getQuickReply().getName();
+                    }).toList();
+
+                    return ShowReviewResponse.from(review, countOfVisit, quickReplyName);
+                }).toList(), reviewSlice.hasNext());
     }
+
+    public ShowReviewMetaResponse getReviewMetaByStore(final Long storeId){
+
+        final Store store = storeRepository.findById(storeId).orElseThrow(()->new GeneralException(
+                StoreException.CANT_FIND_STORE));
+
+        final List<ShowCountPerQuickReplyResponse> showCountPerQuickReplyResponses = quickReplyRepository.findAll().stream().map(quickReply -> {
+            int countByQuickReply = reviewQuickReplyRepository.countByStoreAndQuickReply(store, quickReply);
+            return ShowCountPerQuickReplyResponse.of(quickReply.getName(), countByQuickReply);
+        }).toList();
+
+        return ShowReviewMetaResponse.of(store.getReviewCount(), showCountPerQuickReplyResponses);
+
+
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.rental.controller;
 
 import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewService;
 import com.TwoSeaU.BaData.domain.rental.service.ReviewUploadFacade;
@@ -56,6 +57,12 @@ public class ReviewController {
 
         return ResponseEntity.ok(ApiResponse.success(reviewUploadFacade.changeReviewWithImage(reviewId, updateReviewRequest,
                 user.getUsername())));
+    }
+
+    @GetMapping("/api/v1/{storeId}/review-meta")
+    public ResponseEntity<ApiResponse<ShowReviewMetaResponse>> getReviewMetaByStore(@PathVariable("storeId") final Long storeId){
+
+        return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewMetaByStore(storeId)));
     }
 
 }
