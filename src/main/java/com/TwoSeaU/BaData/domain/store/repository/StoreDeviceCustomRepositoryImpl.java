@@ -8,8 +8,8 @@ import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
-import com.TwoSeaU.BaData.domain.store.dto.response.StoreWithRemainDto;
-import com.TwoSeaU.BaData.domain.store.entity.Store;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.service.GeoUtils;
 import com.querydsl.core.types.Order;
@@ -38,9 +38,20 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     public static final String distance = "distance";
 
     @Override
-    public List<Store> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest){
+    public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest){
 
-        return queryFactory.select(storeDevice.store)
+        return queryFactory.select(Projections.constructor(ShowStoreWithLeftDeviceResponse.class,
+                        storeDevice.store,storeDevice.count.subtract(
+                                JPAExpressions
+                                        .select(deviceReservation.reservationCount.sum().coalesce(0))
+                                        .from(deviceReservation)
+                                        .join(deviceReservation.reservation, reservation)
+                                        .where(
+                                                deviceReservation.storeDevice.eq(storeDevice),
+                                                reservation.rentalStartDate.loe(storeMapSearchRequest.getRentalEndDate()),
+                                                reservation.rentalEndDate.goe(storeMapSearchRequest.getRentalStartDate())
+                                        )
+                        ).sum()))
                 .from(storeDevice)
                 .where(minPriceGoe(storeMapSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(storeMapSearchRequest.getMaxPrice()))
@@ -54,15 +65,16 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .where(availableInBoundingBox(storeMapSearchRequest.getSwLng(),
                         storeMapSearchRequest.getSwLat(),
                         storeMapSearchRequest.getNeLng(), storeMapSearchRequest.getNeLat()))
+                .groupBy(storeDevice.store)
                 .fetch();
 
     }
 
     @Override
-    public Slice<StoreWithRemainDto> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
+    public Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
 
-        List<StoreWithRemainDto> content = queryFactory
-                .select(Projections.constructor(StoreWithRemainDto.class,
+        List<ShowStoreWithLeftDeviceAndDistanceResponse> content = queryFactory
+                .select(Projections.constructor(ShowStoreWithLeftDeviceAndDistanceResponse.class,
                                 storeDevice.store,
                                 Expressions.numberTemplate(Double.class,
                                 "ST_DistanceSphere({0}, ST_MakePoint({1}, {2}))",
