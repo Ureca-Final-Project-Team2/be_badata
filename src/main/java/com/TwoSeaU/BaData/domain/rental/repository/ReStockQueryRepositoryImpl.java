@@ -8,10 +8,8 @@ import com.TwoSeaU.BaData.domain.store.entity.Device;
 import com.TwoSeaU.BaData.domain.store.entity.QDevice;
 import com.TwoSeaU.BaData.domain.store.entity.QStoreDevice;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
-import com.TwoSeaU.BaData.domain.store.exception.StoreException;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
-import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -23,7 +21,7 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public CursorPageResponse<GetRestockResponse> getAllRestocksByCursor(Long cursor, int size, Long userId) {
+	public CursorPageResponse<GetRestockResponse> getAllRestocksByCursor(final Long cursor, final int size, final Long userId) {
 
 		final QReStock qReStock = QReStock.reStock;
 		final QStoreDevice qStoreDevice = QStoreDevice.storeDevice;
@@ -37,8 +35,8 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 		where.and(qReStock.user.id.eq(userId));
 
 		final List<ReStock> fetchedList = queryFactory.selectFrom(qReStock)
-			.leftJoin(qReStock.storeDevice, qStoreDevice).fetchJoin()
-			.leftJoin(qStoreDevice.device, qDevice).fetchJoin()
+			.join(qReStock.storeDevice, qStoreDevice).fetchJoin()
+			.join(qStoreDevice.device, qDevice).fetchJoin()
 			.where(where)
 			.orderBy(qReStock.id.desc())
 			.limit(size + 1)
@@ -50,10 +48,8 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 
 		final List<GetRestockResponse> responseList = qReStockList.stream()
 			.map(reStock -> {
-				StoreDevice storeDevice = reStock.getStoreDevice();
-				if(storeDevice == null) throw new GeneralException(StoreException.CANT_FIND_STORE_DEVICE);
-				Device device = storeDevice.getDevice();
-				if(device == null) throw new GeneralException(StoreException.CANT_FIND_STORE_DEVICE);
+				final StoreDevice storeDevice = reStock.getStoreDevice();
+				final Device device = storeDevice.getDevice();
 
 				return GetRestockResponse.from(reStock, storeDevice, device);
 			})
