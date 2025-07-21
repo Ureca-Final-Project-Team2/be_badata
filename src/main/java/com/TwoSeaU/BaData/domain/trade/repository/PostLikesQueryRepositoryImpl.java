@@ -21,7 +21,7 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public CursorPageResponse<GetLikesPostResponse> getAllLikesPostsByCursor(Long cursor, int size, Long userId) {
+	public CursorPageResponse<GetLikesPostResponse> getAllLikesPostsByCursor(final Long cursor, final int size, final Long userId) {
 		final QPostLikes qPostLikes = QPostLikes.postLikes;
 		final QPost qPost = QPost.post;
 
@@ -44,7 +44,7 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 			.map(postLikes -> postLikes.getPost().getId())
 			.toList();
 
-		Map<Long, Long> postLikesMap = queryFactory
+		final Map<Long, Long> postLikesMap = queryFactory
 			.select(qPostLikes.post.id, qPostLikes.count())
 			.from(qPostLikes)
 			.where(qPostLikes.post.id.in(postIdList))
@@ -61,7 +61,7 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 		final List<PostLikes> qPostLikesList = hasNext
 			? fetchedList.subList(0, size) : fetchedList;
 
-		List<GetLikesPostResponse> responseList = qPostLikesList.stream()
+		final List<GetLikesPostResponse> responseList = qPostLikesList.stream()
 			.map(postLikes -> {
 				final Post post = postLikes.getPost();
 				final int postLikesCount = postLikesMap.getOrDefault(post.getId(), 0L).intValue();

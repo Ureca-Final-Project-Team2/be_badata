@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetReportResponse {
-	private Long Id;
+	private Long id;
 	private Long postId;
 	private ReportStatus reportStatus;
 	private ReportType reportTypeCode;
@@ -28,7 +28,7 @@ public class GetReportResponse {
 
 	public static GetReportResponse from(final Report report, final Post post) {
 		return GetReportResponse.builder()
-			.Id(report.getId())
+			.id(report.getId())
 			.postId(post.getId())
 			.reportStatus(report.getReportStatus())
 			.reportTypeCode(report.getReportTypeCode())

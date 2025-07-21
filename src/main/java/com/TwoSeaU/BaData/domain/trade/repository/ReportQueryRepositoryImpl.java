@@ -48,15 +48,15 @@ public class ReportQueryRepositoryImpl implements ReportQueryRepository{
 		final List<Report> qReportList = hasNext
 			? fetchedList.subList(0, size) : fetchedList;
 
-		List<GetReportResponse> responseList = qReportList.stream()
+		final List<GetReportResponse> responseList = qReportList.stream()
 			.map(report -> {
-				Post post = report.getPost();
+				final Post post = report.getPost();
 
 				return GetReportResponse.from(report, post);
 			})
 			.toList();
 
-		Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
+		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
 
 		return CursorPageResponse.of(responseList, nextCursor, hasNext);
 	}
