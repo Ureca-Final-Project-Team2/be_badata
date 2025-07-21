@@ -70,6 +70,10 @@ public class Reservation extends BaseEntity {
                 .build();
     }
 
+    public void changePrice(final Integer price){
+        this.price = price;
+    }
+
 
 
 }

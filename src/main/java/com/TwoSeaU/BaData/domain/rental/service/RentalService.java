@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
+import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveDeviceRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveRentalRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowRentalResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservationDeviceInfoResponse;
@@ -21,6 +22,7 @@ import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -66,18 +68,28 @@ public class RentalService {
 
         reservationRepository.save(reservation);
 
-        reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
+        int totalPrice = 0;
+        final long rentalDays = ChronoUnit.DAYS.between(
+                reserveRentalRequest.getRentalStartDate().toLocalDate(),
+                reserveRentalRequest.getRentalEndDate().toLocalDate()
+        );
+        long adjustedRentalDays = (rentalDays == 0) ? 1 : rentalDays;
+
+        for (final ReserveDeviceRequest reserveDeviceRequest : reserveRentalRequest.getStoreDevices()) {
 
             final StoreDevice storeDevice = storeDeviceRepository.findById(reserveDeviceRequest.getStoreDeviceId())
-                            .orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE_DEVICE));
+                    .orElseThrow(() -> new GeneralException(StoreException.CANT_FIND_STORE_DEVICE));
 
-            deviceReservationRepository.save(DeviceReservation.of(reservation,storeDevice,
+            deviceReservationRepository.save(DeviceReservation.of(reservation, storeDevice,
                     reserveDeviceRequest.getCount()));
-        });
+
+            totalPrice += (storeDevice.getPrice() * reserveDeviceRequest.getCount() * (int) adjustedRentalDays);
+        }
+
+        reservation.changePrice(totalPrice);
 
         return reservation.getId();
     }
-
     public ShowRentalResponse getReservedDeviceByReservationId(final Long reservationId, final String username){
 
         // 예약 조회
