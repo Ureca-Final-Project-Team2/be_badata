@@ -18,6 +18,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRentalResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
@@ -105,5 +106,13 @@ public class UserController {
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllRentalsByCursor(cursor, size, user.getUsername())));
+	}
+
+	@GetMapping("/restock")
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetRestockResponse>>> getAllRestocksByCursor(
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllRestocksByCursor(cursor, size, user.getUsername())));
 	}
 }
