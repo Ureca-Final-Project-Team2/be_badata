@@ -51,8 +51,8 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
     }
 
-    @PostMapping(path = "/posts/data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@Valid @ModelAttribute SaveDataPostRequest saveDataPostRequest,
+    @PostMapping(path = "/posts/data")
+    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@Valid @RequestBody SaveDataPostRequest saveDataPostRequest,
                                                                         @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, user.getUsername())));
     }
