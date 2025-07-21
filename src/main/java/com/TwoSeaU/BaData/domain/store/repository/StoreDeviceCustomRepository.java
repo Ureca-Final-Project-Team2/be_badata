@@ -13,7 +13,7 @@ import org.springframework.data.domain.Slice;
 public interface StoreDeviceCustomRepository {
     List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest);
 
-    Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, Pageable pageable);
+    Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable);
 
     List<StoreDevice> findProperDevicesByStore(final DeviceSearchRequest deviceSearchRequest, final Long storeId);
 

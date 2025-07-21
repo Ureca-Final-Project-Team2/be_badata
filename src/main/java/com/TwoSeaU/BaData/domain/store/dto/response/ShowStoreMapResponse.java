@@ -19,7 +19,7 @@ public class ShowStoreMapResponse {
     private String name;
     private int leftDeviceCount;
 
-    public static ShowStoreMapResponse from(final Store store, int leftDeviceCount){
+    public static ShowStoreMapResponse from(final Store store, final int leftDeviceCount){
 
         return ShowStoreMapResponse.builder()
                 .id(store.getId())
