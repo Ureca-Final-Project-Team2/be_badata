@@ -8,7 +8,7 @@ import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithMetaResponse;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
-import com.TwoSeaU.BaData.domain.store.dto.response.StoreWithRemainDto;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
 import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
@@ -31,17 +31,20 @@ public class StoreService {
     public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest){
 
         return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest).stream().map(
-                ShowStoreMapResponse::from).toList();
+                showStoreWithLeftDeviceResponse ->
+            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getRemainingCount())
+        ).toList();
     }
 
     public ShowStoreWithMetaResponse getStoresResponse(final StoreSearchRequest storeSearchRequest,final
             Pageable pageable){
 
-        Slice<StoreWithRemainDto> storesWithSlice = storeDeviceRepository.findStoresByPage(storeSearchRequest,pageable);
+        Slice<ShowStoreWithLeftDeviceAndDistanceResponse> storesWithSlice = storeDeviceRepository.findStoresByPage(storeSearchRequest,pageable);
 
-        return ShowStoreWithMetaResponse.of(storesWithSlice.getContent().stream().map(storeWithRemainDto -> {
-            return ShowStoreResponse.from(storeWithRemainDto.getStore(), storeWithRemainDto.getDistance(), storeWithRemainDto.getRemainingCount());
-        }).toList(),storesWithSlice.hasNext());
+        return ShowStoreWithMetaResponse.of(storesWithSlice.getContent().stream().map(
+                showStoreWithLeftDeviceAndDistanceResponse ->
+            ShowStoreResponse.from(showStoreWithLeftDeviceAndDistanceResponse.getStore(), showStoreWithLeftDeviceAndDistanceResponse.getDistance(), showStoreWithLeftDeviceAndDistanceResponse.getRemainingCount())
+        ).toList(),storesWithSlice.hasNext());
 
     }
 
