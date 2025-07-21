@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,10 +23,10 @@ public class GetRentalResponse {
 	private Integer price;
 	private ReservationStatus reservationStatus;
 
-	public static GetRentalResponse from(final Reservation reservation) {
+	public static GetRentalResponse from(final Reservation reservation, final Store store) {
 		return GetRentalResponse.builder()
 			.id(reservation.getId())
-			.storeName(reservation.getStore().getName())
+			.storeName(store.getName())
 			.rentalStartDate(reservation.getRentalStartDate())
 			.price(reservation.getPrice())
 			.reservationStatus(reservation.getStatus())
