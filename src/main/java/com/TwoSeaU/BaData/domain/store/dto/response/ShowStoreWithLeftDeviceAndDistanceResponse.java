@@ -10,6 +10,6 @@ public class ShowStoreWithLeftDeviceAndDistanceResponse {
 
     private Store store;
     private Double distance;
-    private Integer remainingCount;
+    private Integer leftDeviceCount;
 
 }

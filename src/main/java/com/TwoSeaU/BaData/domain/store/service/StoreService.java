@@ -32,7 +32,7 @@ public class StoreService {
 
         return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest).stream().map(
                 showStoreWithLeftDeviceResponse ->
-            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getRemainingCount())
+            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getLeftDeviceCount())
         ).toList();
     }
 
@@ -43,7 +43,7 @@ public class StoreService {
 
         return ShowStoreWithMetaResponse.of(storesWithSlice.getContent().stream().map(
                 showStoreWithLeftDeviceAndDistanceResponse ->
-            ShowStoreResponse.from(showStoreWithLeftDeviceAndDistanceResponse.getStore(), showStoreWithLeftDeviceAndDistanceResponse.getDistance(), showStoreWithLeftDeviceAndDistanceResponse.getRemainingCount())
+            ShowStoreResponse.from(showStoreWithLeftDeviceAndDistanceResponse.getStore(), showStoreWithLeftDeviceAndDistanceResponse.getDistance(), showStoreWithLeftDeviceAndDistanceResponse.getLeftDeviceCount())
         ).toList(),storesWithSlice.hasNext());
 
     }

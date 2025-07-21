@@ -9,5 +9,5 @@ import lombok.Getter;
 public class ShowStoreWithLeftDeviceResponse {
 
     private Store store;
-    private Integer remainingCount;
+    private Integer leftDeviceCount;
 }
