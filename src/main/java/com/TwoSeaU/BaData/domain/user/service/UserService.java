@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.TwoSeaU.BaData.domain.rental.repository.ReStockRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreLikesRepository;
@@ -29,6 +30,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRentalResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
@@ -54,6 +56,7 @@ public class UserService {
 	private final UserLikesRepository userLikesRepository;
 	private final StoreLikesRepository storeLikesRepository;
 	private final ReservationRepository reservationRepository;
+	private final ReStockRepository reStockRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -168,5 +171,12 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return reservationRepository.getAllRentalsByCursor(cursor, size, user.getId());
+	}
+
+	public CursorPageResponse<GetRestockResponse> getAllRestocksByCursor(final Long cursor, final int size, final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return reStockRepository.getAllRestocksByCursor(cursor, size, user.getId());
 	}
 }
