@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface PaymentRepository extends JpaRepository<Payment, Long>, PaymentQueryRepository {
 
 	List<Payment> findAllByUserId(Long userId);
 	Optional<Payment> findByUserIdAndPostId(Long buyerId, Long postId);
