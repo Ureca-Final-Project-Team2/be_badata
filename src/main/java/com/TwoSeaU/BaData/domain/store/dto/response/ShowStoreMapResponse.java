@@ -17,13 +17,16 @@ public class ShowStoreMapResponse {
     private double longititude;
     private double latitude;
     private String name;
+    private int leftDeviceCount;
 
-    public static ShowStoreMapResponse from(final Store store){
+    public static ShowStoreMapResponse from(final Store store, int leftDeviceCount){
+
         return ShowStoreMapResponse.builder()
                 .id(store.getId())
                 .latitude(store.getPosition().getY())
                 .longititude(store.getPosition().getX())
                 .name(store.getName())
+                .leftDeviceCount(leftDeviceCount)
                 .build();
     }
 }
