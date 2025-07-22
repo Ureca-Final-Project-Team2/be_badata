@@ -1,7 +1,5 @@
 package com.TwoSeaU.BaData.domain.user.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,21 +7,14 @@ import com.TwoSeaU.BaData.domain.rental.repository.ReStockRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreLikesRepository;
-import com.TwoSeaU.BaData.domain.trade.entity.Payment;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
-import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.ReportRepository;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
@@ -72,65 +63,25 @@ public class UserService {
 		return CoinResponse.of(user.getCoin());
 	}
 
-	public GetAllReportResponse getCompleteReports(String username) {
+	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final ReportStatus reportStatus, final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException((UserException.USER_NOT_FOUND)));
 
-		List<GetReportResponse> CompleteReports = reportRepository.findAllByUserIdAndReportStatus(user.getId(), ReportStatus.COMPLETE)
-			.stream()
-			.map(GetReportResponse::from)
-			.toList();
-
-		return GetAllReportResponse.of(CompleteReports);
+		return reportRepository.getAllReportsByCursor(reportStatus, cursor, size, user.getId());
 	}
 
-	public GetAllReportResponse getPendingReports(String username) {
+	public CursorPageResponse<GetPurchaseResponse> getAllPurchasesByCursor(final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		List<GetReportResponse> pendingReports = reportRepository.findAllByUserIdAndReportStatusNot(user.getId(), ReportStatus.COMPLETE)
-			.stream()
-			.map(GetReportResponse::from)
-			.toList();
-
-		return GetAllReportResponse.of(pendingReports);
+		return paymentRepository.getAllPurchasesByCursor(cursor, size, user.getId());
 	}
 
-	public GetAllPurchasesResponse getAllPurchasesResponse(String username) {
+	public CursorPageResponse<GetLikesPostResponse> getAllLikesPostsByCursor(final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		List<Payment> paymentList = paymentRepository.findAllByUserId(user.getId());
-
-		List<GetPurchaseResponse> getPurchaseResponseList = paymentList.stream()
-			.map(payment -> {
-				Post post = postRepository.findById(payment.getPost().getId())
-					.orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
-				int postLikes = postLikesRepository.countByPostId(post.getId());
-
-				return GetPurchaseResponse.from(post, payment, postLikes);
-			})
-			.toList();
-
-		return GetAllPurchasesResponse.of(getPurchaseResponseList);
-	}
-
-	public GetAllLikesPostsResponse getAllLikesPosts(String username) {
-		User user = userRepository.findByUsername(username)
-			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-		List<PostLikes> postLikesList = postLikesRepository.findAllByUserId(user.getId());
-		List<GetLikesPostResponse> getLikesPostResponseList = postLikesList.stream()
-			.map(postLikes -> {
-				Post post = postRepository.findById(postLikes.getPost().getId())
-					.orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
-				int postLikesCount = postLikesRepository.countByPostId(post.getId());
-
-				return GetLikesPostResponse.from(post, postLikesCount);
-			})
-			.toList();
-
-		return GetAllLikesPostsResponse.of(getLikesPostResponseList);
+		return postLikesRepository.getAllLikesPostsByCursor(cursor, size, user.getId());
 	}
 
 	public CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, String username) {
@@ -147,7 +98,7 @@ public class UserService {
 		return sosRepository.getAllSosResponse(cursor, size, user.getId());
 	}
 
-	public CursorPageResponse<GetFollowsResponse> getFollowsResponseByCursor(final FollowType followType, final Long cursor, final int size, final String username) {
+	public CursorPageResponse<GetFollowsResponse> getFollowsByCursor(final FollowType followType, final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 

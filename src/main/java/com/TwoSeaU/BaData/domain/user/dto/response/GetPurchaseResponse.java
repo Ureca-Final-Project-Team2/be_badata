@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetPurchaseResponse {
-	private Long paymentId;
+	private Long id;
 	private Long postId;
 	private PostCategory postCategory;
 	private String partner;
@@ -28,7 +28,7 @@ public class GetPurchaseResponse {
 
 	public static GetPurchaseResponse from(final Post post, final Payment payment, final int postLikes) {
 		return GetPurchaseResponse.builder()
-			.paymentId(payment.getId())
+			.id(payment.getId())
 			.postId(post.getId())
 			.postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
 			.partner(post instanceof Gifticon gifticon ? gifticon.getPartner() : null)

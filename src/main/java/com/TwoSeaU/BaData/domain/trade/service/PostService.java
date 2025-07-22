@@ -23,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +68,9 @@ public class PostService {
                 .build();
     }
 
+    public ELAResult E3Test(final MultipartFile file){
+        return elaService.analyzeImage(file);
+    }
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
 
@@ -83,7 +88,7 @@ public class PostService {
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDate.now().minusDays(2)), userdetails);
 
     }
 

@@ -6,9 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface PostLikesRepository extends JpaRepository<PostLikes, Long> {
+public interface PostLikesRepository extends JpaRepository<PostLikes, Long>, PostLikesQueryRepository{
     Optional<PostLikes> findByUserIdAndPostId(Long userId, Long postId);
-    List<PostLikes> findAllByUserId(Long userId);
     Boolean existsByUserIdAndPostId(Long userId, Long postId);
     int countByPostId(Long postId);
 }
