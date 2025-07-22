@@ -57,8 +57,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                                         .join(deviceReservation.reservation, reservation)
                                         .where(
                                                 deviceReservation.storeDevice.eq(storeDevice),
-                                                reservation.rentalStartDate.loe(rentalStartDate),
-                                                reservation.rentalEndDate.goe(rentalEndDate)
+                                                reservation.rentalStartDate.loe(rentalEndDate),
+                                                reservation.rentalEndDate.goe(rentalStartDate)
                                         )
                         ).sum()))
                 .from(storeDevice)
