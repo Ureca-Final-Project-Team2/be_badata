@@ -4,14 +4,18 @@ import static com.TwoSeaU.BaData.domain.rental.entity.QDeviceReservation.deviceR
 import static com.TwoSeaU.BaData.domain.rental.entity.QReservation.reservation;
 import static com.TwoSeaU.BaData.domain.store.entity.QStore.store;
 import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
+import static com.TwoSeaU.BaData.domain.store.entity.QStoreLikes.storeLikes;
 
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
+import com.TwoSeaU.BaData.domain.store.entity.StoreLikes;
 import com.TwoSeaU.BaData.domain.store.service.GeoUtils;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -22,7 +26,9 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,9 +44,11 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     public static final String distance = "distance";
 
     @Override
-    public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest){
+    public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest, final String username){
 
-        return queryFactory.select(Projections.constructor(ShowStoreWithLeftDeviceResponse.class,
+        final Set<Long> userLikedStoreIds = getUserLikedStoreIds(username);
+
+        final List<Tuple> results =  queryFactory.select(
                         storeDevice.store,storeDevice.count.subtract(
                                 JPAExpressions
                                         .select(deviceReservation.reservationCount.sum().coalesce(0))
@@ -51,7 +59,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                                                 reservation.rentalStartDate.loe(storeMapSearchRequest.getRentalEndDate()),
                                                 reservation.rentalEndDate.goe(storeMapSearchRequest.getRentalStartDate())
                                         )
-                        ).sum()))
+                        ).sum())
                 .from(storeDevice)
                 .where(minPriceGoe(storeMapSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(storeMapSearchRequest.getMaxPrice()))
@@ -68,6 +76,15 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .groupBy(storeDevice.store)
                 .fetch();
 
+        return results.stream()
+                .map(tuple -> {
+                    final Store store = tuple.get(storeDevice.store);
+                    final Integer leftCount = tuple.get(1, Integer.class);
+                    final boolean liked = userLikedStoreIds.contains(store.getId());
+
+                    return new ShowStoreWithLeftDeviceResponse(store, leftCount, liked);
+                })
+                .toList();
     }
 
     @Override
@@ -246,6 +263,19 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         }
 
         return new OrderSpecifier(Order.DESC, store.id);
+    }
+
+    public Set<Long> getUserLikedStoreIds(final String username) {
+
+        if(username == null){
+            return new HashSet<>();
+        }
+
+        return new HashSet<>(queryFactory
+                .select(storeLikes.store.id)
+                .from(storeLikes)
+                .where(storeLikes.user.username.eq(username))
+                .fetch());
     }
 
 }

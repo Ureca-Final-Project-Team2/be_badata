@@ -10,4 +10,5 @@ public class ShowStoreWithLeftDeviceResponse {
 
     private Store store;
     private Integer leftDeviceCount;
+    private boolean isLiked;
 }
