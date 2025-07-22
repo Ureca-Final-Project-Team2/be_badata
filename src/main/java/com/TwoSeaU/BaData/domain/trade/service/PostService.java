@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +88,7 @@ public class PostService {
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDate.now().minusDays(2)), userdetails);
 
     }
 
