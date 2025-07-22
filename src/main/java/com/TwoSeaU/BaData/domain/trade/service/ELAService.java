@@ -21,6 +21,7 @@ import javax.imageio.stream.ImageOutputStream;
 public class ELAService {
     private static final double QUALITY_FACTOR = 0.90;
     private static final int SUSPICIOUS_THRESHOLD = 1;
+    private static final int BLOCK_SIZE = 8;
 
     public ELAResult analyzeImage(final MultipartFile file) {
         try {
@@ -34,7 +35,9 @@ public class ELAService {
 
             final double manipulationScore = calculateManipulationScore(differenceImage);
 
-            return new ELAResult(suspiciousRegions, manipulationScore);
+            int tot = ((differenceImage.getWidth() - BLOCK_SIZE) / BLOCK_SIZE) * ((differenceImage.getHeight() - BLOCK_SIZE) / BLOCK_SIZE);
+
+            return new ELAResult(suspiciousRegions, manipulationScore, (suspiciousRegions.size() / (double) tot) * 100);
 
         } catch (IOException e) {
             throw new GeneralException(TradeException.ELA_IMAGE_PROCESSING_FAILED);
@@ -95,17 +98,15 @@ public class ELAService {
         final int width = difference.getWidth();
         final int height = difference.getHeight();
 
-        final int blockSize = 8;
-        for (int y = 0; y < height - blockSize; y += blockSize) {
-            for (int x = 0; x < width - blockSize; x += blockSize) {
-                double avgDifference = calculateBlockAverage(difference, x, y, blockSize);
+        for (int y = 0; y < height - BLOCK_SIZE; y += BLOCK_SIZE) {
+            for (int x = 0; x < width - BLOCK_SIZE; x += BLOCK_SIZE) {
+                double avgDifference = calculateBlockAverage(difference, x, y, BLOCK_SIZE);
 
                 if (avgDifference > SUSPICIOUS_THRESHOLD) {
-                    regions.add(SuspiciousRegion.of(x, y, blockSize, blockSize, avgDifference));
+                    regions.add(SuspiciousRegion.of(x, y, BLOCK_SIZE, BLOCK_SIZE, avgDifference));
                 }
             }
         }
-
         return regions;
     }
 
@@ -124,27 +125,19 @@ public class ELAService {
         return count > 0 ? sum / count : 0;
     }
 
-    private double calculateManipulationScore(final BufferedImage difference) {
-        final int width = difference.getWidth();
-        final int height = difference.getHeight();
-        int modifiedPixels = 0;
+    private static double calculateManipulationScore(BufferedImage difference) {
+        long totalDifference = 0;
+        int width = difference.getWidth();
+        int height = difference.getHeight();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Color color = new Color(difference.getRGB(x, y));
-                int grayValue = color.getRed();
-
-                if (grayValue > 1) {
-                    modifiedPixels++;
-                }
+                totalDifference += color.getRed();
             }
         }
 
-        if (modifiedPixels > 0) {
-            final double modifiedRatio = (double) modifiedPixels / (width * height);
-            return Math.min(100, 50 + (modifiedRatio * 1000));
-        }
-
-        return 0;
+        double avgDifference = (double) totalDifference / (width * height);
+        return Math.min(100, (avgDifference / 255.0) * 100);
     }
 }

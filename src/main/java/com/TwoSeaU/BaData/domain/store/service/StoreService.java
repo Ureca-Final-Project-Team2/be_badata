@@ -28,11 +28,11 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreDeviceRepository storeDeviceRepository;
 
-    public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest){
+    public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest, final String username){
 
-        return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest).stream().map(
+        return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest, username).stream().map(
                 showStoreWithLeftDeviceResponse ->
-            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getLeftDeviceCount())
+            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getLeftDeviceCount(), showStoreWithLeftDeviceResponse.isLiked())
         ).toList();
     }
 
