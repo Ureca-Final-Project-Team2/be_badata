@@ -18,7 +18,7 @@ public class ShowStoreMapResponse {
     private double latitude;
     private String name;
     private int leftDeviceCount;
-    boolean isLiked;
+    private boolean isLiked;
 
     public static ShowStoreMapResponse from(final Store store, final int leftDeviceCount, final boolean isLiked){
 
