@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +68,9 @@ public class PostService {
                 .build();
     }
 
+    public ELAResult E3Test(final MultipartFile file){
+        return elaService.analyzeImage(file);
+    }
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
 
