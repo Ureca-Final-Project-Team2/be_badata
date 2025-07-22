@@ -24,6 +24,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
@@ -48,6 +49,14 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
 
         final Set<Long> userLikedStoreIds = getUserLikedStoreIds(username);
 
+        LocalDateTime rentalStartDate = storeMapSearchRequest.getRentalStartDate();
+        LocalDateTime rentalEndDate = storeMapSearchRequest.getRentalEndDate();
+
+        if( rentalStartDate == null || rentalEndDate == null){
+            rentalStartDate = LocalDateTime.now();
+            rentalEndDate = LocalDate.now().atTime(23, 59, 59);
+        }
+
         final List<Tuple> results =  queryFactory.select(
                         storeDevice.store,storeDevice.count.subtract(
                                 JPAExpressions
@@ -56,8 +65,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                                         .join(deviceReservation.reservation, reservation)
                                         .where(
                                                 deviceReservation.storeDevice.eq(storeDevice),
-                                                reservation.rentalStartDate.loe(storeMapSearchRequest.getRentalEndDate()),
-                                                reservation.rentalEndDate.goe(storeMapSearchRequest.getRentalStartDate())
+                                                reservation.rentalStartDate.loe(rentalEndDate),
+                                                reservation.rentalEndDate.goe(rentalStartDate)
                                         )
                         ).sum())
                 .from(storeDevice)
