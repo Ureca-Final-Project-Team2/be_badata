@@ -21,6 +21,7 @@ import javax.imageio.stream.ImageOutputStream;
 public class ELAService {
     private static final double QUALITY_FACTOR = 0.90;
     private static final int SUSPICIOUS_THRESHOLD = 1;
+    private static final int BLOCK_SIZE = 8;
 
     public ELAResult analyzeImage(final MultipartFile file) {
         try {
@@ -34,7 +35,9 @@ public class ELAService {
 
             final double manipulationScore = calculateManipulationScore(differenceImage);
 
-            return new ELAResult(suspiciousRegions, manipulationScore);
+            int tot = ((differenceImage.getWidth() - BLOCK_SIZE) / BLOCK_SIZE) * ((differenceImage.getHeight() - BLOCK_SIZE) / BLOCK_SIZE);
+
+            return new ELAResult(suspiciousRegions, manipulationScore, (suspiciousRegions.size() / (double) tot) * 100);
 
         } catch (IOException e) {
             throw new GeneralException(TradeException.ELA_IMAGE_PROCESSING_FAILED);
@@ -95,21 +98,15 @@ public class ELAService {
         final int width = difference.getWidth();
         final int height = difference.getHeight();
 
-        final int blockSize = 8;
-        int totalsize = 0;
-        for (int y = 0; y < height - blockSize; y += blockSize) {
-            for (int x = 0; x < width - blockSize; x += blockSize) {
-                totalsize++;
-                double avgDifference = calculateBlockAverage(difference, x, y, blockSize);
+        for (int y = 0; y < height - BLOCK_SIZE; y += BLOCK_SIZE) {
+            for (int x = 0; x < width - BLOCK_SIZE; x += BLOCK_SIZE) {
+                double avgDifference = calculateBlockAverage(difference, x, y, BLOCK_SIZE);
 
                 if (avgDifference > SUSPICIOUS_THRESHOLD) {
-                    regions.add(SuspiciousRegion.of(x, y, blockSize, blockSize, avgDifference));
+                    regions.add(SuspiciousRegion.of(x, y, BLOCK_SIZE, BLOCK_SIZE, avgDifference));
                 }
             }
         }
-
-        System.out.println("총 갯수: "+totalsize);
-        System.out.println("비율: " + (regions.size() / (double) totalsize) * 100 + "%");
         return regions;
     }
 
