@@ -96,8 +96,10 @@ public class ELAService {
         final int height = difference.getHeight();
 
         final int blockSize = 8;
+        int totalsize = 0;
         for (int y = 0; y < height - blockSize; y += blockSize) {
             for (int x = 0; x < width - blockSize; x += blockSize) {
+                totalsize++;
                 double avgDifference = calculateBlockAverage(difference, x, y, blockSize);
 
                 if (avgDifference > SUSPICIOUS_THRESHOLD) {
@@ -106,6 +108,8 @@ public class ELAService {
             }
         }
 
+        System.out.println("총 갯수: "+totalsize);
+        System.out.println("비율: " + (regions.size() / (double) totalsize) * 100 + "%");
         return regions;
     }
 
@@ -124,27 +128,19 @@ public class ELAService {
         return count > 0 ? sum / count : 0;
     }
 
-    private double calculateManipulationScore(final BufferedImage difference) {
-        final int width = difference.getWidth();
-        final int height = difference.getHeight();
-        int modifiedPixels = 0;
+    private static double calculateManipulationScore(BufferedImage difference) {
+        long totalDifference = 0;
+        int width = difference.getWidth();
+        int height = difference.getHeight();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Color color = new Color(difference.getRGB(x, y));
-                int grayValue = color.getRed();
-
-                if (grayValue > 1) {
-                    modifiedPixels++;
-                }
+                totalDifference += color.getRed();
             }
         }
 
-        if (modifiedPixels > 0) {
-            final double modifiedRatio = (double) modifiedPixels / (width * height);
-            return Math.min(100, 50 + (modifiedRatio * 1000));
-        }
-
-        return 0;
+        double avgDifference = (double) totalDifference / (width * height);
+        return Math.min(100, (avgDifference / 255.0) * 100);
     }
 }
