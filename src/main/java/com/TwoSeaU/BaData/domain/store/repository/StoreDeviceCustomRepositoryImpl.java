@@ -274,7 +274,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         return new OrderSpecifier(Order.DESC, store.id);
     }
 
-    public Set<Long> getUserLikedStoreIds(final String username) {
+    private Set<Long> getUserLikedStoreIds(final String username) {
 
         if(username == null){
             return new HashSet<>();
