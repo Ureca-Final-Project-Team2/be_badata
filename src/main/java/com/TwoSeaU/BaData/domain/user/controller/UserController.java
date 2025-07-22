@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
+import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllLikesPostsResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllPurchasesResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.GetAllReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRentalResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
@@ -44,24 +45,29 @@ public class UserController {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getCoin(user.getUsername())));
 	}
 
-	@GetMapping("/reports/complete")
-	public ResponseEntity<ApiResponse<GetAllReportResponse>> getCompleteReports(@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getCompleteReports(user.getUsername())));
-	}
-
-	@GetMapping("/reports/pending")
-	public ResponseEntity<ApiResponse<GetAllReportResponse>> getPendingReports(@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getPendingReports(user.getUsername())));
+	@GetMapping("/reports")
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetReportResponse>>> getAllReportsByCursor(
+		@RequestParam ReportStatus reportStatus,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllReportsByCursor(reportStatus, cursor, size, user.getUsername())));
 	}
 
 	@GetMapping("/purchases")
-	public ResponseEntity<ApiResponse<GetAllPurchasesResponse>> getAllPurchases(@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllPurchasesResponse(user.getUsername())));
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetPurchaseResponse>>> getAllPurchasesByCursor(
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllPurchasesByCursor(cursor, size, user.getUsername())));
 	}
 
 	@GetMapping("/likes/posts")
-	public ResponseEntity<ApiResponse<GetAllLikesPostsResponse>> getAllLikesPosts(@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllLikesPosts(user.getUsername())));
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetLikesPostResponse>>> getAllLikesPostsByCursor(
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllLikesPostsByCursor(cursor, size, user.getUsername())));
 	}
 
 	@GetMapping("/sales")
@@ -84,12 +90,12 @@ public class UserController {
 	}
 
 	@GetMapping("/follows")
-	public ResponseEntity<ApiResponse<CursorPageResponse<GetFollowsResponse>>> getFollowsResponse(
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetFollowsResponse>>> getFollowsByCursor(
 		@RequestParam(defaultValue = "FOLLOWERS") FollowType followType,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getFollowsResponseByCursor(followType, cursor, size, user.getUsername())));
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getFollowsByCursor(followType, cursor, size, user.getUsername())));
 	}
 
 	@GetMapping("/likes/stores")

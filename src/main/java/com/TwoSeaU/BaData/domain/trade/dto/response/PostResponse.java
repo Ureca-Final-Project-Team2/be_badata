@@ -1,7 +1,9 @@
 package com.TwoSeaU.BaData.domain.trade.dto.response;
 
+import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
+import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import lombok.*;
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ public class PostResponse {
     private PostCategory postCategory;
     private String gifticonCategory;
     private LocalDate deadLine;
+    private MobileCarrier mobileCarrier;
     private Integer likesCount;
     private Boolean isLiked;
 
@@ -36,6 +39,7 @@ public class PostResponse {
                 .postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
                 .gifticonCategory(post instanceof Gifticon gifticon ? gifticon.getCategory().getCategoryName() : null)
                 .deadLine(post.getDeadLine())
+                .mobileCarrier(post instanceof Data data ? data.getMobileCarrier() : null)
                 .likesCount(likesCount)
                 .isLiked(isLiked)
                 .build();
