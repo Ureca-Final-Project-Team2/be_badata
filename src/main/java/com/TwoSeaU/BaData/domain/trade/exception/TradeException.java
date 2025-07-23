@@ -28,8 +28,8 @@ public enum TradeException implements BaseException {
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3016, "결제 정보를 찾을 수 없습니다."),
     ELA_IMAGE_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3017, "ELA 이미지 처리에 실패했습니다."),
     SUSPICIOUS_IMAGE_DETECTED(HttpStatus.BAD_REQUEST, 3018, "조작이 감지되었습니다."),
-    REPORT_COMMENT_REQUIRED(HttpStatus.BAD_REQUEST, 3019, "신고 사유가 기타일 경우 상세 사유를 작성해야 합니다.");
-
+    REPORT_COMMENT_REQUIRED(HttpStatus.BAD_REQUEST, 3019, "신고 사유가 기타일 경우 상세 사유를 작성해야 합니다."),
+    DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3020, "삭제된 게시글에 접근할 수 없습니다.");
     private final HttpStatus httpStatus;
     private final int code;
     private final String message;
