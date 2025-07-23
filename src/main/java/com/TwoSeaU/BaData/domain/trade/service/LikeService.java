@@ -29,7 +29,7 @@ public class LikeService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        if(postLikesRepository.findByUserIdAndPostId(user.getId(), postId).isPresent()){
+        if (postLikesRepository.findByUserIdAndPostId(user.getId(), postId).isPresent()) {
             throw new GeneralException(TradeException.ALREADY_LIKED_POST);
         }
 

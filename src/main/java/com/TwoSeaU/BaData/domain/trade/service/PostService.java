@@ -219,12 +219,12 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        if (post.getIsDeleted()){
+        if (post.getIsDeleted()) {
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
 
-        if( post.getIsSold()) {
-            throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
+        if(post.getIsSold()) {
+            throw new GeneralException(TradeException.SOLD_POST_DELETE_DENIED);
         }
 
         post.updateIsDeleted();

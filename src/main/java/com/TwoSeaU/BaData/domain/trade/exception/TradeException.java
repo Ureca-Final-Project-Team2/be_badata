@@ -30,7 +30,9 @@ public enum TradeException implements BaseException {
     SUSPICIOUS_IMAGE_DETECTED(HttpStatus.BAD_REQUEST, 3018, "조작이 감지되었습니다."),
     REPORT_COMMENT_REQUIRED(HttpStatus.BAD_REQUEST, 3019, "신고 사유가 기타일 경우 상세 사유를 작성해야 합니다."),
     DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3020, "삭제된 게시글에 접근할 수 없습니다."),
-    ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3021, "이미 찜한 게시글입니다.");
+    ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3021, "이미 찜한 게시글입니다."),
+    SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3022, "판매 완료된 게시글은 삭제할 수 없습니다."),;
+
     private final HttpStatus httpStatus;
     private final int code;
     private final String message;
