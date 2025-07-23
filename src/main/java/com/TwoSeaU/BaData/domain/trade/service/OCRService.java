@@ -43,10 +43,11 @@ public class OCRService {
 						throw new GeneralException(TradeException.OCR_PROCESSING_FAILED);
 					}
 
-					final String fullText = res.getTextAnnotationsList().get(0).getDescription();
 					if (res.getTextAnnotationsList().isEmpty()) {
 						throw new GeneralException(TradeException.OCR_PROCESSING_FAILED);
 					}
+					final String fullText = res.getTextAnnotationsList().get(0).getDescription();
+
 					return parseGifticonInfo(fullText);
 				}
 
