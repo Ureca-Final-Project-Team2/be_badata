@@ -71,6 +71,13 @@ dependencies {
 
 	//google cloud vision
 	implementation 'com.google.cloud:google-cloud-vision:3.65.0'
+
+	//logback
+	implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
+
+	//elastic search
+	implementation 'co.elastic.clients:elasticsearch-java:8.12.2'
+	implementation 'org.springframework.data:spring-data-elasticsearch:5.2.0'
 }
 
 tasks.named('test') {
