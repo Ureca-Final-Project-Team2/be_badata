@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/trades/posts/deadline").permitAll()
                                 .requestMatchers("/api/v1/trades/partners/{categoryId}").permitAll()
                                 .requestMatchers("/api/v1/trades/test/e3").permitAll()
+                                .requestMatchers("/api/v1/trades/search/trending").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies"
                                 ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta").permitAll()
                                 .anyRequest().authenticated())
