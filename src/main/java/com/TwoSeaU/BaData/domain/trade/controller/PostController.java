@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.controller;
 
+import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,8 +53,13 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
     }
 
-    @PostMapping(path = "/posts/data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@Valid @ModelAttribute SaveDataPostRequest saveDataPostRequest,
+    @PostMapping(path = "/test/e3", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<ELAResult>> testE3(@ModelAttribute MultipartFile file) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.E3Test(file)));
+    }
+
+    @PostMapping(path = "/posts/data")
+    public ResponseEntity<ApiResponse<SavePostResponse>> createDataPost(@Valid @RequestBody SaveDataPostRequest saveDataPostRequest,
                                                                         @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createDataPost(saveDataPostRequest, user.getUsername())));
     }

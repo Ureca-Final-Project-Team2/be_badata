@@ -28,6 +28,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 		QPost qpost = QPost.post;
 		BooleanBuilder where = new BooleanBuilder();
 
+		where.and(qpost.isDeleted.isFalse());
+
 		if(postCategory != null) {
 			if(postCategory == PostCategory.GIFTICON) {
 				where.and(qpost.instanceOf(Gifticon.class));

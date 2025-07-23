@@ -1,7 +1,5 @@
 package com.TwoSeaU.BaData.domain.user.dto.response;
 
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,12 +10,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetAllReportResponse {
-	private List<GetReportResponse> reportList;
+public class CreateFollowResponse {
 
-	public static GetAllReportResponse of(final List<GetReportResponse> reportList) {
-		return GetAllReportResponse.builder()
-			.reportList(reportList)
-			.build();
-	}
+    private boolean isFollowing;
+
+    public static CreateFollowResponse of(final boolean isFollowing){
+
+        return CreateFollowResponse.builder()
+                .isFollowing(isFollowing)
+                .build();
+    }
+
 }

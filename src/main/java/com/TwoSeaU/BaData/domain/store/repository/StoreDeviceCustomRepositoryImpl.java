@@ -4,14 +4,18 @@ import static com.TwoSeaU.BaData.domain.rental.entity.QDeviceReservation.deviceR
 import static com.TwoSeaU.BaData.domain.rental.entity.QReservation.reservation;
 import static com.TwoSeaU.BaData.domain.store.entity.QStore.store;
 import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
+import static com.TwoSeaU.BaData.domain.store.entity.QStoreLikes.storeLikes;
 
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
-import com.TwoSeaU.BaData.domain.store.dto.response.StoreWithRemainDto;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
+import com.TwoSeaU.BaData.domain.store.entity.StoreLikes;
 import com.TwoSeaU.BaData.domain.store.service.GeoUtils;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -20,9 +24,12 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,9 +45,30 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     public static final String distance = "distance";
 
     @Override
-    public List<Store> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest){
+    public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest, final String username){
 
-        return queryFactory.select(storeDevice.store)
+        final Set<Long> userLikedStoreIds = getUserLikedStoreIds(username);
+
+        LocalDateTime rentalStartDate = storeMapSearchRequest.getRentalStartDate();
+        LocalDateTime rentalEndDate = storeMapSearchRequest.getRentalEndDate();
+
+        if( rentalStartDate == null || rentalEndDate == null){
+            rentalStartDate = LocalDateTime.now();
+            rentalEndDate = LocalDate.now().atTime(23, 59, 59);
+        }
+
+        final List<Tuple> results =  queryFactory.select(
+                        storeDevice.store,storeDevice.count.subtract(
+                                JPAExpressions
+                                        .select(deviceReservation.reservationCount.sum().coalesce(0))
+                                        .from(deviceReservation)
+                                        .join(deviceReservation.reservation, reservation)
+                                        .where(
+                                                deviceReservation.storeDevice.eq(storeDevice),
+                                                reservation.rentalStartDate.loe(rentalEndDate),
+                                                reservation.rentalEndDate.goe(rentalStartDate)
+                                        )
+                        ).sum())
                 .from(storeDevice)
                 .where(minPriceGoe(storeMapSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(storeMapSearchRequest.getMaxPrice()))
@@ -54,15 +82,25 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .where(availableInBoundingBox(storeMapSearchRequest.getSwLng(),
                         storeMapSearchRequest.getSwLat(),
                         storeMapSearchRequest.getNeLng(), storeMapSearchRequest.getNeLat()))
+                .groupBy(storeDevice.store)
                 .fetch();
 
+        return results.stream()
+                .map(tuple -> {
+                    final Store store = tuple.get(storeDevice.store);
+                    final Integer leftCount = tuple.get(1, Integer.class);
+                    final boolean liked = userLikedStoreIds.contains(store.getId());
+
+                    return new ShowStoreWithLeftDeviceResponse(store, leftCount, liked);
+                })
+                .toList();
     }
 
     @Override
-    public Slice<StoreWithRemainDto> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
+    public Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
 
-        List<StoreWithRemainDto> content = queryFactory
-                .select(Projections.constructor(StoreWithRemainDto.class,
+        List<ShowStoreWithLeftDeviceAndDistanceResponse> content = queryFactory
+                .select(Projections.constructor(ShowStoreWithLeftDeviceAndDistanceResponse.class,
                                 storeDevice.store,
                                 Expressions.numberTemplate(Double.class,
                                 "ST_DistanceSphere({0}, ST_MakePoint({1}, {2}))",
@@ -234,6 +272,19 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         }
 
         return new OrderSpecifier(Order.DESC, store.id);
+    }
+
+    private Set<Long> getUserLikedStoreIds(final String username) {
+
+        if(username == null){
+            return new HashSet<>();
+        }
+
+        return new HashSet<>(queryFactory
+                .select(storeLikes.store.id)
+                .from(storeLikes)
+                .where(storeLikes.user.username.eq(username))
+                .fetch());
     }
 
 }

@@ -2,12 +2,12 @@ package com.TwoSeaU.BaData.domain.trade.repository;
 
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepository {
-    List<Post> findByIsSoldOrderByCreatedAtDesc(boolean isSold);
-    List<Post> findByIsSoldAndSellerIdOrderByCreatedAtDesc(boolean isSold, Long sellerId);
-    List<Post> findByDeadLineBefore(LocalDateTime time);
-    List<Post> findByTitleContaining(String query);
+    List<Post> findByIsSoldAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final boolean isDeleted);
+    List<Post> findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final Long sellerId, final boolean isDeleted);
+    List<Post> findByDeadLineBeforeAndIsDeleted(final LocalDate time, final boolean isDeleted);
+    List<Post> findByIsDeletedAndTitleContaining(final boolean isDeleted, final String query);
 }

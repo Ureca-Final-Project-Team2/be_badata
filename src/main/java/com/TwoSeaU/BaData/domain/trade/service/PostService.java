@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
+import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
@@ -23,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +44,7 @@ public class PostService {
     private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
     private final S3ImageService s3ImageService;
+    private final OCRService ocrService;
 
     public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
         Optional<Long> optionalUserId;
@@ -66,24 +70,27 @@ public class PostService {
                 .build();
     }
 
+    public ELAResult E3Test(final MultipartFile file){
+        return elaService.analyzeImage(file);
+    }
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByIsSoldOrderByCreatedAtDesc(false), userdetails);
+        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), userdetails);
     }
 
 
     public UserPostsResponse getPostsByUserId(final Long userId, final UserDetails userdetails) {
 
         return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId), userdetails),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, userId), userdetails));
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), userdetails),
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), userdetails));
     }
 
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBeforeAndIsDeleted(LocalDate.now().minusDays(2), false), userdetails);
 
     }
 
@@ -100,7 +107,7 @@ public class PostService {
             }
         }
 
-        return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
+        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), userdetails);
     }
 
 
@@ -116,6 +123,8 @@ public class PostService {
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
+
+        final OCRResult ocrResult = ocrService.extractTextFromImageFile(saveGifticonPostRequest.getFile());
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
 
@@ -146,19 +155,13 @@ public class PostService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final ELAResult result = elaService.analyzeImage(saveDataPostRequest.getFile());
-
-        if (result.isManipulated()) {
-            throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
-        }
-
         final Data data = new Data(
                 user,
                 saveDataPostRequest.getTitle(),
-                null,
+                saveDataPostRequest.getComment(),
                 saveDataPostRequest.getPrice(),
                 saveDataPostRequest.getDeadLine(),
-                "no image",
+                null,
                 false,
                 saveDataPostRequest.getMobileCarrier(),
                 saveDataPostRequest.getCapacity()
@@ -174,6 +177,10 @@ public class PostService {
     public GetPostDetailResponse getPost(final Long postId, final UserDetails user) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
 
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
@@ -212,7 +219,15 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        postRepository.delete(post);
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
+        if(post.getIsSold()) {
+            throw new GeneralException(TradeException.SOLD_POST_DELETE_DENIED);
+        }
+
+        post.updateIsDeleted();
 
         return DeletePostResponse.of(postId);
     }
@@ -224,6 +239,10 @@ public class PostService {
 
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
 
         if (post.getIsSold()) {
             throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);

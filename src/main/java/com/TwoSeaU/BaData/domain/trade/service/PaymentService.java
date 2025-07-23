@@ -40,6 +40,10 @@ public class PaymentService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
         if(post.getIsSold()){
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
@@ -60,6 +64,10 @@ public class PaymentService {
 
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
 
         if(post.getIsSold()){
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
