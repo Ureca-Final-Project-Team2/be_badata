@@ -219,6 +219,14 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
+        if (post.getIsDeleted()){
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
+        if( post.getIsSold()) {
+            throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
+        }
+
         post.updateIsDeleted();
 
         return DeletePostResponse.of(postId);
