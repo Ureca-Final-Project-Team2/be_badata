@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
+import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
@@ -43,6 +44,7 @@ public class PostService {
     private final SearchHistoryRepository searchHistoryRepository;
     private final ELAService elaService;
     private final S3ImageService s3ImageService;
+    private final OCRService ocrService;
 
     public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
         Optional<Long> optionalUserId;
@@ -121,6 +123,8 @@ public class PostService {
         if (result.isManipulated()) {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
+
+        final OCRResult ocrResult = ocrService.extractTextFromImageFile(saveGifticonPostRequest.getFile());
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
 

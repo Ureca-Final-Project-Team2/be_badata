@@ -70,7 +70,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
 
 	//google cloud vision
-	implementation 'com.google.cloud:google-cloud-vision:3.34.0'
+	implementation 'com.google.cloud:google-cloud-vision:3.65.0'
 }
 
 tasks.named('test') {
