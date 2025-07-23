@@ -109,6 +109,10 @@ public class UserService {
 		final User followingUser = userRepository.findById(userId)
 				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
+		if (loginUser.getUsername().equals(followingUser.getUsername())){
+			throw new GeneralException(UserException.CANT_FOLLOW_SELF);
+		}
+
 		return userLikesRepository.findByFollowerUserAndFollowingUser(loginUser, followingUser)
 				.map(userLikes -> {
 					userLikesRepository.delete(userLikes);
