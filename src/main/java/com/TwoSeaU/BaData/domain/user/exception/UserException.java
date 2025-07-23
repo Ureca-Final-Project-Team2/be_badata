@@ -23,7 +23,8 @@ public enum UserException implements BaseException {
     LIKES_POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, 2010, "찜한 거래 물품이 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2011, "유저 정보를 찾을 수 없습니다."),
     ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, 2012, "주소 정보를 찾을 수 없습니다."),
-    CANT_DELETE_OTHER_ADDRESS(HttpStatus.FORBIDDEN, 2013, "다른 사람의 주소 정보를 삭제할 수 없습니다.");
+    CANT_DELETE_OTHER_ADDRESS(HttpStatus.FORBIDDEN, 2013, "다른 사람의 주소 정보를 삭제할 수 없습니다."),
+    CANT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 2014, "자기 자신을 팔로우/언팔로우 할 수 없습니다");
 
 
     private final HttpStatus httpStatus;
