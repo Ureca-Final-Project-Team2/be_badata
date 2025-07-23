@@ -101,10 +101,19 @@ jacocoTestReport {
 			Qdomains.add(qPattern + "*")
 		}
 
+		def jacocoExcludePatterns = [
+				'com/TwoSeaU/BaDataApplication.class',
+				'**/common/**',
+				'**/exception/**',
+				'**/dto/**',
+				'**/config/**',
+				'**/test/**'
+		]
+
 		afterEvaluate {
 			classDirectories.setFrom(files(classDirectories.files.collect {
 				fileTree(dir: it,
-						exclude: [] + Qdomains)
+						exclude:  Qdomains + jacocoExcludePatterns)
 			}))
 		}
 
