@@ -17,6 +17,7 @@ public class ShowDeviceInfoResponse {
     private String deviceName;
     private int dataCapacity;
     private String imageUrl;
+    private int price;
 
     public static ShowDeviceInfoResponse from(final StoreDevice storeDevice){
 
@@ -25,6 +26,7 @@ public class ShowDeviceInfoResponse {
                 .storeDeviceId(storeDevice.getId())
                 .deviceName(storeDevice.getDevice().getName())
                 .imageUrl(storeDevice.getDevice().getImageUrl())
+                .price(storeDevice.getPrice())
                 .build();
     }
 
