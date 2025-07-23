@@ -1,9 +1,12 @@
 package com.TwoSeaU.BaData.domain.user.controller;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,6 +90,12 @@ public class UserController {
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllSosByCursor(cursor, size, user.getUsername())));
+	}
+
+	@PostMapping("/{userId}/follows")
+	public ResponseEntity<ApiResponse<CreateFollowResponse>> createFollow(@PathVariable("userId") Long userId, @AuthenticationPrincipal User user){
+
+		return ResponseEntity.ok().body(ApiResponse.success(userService.createFollow(userId, user.getUsername())));
 	}
 
 	@GetMapping("/follows")
