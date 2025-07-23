@@ -47,7 +47,7 @@
         }
 
         @AfterAll
-        static void stopNeo4j() {
+        static void stopPostgres() {
 
             postgresContainer.close();
         }
