@@ -8,6 +8,6 @@ import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
 
 public interface UserLikesRepository extends JpaRepository<UserLikes, Long>, UserLikesQueryRepository {
 
-    Optional<UserLikes> findByFollowerUserAndFollowingUser(final User follower,final User followingUser);
+    Optional<UserLikes> findByFollowerUserAndFollowingUser(final User follower, final User followingUser);
 
 }
