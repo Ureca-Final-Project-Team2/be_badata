@@ -96,6 +96,8 @@ public class PostService {
 
 
     public PostsResponse searchPosts(final String query, final UserDetails userdetails) {
+        log.info("event-keyword-search, {}", query);
+
         if(userdetails != null) {
             final User user = userRepository.findByUsername(userdetails.getUsername())
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
