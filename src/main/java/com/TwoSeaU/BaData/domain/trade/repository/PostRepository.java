@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepository {
-    List<Post> findByIsSoldOrderByCreatedAtDesc(final boolean isSold);
-    List<Post> findByIsSoldAndSellerIdOrderByCreatedAtDesc(final boolean isSold, final Long sellerId);
-    List<Post> findByDeadLineBefore(final LocalDate time);
-    List<Post> findByTitleContaining(final String query);
+    List<Post> findByIsSoldAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final boolean isDeleted);
+    List<Post> findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final Long sellerId, final boolean isDeleted);
+    List<Post> findByDeadLineBeforeAndIsDeleted(final LocalDate time, final boolean isDeleted);
+    List<Post> findByIsDeletedAndTitleContaining(final boolean isDeleted, final String query);
 }

@@ -35,6 +35,8 @@ public abstract class Post extends BaseEntity {
 
     private Boolean isSold;
 
+    private Boolean isDeleted;
+
     public Post(final User seller, final String title, final String comment, final Integer price,
                 final LocalDate deadLine, final String postImage, final Boolean isSold) {
         this.seller = seller;
@@ -44,6 +46,7 @@ public abstract class Post extends BaseEntity {
         this.deadLine = deadLine;
         this.postImage = postImage;
         this.isSold = isSold;
+        this.isDeleted = false;
     }
 
     public void updateCommentAndPrice(final String comment, final Integer price) {
@@ -53,5 +56,9 @@ public abstract class Post extends BaseEntity {
 
     public void updateIsSold(final Boolean isSold) {
         this.isSold = isSold;
+    }
+
+    public void updateIsDeleted() {
+        this.isDeleted = true;
     }
 }

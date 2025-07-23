@@ -27,6 +27,8 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 
 		final BooleanBuilder where = new BooleanBuilder();
 
+		where.and(qPostLikes.post.isDeleted.isFalse());
+
 		if(cursor != null) {
 			where.and(qPostLikes.id.lt(cursor));
 		}
