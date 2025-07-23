@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.service;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
+import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +98,26 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return sosRepository.getAllSosResponse(cursor, size, user.getId());
+	}
+
+	@Transactional
+	public CreateFollowResponse createFollow(final Long userId, final String username){
+
+		final User loginUser = userRepository.findByUsername(username)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final User followingUser = userRepository.findById(userId)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return userLikesRepository.findByFollowerUserAndFollowingUser(loginUser, followingUser)
+				.map(userLikes -> {
+					userLikesRepository.delete(userLikes);
+					return CreateFollowResponse.of(false);
+				})
+				.orElseGet(() -> {
+					userLikesRepository.save(UserLikes.of(followingUser, loginUser));
+					return CreateFollowResponse.of(true);
+				});
 	}
 
 	public CursorPageResponse<GetFollowsResponse> getFollowsByCursor(final FollowType followType, final Long cursor, final int size, final String username) {
