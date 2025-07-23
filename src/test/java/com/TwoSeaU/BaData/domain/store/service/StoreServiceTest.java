@@ -1,10 +1,12 @@
 package com.TwoSeaU.BaData.domain.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreMapResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
@@ -70,13 +72,15 @@ class StoreServiceTest {
                     LocalTime.of(18, 0)
             );
 
-            List<Store> storeList = List.of(store);
+            List<ShowStoreWithLeftDeviceResponse> storeList = List.of(store).stream().map(store1 ->
+                 new ShowStoreWithLeftDeviceResponse(store1,5,false)
+            ).toList();
 
-            given(storeDeviceRepository.findStoresInBoundingBox(request))
+            given(storeDeviceRepository.findStoresInBoundingBox(request,"kakao12345"))
                     .willReturn(storeList);
 
             // when
-            List<ShowStoreMapResponse> result = storeService.getStoreMapResponse(request);
+            List<ShowStoreMapResponse> result = storeService.getStoreMapResponse(request,"kakao12345");
 
             // then
             assertThat(result).hasSize(1);
