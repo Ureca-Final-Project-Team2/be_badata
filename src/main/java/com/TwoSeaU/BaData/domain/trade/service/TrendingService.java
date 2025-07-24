@@ -125,16 +125,7 @@ public class TrendingService {
                 .build()
                 ._toQuery();
 
-        ScriptedField scriptedField = new ScriptedField(INDEX_NAME, new ScriptData(
-                ScriptType.INLINE,
-                "painless",
-                "return "+KEYWORD_EXTRACTION_SCRIPT,
-                "keyword_script",
-                Collections.emptyMap()
-        ));
-
         return queryBuilder.withQuery(boolQuery)
-                .withScriptedField(scriptedField)
                 .withAggregation("top_ten", agg)
                 .build();
     }
