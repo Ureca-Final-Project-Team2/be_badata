@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.store.repository;
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreDeviceWithRemainCountResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
@@ -15,6 +16,6 @@ public interface StoreDeviceCustomRepository {
 
     Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable);
 
-    List<StoreDevice> findProperDevicesByStore(final DeviceSearchRequest deviceSearchRequest, final Long storeId);
+    List<ShowStoreDeviceWithRemainCountResponse> findProperDevicesByStore(final DeviceSearchRequest deviceSearchRequest, final Long storeId);
 
 }

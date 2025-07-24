@@ -18,8 +18,11 @@ public class ShowDeviceInfoResponse {
     private int dataCapacity;
     private String imageUrl;
     private int price;
+    private int leftCount;
 
-    public static ShowDeviceInfoResponse from(final StoreDevice storeDevice){
+    public static ShowDeviceInfoResponse from(final ShowStoreDeviceWithRemainCountResponse showStoreDeviceWithRemainCountResponse){
+
+        final StoreDevice storeDevice = showStoreDeviceWithRemainCountResponse.getStoreDevice();
 
         return ShowDeviceInfoResponse.builder()
                 .dataCapacity(storeDevice.getDataCapacity())
@@ -27,6 +30,7 @@ public class ShowDeviceInfoResponse {
                 .deviceName(storeDevice.getDevice().getName())
                 .imageUrl(storeDevice.getDevice().getImageUrl())
                 .price(storeDevice.getPrice())
+                .leftCount(showStoreDeviceWithRemainCountResponse.getLeftCount())
                 .build();
     }
 

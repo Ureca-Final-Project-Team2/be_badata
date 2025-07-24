@@ -9,6 +9,7 @@ import static com.TwoSeaU.BaData.domain.store.entity.QStoreLikes.storeLikes;
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreDeviceWithRemainCountResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
@@ -20,7 +21,9 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -145,21 +148,42 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
 
 
     @Override
-    public List<StoreDevice> findProperDevicesByStore(final DeviceSearchRequest deviceSearchRequest,
+    public List<ShowStoreDeviceWithRemainCountResponse> findProperDevicesByStore(final DeviceSearchRequest deviceSearchRequest,
             final Long storeId) {
 
-        return queryFactory.select(storeDevice)
+        LocalDateTime rentalStartDate = deviceSearchRequest.getRentalStartDate();
+        LocalDateTime rentalEndDate = deviceSearchRequest.getRentalEndDate();
+
+        if( rentalStartDate == null || rentalEndDate == null){
+            rentalStartDate = LocalDateTime.now();
+            rentalEndDate = LocalDate.now().atTime(23, 59, 59);
+        }
+
+        NumberExpression<Integer> reservedCountSum = new CaseBuilder()
+                .when(reservation.rentalStartDate.loe(rentalEndDate)
+                        .and(reservation.rentalEndDate.goe(rentalStartDate)))
+                .then(deviceReservation.reservationCount)
+                .otherwise(0)
+                .sum();
+
+        return queryFactory
+                .select(Projections.constructor(ShowStoreDeviceWithRemainCountResponse.class,
+                        storeDevice,
+                        storeDevice.count.subtract(reservedCountSum)
+                ))
                 .from(storeDevice)
+                .leftJoin(deviceReservation).on(deviceReservation.storeDevice.eq(storeDevice))
+                .leftJoin(deviceReservation.reservation, reservation)
                 .where(minPriceGoe(deviceSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(deviceSearchRequest.getMaxPrice()))
                 .where(inDataCapacity(deviceSearchRequest.getDataCapacity()))
                 .where(is5GEq(deviceSearchRequest.getIs5G()))
-                .where(availableDuringPeriod(deviceSearchRequest.getRentalStartDate(),
-                        deviceSearchRequest.getRentalEndDate()))
+                .where(availableDuringPeriod(rentalStartDate, rentalEndDate))
                 .where(inMaxSupportConnection(deviceSearchRequest.getMaxSupportConnection()))
                 .where(isOpeningNow(deviceSearchRequest.getIsOpeningNow()))
                 .where(filterReviewRating(deviceSearchRequest.getReviewRating()))
                 .where(storeDevice.store.id.eq(storeId))
+                .groupBy(storeDevice.id)
                 .fetch();
     }
 
