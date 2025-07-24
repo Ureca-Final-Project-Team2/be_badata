@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class ShowStoreDetailResponse {
 
     private Long storeId;
+    private String name;
     private String imageUrl;
     private String detailAddress;
     private String phoneNumber;
@@ -32,6 +33,7 @@ public class ShowStoreDetailResponse {
 
         return ShowStoreDetailResponse.builder()
                 .storeId(storeWithDistanceProjection.getStoreId())
+                .name(storeWithDistanceProjection.getName())
                 .imageUrl(storeWithDistanceProjection.getImageUrl())
                 .detailAddress(storeWithDistanceProjection.getDetailAddress())
                 .phoneNumber(storeWithDistanceProjection.getPhoneNumber())
