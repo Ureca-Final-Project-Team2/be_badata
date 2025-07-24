@@ -1,46 +1,57 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
+import co.elastic.clients.elasticsearch._types.Script;
 import co.elastic.clients.elasticsearch._types.ScriptLanguage;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.JsonData;
 import com.TwoSeaU.BaData.domain.trade.dto.response.GetTrendingResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.SearchHistoryDocument;
-import com.TwoSeaU.BaData.domain.trade.repository.DocumentElasticSearchRepository;
+import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
-import co.elastic.clients.elasticsearch._types.Script;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TrendingService {
     private final ElasticsearchOperations elasticsearchOperations;
-    private final DocumentElasticSearchRepository documentElasticSearchRepository;
+    private static final String INDEX_NAME = "keyword-index-v2";
+    private static final int DEFAULT_TOP_COUNT = 10;
+    private static final String KEYWORD_EXTRACTION_SCRIPT = "doc['message.keyword'].value.substring(22)";
 
+    public GetTrendingResponse getTrendingKeyword() {
+        try {
+            return GetTrendingResponse.of(getRecentTop10Keywords().toArray(String[]::new));
+        }
+        catch (Exception e){
+            throw new GeneralException(TradeException.REALTIME_SEARCH_FAILED);
+        }
+    }
 
     public List<String> getRecentTop10Keywords() {
-        NativeQuery searchQuery = testQuery();
+        NativeQuery searchQuery = getRecentTop10KeywordsNativeQuery();
 
-        SearchHits<SearchHistoryDocument> searchHits = elasticsearchOperations.search(searchQuery,
+        SearchHits<SearchHistoryDocument> searchHits = elasticsearchOperations.search(
+                searchQuery,
                 SearchHistoryDocument.class,
-                IndexCoordinates.of("keyword-index-v2"));
+                IndexCoordinates.of(INDEX_NAME));
 
         ElasticsearchAggregations aggregations = (ElasticsearchAggregations)searchHits.getAggregations();
         assert aggregations != null;
@@ -53,98 +64,67 @@ public class TrendingService {
                 .buckets()
                 .array();
 
-        List<String> result = searchHits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getMessage())
-                .collect(Collectors.toList());
+        List<String> result = new LinkedList<>();
 
-//        topTenBuckets.forEach(topTenBucket -> {
-//            String keyword = String.valueOf(topTenBucket.key());
-//            if (keyword != null && !keyword.isEmpty()) {
-//                result.add(keyword);
-//            }
-//        });
+        topTenBuckets.forEach(topTenBucket -> {
+                    String keyword = topTenBucket.key().stringValue();
+                    if (keyword != null && !keyword.isEmpty()) {
+                        result.add(keyword);
+                    }
+        });
 
         return result;
     }
 
-    private NativeQuery getAllMessagesFromKeywordIndexQuery() {
-        return new NativeQueryBuilder()
-                .withQuery(QueryBuilders.matchAll().build()._toQuery())  // 전체 문서 조회
-                .withSourceFilter(new FetchSourceFilter(new String[]{"message"}, null)) // message 필드만 포함
-                .build();
-    }
+    private Query createTimeRangeQuery() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneHourAgo = now.minusHours(1);
 
-    private NativeQuery testQuery() {
-        //message 필드만 포함
-        SourceFilter sourceFilter = new FetchSourceFilter(new String[]{"message"}, null);
-
-        Query rangeQuery = QueryBuilders.range()
+        return QueryBuilders.range()
                 .field("@timestamp")
-                .gte(JsonData.of(LocalDateTime.now()
-                        .truncatedTo(ChronoUnit.DAYS)
+                .gte(JsonData.of(oneHourAgo
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
                         .toEpochMilli()))
-                .lte(JsonData.of(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
+                .lte(JsonData.of(now
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()))
                 .build()
                 ._toQuery();
-
-        Aggregation agg = AggregationBuilders.terms()
-                .field("message.keyword")
-                .size(10)
-                .build()
-                ._toAggregation();
-
-        return new NativeQueryBuilder()
-                .withQuery(rangeQuery)
-                .withSourceFilter(sourceFilter)
-                .withAggregation("top_ten", agg)
-                .build();
     }
-
 
     private NativeQuery getRecentTop10KeywordsNativeQuery() {
         NativeQueryBuilder queryBuilder = new NativeQueryBuilder();
 
         Script script = Script.of(scriptBuilder -> scriptBuilder.inline(inlineScriptBuilder ->
                 inlineScriptBuilder.lang(ScriptLanguage.Painless)
-                        //.source("doc['message.keyword'].value.substring(22);")
-                        .source("doc['message'].value.substring(22);")
+                        .source(KEYWORD_EXTRACTION_SCRIPT+";")
                         .params(Collections.emptyMap())
         ));
 
         Aggregation agg = AggregationBuilders.terms()
-                //.script(script)
-                .size(10)
+                .script(script)
+                .size(DEFAULT_TOP_COUNT)
                 .build()
                 ._toAggregation();
 
         Query boolQuery = QueryBuilders.bool()
-                //.must(matchQuery, loggerQuery, rangeQuery)
+                .must(createTimeRangeQuery())
                 .build()
                 ._toQuery();
 
-        ScriptedField scriptedField = new ScriptedField("search_keyword", new ScriptData(
+        ScriptedField scriptedField = new ScriptedField(INDEX_NAME, new ScriptData(
                 ScriptType.INLINE,
                 "painless",
-                "return doc['message'].value.substring(22);",
-//                "return doc['message.keyword'].value.substring(22);",
+                "return "+KEYWORD_EXTRACTION_SCRIPT+";",
                 "keyword_script",
                 Collections.emptyMap()
         ));
 
-        SourceFilter sourceFilter = new FetchSourceFilter(new String[] {"*"}, new String[] {});
-
         return queryBuilder.withQuery(boolQuery)
-                .withSourceFilter(sourceFilter)
                 .withScriptedField(scriptedField)
                 .withAggregation("top_ten", agg)
                 .build();
-    }
-
-
-
-    public GetTrendingResponse getTrending() {
-        return GetTrendingResponse.of(getRecentTop10Keywords().toArray(new String[0]));
     }
 }
