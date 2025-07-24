@@ -16,7 +16,7 @@ public class ShowStoreDeviceWithRemainCountResponse {
     private StoreDevice storeDevice;
     private Integer leftCount;
 
-    public static ShowStoreDeviceWithRemainCountResponse from(final StoreDevice storeDevice, final Integer leftCount){
+    public static ShowStoreDeviceWithRemainCountResponse of(final StoreDevice storeDevice, final Integer leftCount){
 
         return ShowStoreDeviceWithRemainCountResponse.builder()
                 .storeDevice(storeDevice)
