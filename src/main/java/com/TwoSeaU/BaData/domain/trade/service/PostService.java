@@ -76,21 +76,21 @@ public class PostService {
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByIsSoldOrderByCreatedAtDesc(false), userdetails);
+        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), userdetails);
     }
 
 
     public UserPostsResponse getPostsByUserId(final Long userId, final UserDetails userdetails) {
 
         return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId), userdetails),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, userId), userdetails));
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), userdetails),
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), userdetails));
     }
 
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDate.now().minusDays(2)), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBeforeAndIsDeleted(LocalDate.now().minusDays(2), false), userdetails);
 
     }
 
@@ -109,7 +109,7 @@ public class PostService {
             }
         }
 
-        return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
+        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), userdetails);
     }
 
 
@@ -180,6 +180,10 @@ public class PostService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
         final int likesCount = postLikesRepository.countByPostId(postId);
@@ -217,7 +221,15 @@ public class PostService {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        postRepository.delete(post);
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
+        if(post.getIsSold()) {
+            throw new GeneralException(TradeException.SOLD_POST_DELETE_DENIED);
+        }
+
+        post.updateIsDeleted();
 
         return DeletePostResponse.of(postId);
     }
@@ -229,6 +241,10 @@ public class PostService {
 
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
 
         if (post.getIsSold()) {
             throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
