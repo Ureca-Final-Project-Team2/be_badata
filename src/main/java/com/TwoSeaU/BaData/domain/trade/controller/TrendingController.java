@@ -17,6 +17,6 @@ public class TrendingController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<GetTrendingResponse>> getTrendingKeyword() {
-        return ResponseEntity.ok().body(ApiResponse.success(trendingService.getTrending()));
+        return ResponseEntity.ok().body(ApiResponse.success(trendingService.getTrendingKeyword()));
     }
 }
