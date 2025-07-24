@@ -32,7 +32,9 @@ public enum TradeException implements BaseException {
     REALTIME_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3020, "실시간 검색 처리에 실패했습니다."),
     DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3021, "삭제된 게시글에 접근할 수 없습니다."),
     ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3022, "이미 찜한 게시글입니다."),
-    SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3023, "판매 완료된 게시글은 삭제할 수 없습니다.");
+    SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3023, "판매 완료된 게시글은 삭제할 수 없습니다."),
+    REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3024, "실시간 검색 내용이 없습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final int code;
