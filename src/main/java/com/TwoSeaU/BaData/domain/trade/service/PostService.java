@@ -90,7 +90,7 @@ public class PostService {
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBeforeAndIsDeleted(LocalDate.now().minusDays(2), false), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), userdetails);
 
     }
 
