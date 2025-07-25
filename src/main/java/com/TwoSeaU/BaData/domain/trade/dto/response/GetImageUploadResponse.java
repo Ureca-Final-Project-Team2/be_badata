@@ -12,6 +12,7 @@ public class GetImageUploadResponse {
     private boolean isManipulated;
     private double ratio;
     private String couponName;
+    private String partner;
     private String expirationDate;
     private String barcode;
 
@@ -20,6 +21,7 @@ public class GetImageUploadResponse {
                 .isManipulated(elaResult.isManipulated())
                 .ratio(elaResult.getRatio())
                 .couponName(ocrResult.getCouponName())
+                .partner(ocrResult.getPartner())
                 .expirationDate(ocrResult.getExpirationDate())
                 .barcode(ocrResult.getBarcode())
                 .build();
