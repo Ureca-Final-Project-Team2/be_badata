@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.user.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,13 +31,14 @@ public class FcmToken {
     @JoinColumn(nullable = false)
     private User user;
 
-    private String fcmToken;
+    @Column(unique = true, nullable = false)
+    private String token;
 
-    public static FcmToken of(final User user, final String fcmToken){
+    public static FcmToken of(final User user, final String token){
 
         return FcmToken.builder()
                 .user(user)
-                .fcmToken(fcmToken)
+                .token(token)
                 .build();
     }
 }
