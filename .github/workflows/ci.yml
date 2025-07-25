@@ -66,6 +66,7 @@ jobs:
           echo "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" >> $GITHUB_ENV
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "S3_BUCKET_URL=${{ secrets.S3_BUCKET_URL }}" >> $GITHUB_ENV
+          echo "LOGSTASH_URL=${{ secrets.LOGSTASH_URL }}" >> $GITHUB_ENV
 
 
       - name: Set up JDK 17
