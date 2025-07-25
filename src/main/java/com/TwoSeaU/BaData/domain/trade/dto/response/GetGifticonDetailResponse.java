@@ -18,7 +18,6 @@ public class GetGifticonDetailResponse {
     private String postImage;
     private Boolean isSold;
     private LocalDateTime createdAt;
-    private LocalDateTime issueDate;
     private String partner;
     private Integer likesCount;
     private Boolean isLiked;
@@ -33,7 +32,6 @@ public class GetGifticonDetailResponse {
                 .postImage(gifticon.getPostImage())
                 .isSold(gifticon.getIsSold())
                 .createdAt(gifticon.getCreatedAt())
-                .issueDate(gifticon.getIssueDate())
                 .partner(gifticon.getPartner())
                 .likesCount(likesCount)
                 .isLiked(isLiked)

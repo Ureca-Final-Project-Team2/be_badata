@@ -18,7 +18,7 @@ import java.io.IOException;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/create/{postId}")
+    @PostMapping("/order/{postId}")
     public ResponseEntity<ApiResponse<CreatePaymentResponse>> createOrder(@PathVariable Long postId, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(paymentService.createOrder(postId, user.getUsername())));
     }
