@@ -70,8 +70,11 @@ public class PostService {
                 .build();
     }
 
-    public ELAResult E3Test(final MultipartFile file){
-        return elaService.analyzeImage(file);
+    public GetImageUploadResponse E3Test(final MultipartFile file){
+        ELAResult elaResult = elaService.analyzeImage(file);
+        OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
+
+        return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
