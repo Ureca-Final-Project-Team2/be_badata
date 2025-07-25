@@ -9,7 +9,7 @@ import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long>, PaymentQueryRepository {
 
-	List<Payment> findAllByUserId(Long userId);
-	Optional<Payment> findByUserIdAndPostId(Long buyerId, Long postId);
-	Optional<Payment> findByUserIdAndPostIdAndPaymentStatus(Long buyerId, Long postId, PaymentStatus paymentStatus);
+	List<Payment> findAllByUserId(final Long userId);
+	Optional<Payment> findByUserIdAndPostId(final Long buyerId, final Long postId);
+	Optional<Payment> findByUserIdAndPostIdAndPaymentStatus(final Long buyerId, final Long postId, final PaymentStatus paymentStatus);
 }
