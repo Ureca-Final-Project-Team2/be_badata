@@ -42,6 +42,12 @@ jobs:
           node port: 9300
           discovery type: 'single-node'
 
+      - name: logstash 실행
+        uses: sjafferali/logstash-config-lint-action@v1
+        with:
+          linter-version: '0.5.3'
+          config-directory: './'
+
       - name: .env 설정
         run: |
           echo "SPRING_PROFILES_ACTIVE=ci" >> $GITHUB_ENV
@@ -60,6 +66,7 @@ jobs:
           echo "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" >> $GITHUB_ENV
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "S3_BUCKET_URL=${{ secrets.S3_BUCKET_URL }}" >> $GITHUB_ENV
+          echo "LOGSTASH_URL=${{ secrets.LOGSTASH_URL }}" >> $GITHUB_ENV
 
 
       - name: Set up JDK 17
