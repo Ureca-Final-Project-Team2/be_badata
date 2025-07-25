@@ -4,7 +4,8 @@ import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
 import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
@@ -219,11 +220,8 @@ public class PostService {
     }
 
     public DeletePostResponse deletePost(final Long postId, final String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-        final Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+        final User user = getUserByUsername(username);
+        final Post post = validateAndGetPost(postId, username);
 
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
@@ -242,14 +240,50 @@ public class PostService {
         return DeletePostResponse.of(postId);
     }
 
-    public SavePostResponse modifyPost(final Long postId, final UpdatePostRequest updatePostRequest, final String username) {
+    public SavePostResponse modifyPostData(final Long postId, final UpdateDataPostRequest updateDataPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
 
-        final User user = userRepository.findByUsername(username)
+        post.updateCommentAndPriceAndTitle(
+                updateDataPostRequest.getComment(),
+                updateDataPostRequest.getPrice(),
+                updateDataPostRequest.getTitle()
+        );
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
+
+        post.updateCommentAndPrice(
+                updateGifticonPostRequest.getComment(),
+                updateGifticonPostRequest.getPrice()
+        );
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    private Post validateAndGetPost(final Long postId, final String username) {
+        final User user = getUserByUsername(username);
+        final Post post = getPostById(postId);
+
+        validatePostStatus(post);
+        validatePostOwnership(post, user);
+
+        return post;
+    }
+
+    private User getUserByUsername(final String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+    }
 
-        final Post post = postRepository.findById(postId)
+    private Post getPostById(final Long postId) {
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+    }
 
+    private void validatePostStatus(final Post post) {
         if (post.getIsDeleted()) {
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
@@ -257,16 +291,11 @@ public class PostService {
         if (post.getIsSold()) {
             throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
         }
+    }
 
+    private void validatePostOwnership(final Post post, final User user) {
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
-
-        post.updateCommentAndPrice(
-                updatePostRequest.getComment(),
-                updatePostRequest.getPrice()
-        );
-
-        return SavePostResponse.of(post.getId());
     }
 }

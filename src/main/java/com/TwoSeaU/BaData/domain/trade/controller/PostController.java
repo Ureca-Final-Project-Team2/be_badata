@@ -2,7 +2,8 @@ package com.TwoSeaU.BaData.domain.trade.controller;
 
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -68,8 +69,13 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.deletePost(postId, user.getUsername())));
     }
 
-    @PatchMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<SavePostResponse>> modifyPost(@PathVariable Long postId, @Valid @RequestBody UpdatePostRequest updatePostRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.modifyPost(postId, updatePostRequest, user.getUsername())));
+    @PatchMapping("/posts/gifticon/{postId}")
+    public ResponseEntity<ApiResponse<SavePostResponse>> modifyPostGifticon(@PathVariable Long postId, @Valid @RequestBody UpdateGifticonPostRequest updateGifticonPostRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.modifyPostGifticon(postId, updateGifticonPostRequest, user.getUsername())));
+    }
+
+    @PatchMapping("/posts/data/{postId}")
+    public ResponseEntity<ApiResponse<SavePostResponse>> modifyPostData(@PathVariable Long postId, @Valid @RequestBody UpdateDataPostRequest updateDataPostRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.modifyPostData(postId, updateDataPostRequest, user.getUsername())));
     }
 }
