@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class UpdatePostRequest {
+public class UpdateGifticonPostRequest {
     private String comment;
 
     @NotNull(message = "가격은 비워둘 수 없습니다.")
