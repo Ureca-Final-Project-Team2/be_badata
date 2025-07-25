@@ -27,7 +27,7 @@ public class FcmTokenService {
 
         final String tokenValue = fcmTokenRequest.getFcmToken();
 
-        return fcmTokenRepository.findByUserAndFcmToken(user, tokenValue)
+        return fcmTokenRepository.findByUserAndToken(user, tokenValue)
                 .map(existingToken -> existingToken.getId())
                 .orElseGet(() -> {
                     final FcmToken fcmToken = FcmToken.of(user, tokenValue);
