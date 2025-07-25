@@ -66,6 +66,12 @@ jobs:
       - name: 실행 권한 부여
         run: chmod +x ./gradlew
 
+      - name: firebase.json 생성
+        run: |
+          cat <<EOF > src/main/resources/firebase.json
+          ${{ secrets.FIRE_BASE_JSON }}
+          EOF
+
       - name: 빌드 테스트
         run: ./gradlew clean build --stacktrace
 
