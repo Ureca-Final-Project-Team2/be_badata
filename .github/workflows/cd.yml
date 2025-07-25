@@ -92,5 +92,4 @@ jobs:
             
             echo "새로운 이미지 빌드"
             docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
-            docker run --env-file ~/be_badata/.env -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
             docker run --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -v ~/be_badata${{ secrets.FIRE_BASE_JSON }}:/BaData/src/main/resources${{ secrets.FIRE_BASE_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
