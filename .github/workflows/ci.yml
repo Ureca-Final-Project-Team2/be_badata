@@ -68,9 +68,7 @@ jobs:
 
       - name: firebase.json 생성
         run: |
-          cat <<EOF > src/main/resources/firebase.json
-          ${{ secrets.FIRE_BASE_JSON }}
-          EOF
+          echo "${{ secrets.FIRE_BASE_JSON }}" | base64 --decode > src/main/resources/firebase.json
 
       - name: 빌드 테스트
         run: ./gradlew clean build --stacktrace
