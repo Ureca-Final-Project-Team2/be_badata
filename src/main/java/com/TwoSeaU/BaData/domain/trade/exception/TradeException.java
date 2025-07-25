@@ -33,6 +33,7 @@ public enum TradeException implements BaseException {
     ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3021, "이미 찜한 게시글입니다."),
     SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3022, "판매 완료된 게시글은 삭제할 수 없습니다."),
     SELF_PAYMENT_DENIED(HttpStatus.FORBIDDEN, 3023, "본인 게시글은 구매할 수 없습니다."),
+    NOT_FOUND_GIFTICON_PARTNER(HttpStatus.NOT_FOUND, 3023, "해당 제휴처를 찾을 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;
