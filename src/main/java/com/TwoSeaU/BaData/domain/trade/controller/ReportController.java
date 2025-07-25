@@ -21,4 +21,5 @@ public class ReportController {
     public ResponseEntity<ApiResponse<SaveReportResponse>> createReport(@PathVariable Long postId, @Valid @RequestBody SaveReportRequest saveReportRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(ApiResponse.success(reportService.createReport(postId, saveReportRequest, user.getUsername())));
     }
+
 }
