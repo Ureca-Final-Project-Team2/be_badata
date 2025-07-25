@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -48,6 +49,10 @@ public class PaymentService {
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
+        if(Objects.equals(post.getSeller().getId(), user.getId())) {
+            throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
+        }
+
         final Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD, new BigDecimal(post.getPrice()));
         paymentRepository.save(payment);
 
@@ -71,6 +76,10 @@ public class PaymentService {
 
         if(post.getIsSold()){
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
+        }
+
+        if(Objects.equals(post.getSeller().getId(), user.getId())) {
+            throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
         }
 
         final Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
