@@ -27,9 +27,6 @@ public class SaveGifticonPostRequest {
     @NotNull(message = "유효 기간은 필수입니다.")
     private LocalDate deadLine;
 
-    @NotNull(message = "발급일은 필수입니다.")
-    private LocalDateTime issueDate;
-
     @NotNull(message = "가격은 필수 작성입니다.")
     @PositiveOrZero(message = "가격은 양수여야 합니다.")
     private Integer price;
