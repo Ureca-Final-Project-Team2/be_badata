@@ -19,7 +19,7 @@ public class FcmInitializer {
     private String googleApplicationCredentials;
 
     @PostConstruct
-    public void initialize() throws IOException {
+    public void initialize() {
 
         final ClassPathResource resource = new ClassPathResource(googleApplicationCredentials);
 
@@ -33,6 +33,9 @@ public class FcmInitializer {
                 FirebaseApp.initializeApp(options);
                 log.info("FirebaseApp initialization complete");
             }
+        } catch (IOException e){
+
+            log.info("Firebase 초기화 테스트 예외");
         }
     }
 
