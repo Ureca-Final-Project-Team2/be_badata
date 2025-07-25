@@ -40,7 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/token/issue").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/trades/**").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies"
-                                ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta").permitAll()
+                                ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta","/test/alarm").permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter,

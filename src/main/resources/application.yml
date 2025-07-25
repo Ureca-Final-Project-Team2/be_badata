@@ -48,3 +48,6 @@ cloud:
 jwt:
   secret: ${JWT_SECRET_KEY}
   validationTime: ${JWT_VALIDATION_TIME}
+
+fcm:
+  certification: firebase.json
