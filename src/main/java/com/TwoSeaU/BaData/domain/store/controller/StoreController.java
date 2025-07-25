@@ -40,7 +40,7 @@ public class StoreController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<ShowStoreWithMetaResponse>> getStoresResponse(@ModelAttribute StoreSearchRequest storeSearchRequest,
-                                                                                    @PageableDefault(size = 10, page = 0, sort = "distance", direction = Sort.Direction.DESC)
+                                                                                    @PageableDefault(size = 10, page = 0, sort = "distance", direction = Sort.Direction.ASC)
                                                                                     final Pageable pageable){
 
         return ResponseEntity.ok(ApiResponse.success(storeService.getStoresResponse(storeSearchRequest,pageable)));
