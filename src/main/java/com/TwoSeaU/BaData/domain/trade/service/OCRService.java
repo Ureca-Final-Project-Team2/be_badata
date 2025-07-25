@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
+import com.TwoSeaU.BaData.domain.trade.entity.Partner;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.domain.trade.repository.PartnerRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
@@ -19,8 +22,13 @@ import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.protobuf.ByteString;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class OCRService {
+
+	private final PartnerRepository partnerRepository;
 
 	public OCRResult extractTextFromImageFile(final MultipartFile imageFile) {
 		try {
@@ -62,7 +70,6 @@ public class OCRService {
 		final Map<String, String> result = new HashMap<>();
 		final String[] lines = text.split("\n");
 
-		String couponName = null;
 		boolean couponFound = false;
 		int startIndex = 0;
 
@@ -86,7 +93,22 @@ public class OCRService {
 				nameBuilder.append(line.trim());
 
 				couponFound = true;
-				result.put("couponName", nameBuilder.toString().trim());
+				final String couponName = nameBuilder.toString().trim();
+
+				final List<Partner> partnerList = partnerRepository.findAll();
+				final Optional<Partner> matchedPartner = partnerList.stream()
+					.filter(p -> couponName.contains(p.getPartner()))
+					.findFirst();
+
+				result.put("couponName", couponName);
+
+				if(matchedPartner.isPresent()) {
+					Partner partner = matchedPartner.get();
+					result.put("partner", partner.getPartner());
+				} else {
+					throw new GeneralException(TradeException.NOT_FOUND_GIFTICON_PARTNER);
+				}
+
 				startIndex = i;
 				break;
 			}
@@ -122,6 +144,6 @@ public class OCRService {
 				}
 			}
 		}
-		return OCRResult.of(result.get("couponName"), result.get("expirationDate"), result.get("barcode"));
+		return OCRResult.of(result.get("couponName"), result.get("partner"), result.get("expirationDate"), result.get("barcode"));
 	}
 }
