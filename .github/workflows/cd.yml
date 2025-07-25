@@ -62,6 +62,7 @@ jobs:
           echo "SOCIAL_SECRET=${{ secrets.SOCIAL_SECRET }}" >> $GITHUB_ENV
           echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
           echo "API_SECRET=${{ secrets.API_SECRET }}" >> $GITHUB_ENV
+          echo "LOGSTASH_URL=${{ secrets.LOGSTASH_URL }}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
