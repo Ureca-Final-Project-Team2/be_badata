@@ -8,6 +8,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepository {
     List<Post> findByIsSoldAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final boolean isDeleted);
     List<Post> findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final Long sellerId, final boolean isDeleted);
-    List<Post> findByDeadLineBeforeAndIsDeleted(final LocalDate time, final boolean isDeleted);
+    List<Post> findByDeadLineBetweenAndIsDeleted(LocalDate start, LocalDate end, boolean isDeleted);
     List<Post> findByIsDeletedAndTitleContaining(final boolean isDeleted, final String query);
 }

@@ -53,8 +53,8 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.createGifticonPost(saveGifticonPostRequest, user.getUsername())));
     }
 
-    @PostMapping(path = "/test/e3", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<ELAResult>> testE3(@ModelAttribute MultipartFile file) {
+    @PostMapping(path = "/posts/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<GetImageUploadResponse>> postImage(@ModelAttribute MultipartFile file) {
         return ResponseEntity.ok().body(ApiResponse.success(postService.E3Test(file)));
     }
 

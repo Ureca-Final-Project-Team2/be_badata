@@ -70,8 +70,11 @@ public class PostService {
                 .build();
     }
 
-    public ELAResult E3Test(final MultipartFile file){
-        return elaService.analyzeImage(file);
+    public GetImageUploadResponse E3Test(final MultipartFile file){
+        ELAResult elaResult = elaService.analyzeImage(file);
+        OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
+
+        return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
     public PostsResponse findAllPosts(final UserDetails userdetails) {
@@ -90,7 +93,7 @@ public class PostService {
 
     public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBeforeAndIsDeleted(LocalDate.now().minusDays(2), false), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), userdetails);
 
     }
 
