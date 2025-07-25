@@ -76,6 +76,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.testcontainers:postgresql'
 	testImplementation "org.testcontainers:junit-jupiter"
+
+	//FCM
+	implementation 'com.google.firebase:firebase-admin:7.1.1'
 }
 
 tasks.named('test') {
