@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +64,7 @@ public class OCRService {
 				throw new GeneralException(TradeException.OCR_PROCESSING_FAILED);
 			}
 		} catch (Exception e) {
-			throw new GeneralException(TradeException.OCR_PROCESSING_FAILED);
+			throw new GeneralException(TradeException.CANNOT_READ_FROM_IMAGE);
 		}
 	}
 
@@ -124,7 +126,21 @@ public class OCRService {
 				if (!expirationFound) {
 					final Matcher dateMatcher = Pattern.compile("(20\\d{2}\\.\\d{2}\\.\\d{2})").matcher(line);
 					if (dateMatcher.find()) {
-						result.put("expirationDate", dateMatcher.group(1));
+						final String expirationDate = dateMatcher.group(1);
+
+						try {
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+							LocalDate extractedDate = LocalDate.parse(expirationDate, formatter);
+							LocalDate now = LocalDate.now();
+
+							if(extractedDate.isBefore(now)) {
+								throw new GeneralException(TradeException.EXPIRED_EXPIRATION_DATE);
+							}
+						} catch (Exception e) {
+							throw new GeneralException(TradeException.CANNOT_PARSE_DATE);
+						}
+
+						result.put("expirationDate", expirationDate);
 						expirationFound = true;
 						continue;
 					}
