@@ -128,12 +128,16 @@ public class OCRService {
 					if (dateMatcher.find()) {
 						final String expirationDate = dateMatcher.group(1);
 
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-						LocalDate extractedDate = LocalDate.parse(expirationDate, formatter);
-						LocalDate now = LocalDate.now();
+						try {
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+							LocalDate extractedDate = LocalDate.parse(expirationDate, formatter);
+							LocalDate now = LocalDate.now();
 
-						if(extractedDate.isBefore(now)) {
-							throw new GeneralException(TradeException.EXPIRED_EXPIRATION_DATE);
+							if(extractedDate.isBefore(now)) {
+								throw new GeneralException(TradeException.EXPIRED_EXPIRATION_DATE);
+							}
+						} catch (Exception e) {
+							throw new GeneralException(TradeException.CANNOT_PARSE_DATE);
 						}
 
 						result.put("expirationDate", expirationDate);

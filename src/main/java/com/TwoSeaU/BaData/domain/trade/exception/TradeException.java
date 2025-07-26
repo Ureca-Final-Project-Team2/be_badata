@@ -32,9 +32,11 @@ public enum TradeException implements BaseException {
     DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3020, "삭제된 게시글에 접근할 수 없습니다."),
     ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3021, "이미 찜한 게시글입니다."),
     SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3022, "판매 완료된 게시글은 삭제할 수 없습니다."),
-    NOT_FOUND_GIFTICON_PARTNER(HttpStatus.NOT_FOUND, 3023, "해당 제휴처를 찾을 수 없습니다."),
-    EXPIRED_EXPIRATION_DATE(HttpStatus.BAD_REQUEST, 3024, "유효 기간이 지난 기프티콘입니다."),
-    CANNOT_READ_FROM_IMAGE(HttpStatus.BAD_REQUEST, 3025, "이미지 파일을 읽어올 수 없습니다.")
+    SELF_PAYMENT_DENIED(HttpStatus.FORBIDDEN, 3023, "본인 게시글은 구매할 수 없습니다."),
+    NOT_FOUND_GIFTICON_PARTNER(HttpStatus.NOT_FOUND, 3024, "해당 제휴처를 찾을 수 없습니다."),
+    EXPIRED_EXPIRATION_DATE(HttpStatus.BAD_REQUEST, 3025, "유효 기간이 지난 기프티콘입니다."),
+    CANNOT_READ_FROM_IMAGE(HttpStatus.BAD_REQUEST, 3026, "이미지 파일을 읽어올 수 없습니다."),
+    CANNOT_PARSE_DATE(HttpStatus.BAD_REQUEST, 3027, "날짜 파싱 처리에 실패하였습니다.")
     ;
 
     private final HttpStatus httpStatus;
