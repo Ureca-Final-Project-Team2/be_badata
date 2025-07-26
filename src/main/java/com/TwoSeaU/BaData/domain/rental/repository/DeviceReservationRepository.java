@@ -24,6 +24,7 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
         MAX(sd.device.name) AS deviceName,
         sd.price AS price,
         MAX(sd.device.imageUrl) AS imageUrl,
+        sd.count AS totalCount,
         (sd.count - COALESCE(SUM(
             CASE 
                 WHEN r.id IS NOT NULL 
