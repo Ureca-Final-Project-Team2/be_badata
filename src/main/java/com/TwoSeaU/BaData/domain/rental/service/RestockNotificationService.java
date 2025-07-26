@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class RestockNotificationService {
 
     private final DeviceReservationRepository deviceReservationRepository;
@@ -41,7 +41,8 @@ public class RestockNotificationService {
         final List<String> fcmTokens = fcmTokenRepository.findByUserIn(sendTargetUser)
                 .stream().map(fcmToken -> fcmToken.getToken()).toList();
 
-        fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(restockTitle, restockContent, fcmTokens, Map.of("storeId",String.valueOf(reservation.getStore().getId()))
+        fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(restockTitle, restockContent, fcmTokens,
+                Map.of("storeId", String.valueOf(reservation.getStore().getId()))
                 ));
 
     }
@@ -68,8 +69,8 @@ public class RestockNotificationService {
                 final Long availableCount = deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(storeDevice.getId(), rentalStart, rentalEnd)
                         .orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE_DEVICE));
 
-                System.out.println("AvailableCount: "+availableCount);
-                System.out.println("Restock DesiredCount"+ reStock.getDesiredCount());
+                log.debug("AvailableCount: {}, Restock DesiredCount: {}", availableCount, reStock.getDesiredCount());
+
 
                 // 3. 남은 수량이 재입고 알림 수량 보다 큰 경우
                 if (availableCount >= reStock.getDesiredCount()) {

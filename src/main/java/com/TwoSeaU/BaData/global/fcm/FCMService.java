@@ -75,7 +75,7 @@ public class FCMService {
             }
 
         } catch (FirebaseMessagingException e) {
-            e.printStackTrace(); // 전체 예외 메시지 확인
+            log.error("Failed to send multicast message", e);
             throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
         }
     }
