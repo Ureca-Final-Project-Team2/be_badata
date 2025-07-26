@@ -41,6 +41,10 @@ public class RestockNotificationService {
         final List<String> fcmTokens = fcmTokenRepository.findByUserIn(sendTargetUser)
                 .stream().map(fcmToken -> fcmToken.getToken()).toList();
 
+        if(fcmTokens.isEmpty()){
+            return;
+        }
+
         fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(restockTitle, restockContent, fcmTokens,
                 Map.of("storeId", String.valueOf(reservation.getStore().getId()))
                 ));
