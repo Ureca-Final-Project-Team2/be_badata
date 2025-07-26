@@ -59,7 +59,9 @@ public class StoreController {
                                                                                        @RequestParam("centerLng") Double centerLng,
                                                                                        @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng, user.getUsername())));
+        final String username = user==null ? null : user.getUsername();
+
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng, username)));
     }
 
 
