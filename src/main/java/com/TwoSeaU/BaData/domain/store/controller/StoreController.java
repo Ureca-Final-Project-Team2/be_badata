@@ -56,9 +56,12 @@ public class StoreController {
     @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<ShowStoreDetailResponse>> getStoreDetailResponse(@PathVariable("storeId") Long storeId,
                                                                                        @RequestParam("centerLat") Double centerLat,
-                                                                                       @RequestParam("centerLng") Double centerLng){
+                                                                                       @RequestParam("centerLng") Double centerLng,
+                                                                                       @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng)));
+        final String username = user==null ? null : user.getUsername();
+
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng, username)));
     }
 
 

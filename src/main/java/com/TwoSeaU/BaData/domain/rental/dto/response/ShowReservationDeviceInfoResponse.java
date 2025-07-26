@@ -19,6 +19,7 @@ public class ShowReservationDeviceInfoResponse {
     private int dataCapacity;
     private String imageUrl;
     private Integer availableCount;
+    private Integer totalCount;
     private Integer price;
 
     public static ShowReservationDeviceInfoResponse from(final AvailableDeviceProjection availableDeviceProjection){
@@ -31,6 +32,7 @@ public class ShowReservationDeviceInfoResponse {
                 .imageUrl(availableDeviceProjection.getImageUrl())
                 .availableCount(availableDeviceProjection.getAvailableCount())
                 .price(availableDeviceProjection.getPrice())
+                .totalCount(availableDeviceProjection.getTotalCount())
                 .build();
     }
 
