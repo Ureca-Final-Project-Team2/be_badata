@@ -47,6 +47,26 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
     );
 
     @Query("""
+    SELECT   
+        sd.id AS storeDeviceId,
+        sd.device.id AS deviceId,
+        sd.dataCapacity AS dataCapacity,
+        MAX(sd.device.name) AS deviceName,
+        sd.price AS price,
+        MAX(sd.device.imageUrl) AS imageUrl,
+        sd.count AS totalCount,
+        sd.count AS availableCount
+    FROM StoreDevice sd
+    WHERE sd.store.id = :storeId
+    GROUP BY sd.id
+    """)
+    List<AvailableDeviceProjection> findAvailableDevicesByStoreId(
+            @Param("storeId") Long storeId
+    );
+
+
+
+    @Query("""
     SELECT 
         (sd.count - COALESCE(SUM(
             CASE 

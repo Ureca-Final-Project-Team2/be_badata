@@ -47,8 +47,13 @@ public class RentalService {
                                                                                     final LocalDateTime rentalEndDate,
                                                                                     final Long storeId){
 
-        if(!storeRepository.existsById(storeId)){
+        if (!storeRepository.existsById(storeId)){
             throw new GeneralException(StoreException.CANT_FIND_STORE);
+        }
+
+        if (rentalStartDate == null || rentalEndDate == null){
+            return deviceReservationRepository.findAvailableDevicesByStoreId(storeId).stream()
+                    .map(ShowReservationDeviceInfoResponse::from).toList();
         }
 
         return deviceReservationRepository.findAvailableDevicesByStoreIdAndPeriod(storeId,rentalStartDate,rentalEndDate)
