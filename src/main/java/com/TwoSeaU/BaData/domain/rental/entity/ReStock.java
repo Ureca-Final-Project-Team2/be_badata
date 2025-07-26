@@ -40,13 +40,16 @@ public class ReStock extends BaseEntity {
     private User user;
 
     @Column(nullable = false)
+    private Integer desiredCount;
+
+    @Column(nullable = false)
     private LocalDateTime desiredStartDate;
 
     @Column(nullable = false)
     private LocalDateTime desiredEndDate;
 
     public static ReStock of(final StoreDevice storeDevice, final User user,
-                             final LocalDateTime desiredStartDate, final LocalDateTime desiredEndDate){
+                             final LocalDateTime desiredStartDate, final LocalDateTime desiredEndDate, final Integer desiredCount){
 
         if (desiredStartDate.isAfter(desiredEndDate)) {
             throw new GeneralException(RentalException.CANT_END_DATE_BEFORE_THAN_START_DATE);
@@ -57,6 +60,7 @@ public class ReStock extends BaseEntity {
                 .storeDevice(storeDevice)
                 .desiredStartDate(desiredStartDate)
                 .desiredEndDate(desiredEndDate)
+                .desiredCount(desiredCount)
                 .build();
     }
 }
