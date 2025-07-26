@@ -25,8 +25,9 @@ public class ShowStoreDetailResponse {
     private Boolean isOpening;
     private LocalTime startTime;
     private LocalTime endTime;
+    private boolean isLiked;
 
-    public static ShowStoreDetailResponse from(final StoreWithDistanceProjection storeWithDistanceProjection){
+    public static ShowStoreDetailResponse from(final StoreWithDistanceProjection storeWithDistanceProjection,final boolean isLiked){
 
         Boolean isOpening = LocalTime.now().isAfter(storeWithDistanceProjection.getStartTime())&& LocalTime.now().isBefore(storeWithDistanceProjection.getEndTime())?
                             true : false;

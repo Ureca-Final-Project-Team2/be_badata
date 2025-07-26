@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.store.service;
 
+import com.TwoSeaU.BaData.domain.store.dto.projection.StoreWithDistanceProjection;
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowDeviceInfoResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreDetailResponse;
@@ -11,7 +12,11 @@ import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
 import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
+import com.TwoSeaU.BaData.domain.store.repository.StoreLikesRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
+import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,8 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final StoreDeviceRepository storeDeviceRepository;
+    private final StoreLikesRepository storeLikesRepository;
+    private final UserRepository userRepository;
 
     public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest, final String username){
 
@@ -59,13 +66,24 @@ public class StoreService {
 
     }
 
-    public ShowStoreDetailResponse getStoreDetail(final Long storeId, final Double centerLat,final Double centerLng){
+    public ShowStoreDetailResponse getStoreDetail(final Long storeId, final Double centerLat,final Double centerLng, final String username){
 
         if(!storeRepository.existsById(storeId)){
             throw new GeneralException(StoreException.CANT_FIND_STORE);
         }
 
-        return ShowStoreDetailResponse.from(storeRepository.findStoreWithDistance(storeId,centerLat,centerLng));
+        final StoreWithDistanceProjection storeWithDistance = storeRepository.findStoreWithDistance(
+                storeId, centerLat, centerLng);
+
+        if(username == null){
+            return ShowStoreDetailResponse.from(storeWithDistance,false);
+        }
+
+        final User user = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(
+                UserException.USER_NOT_FOUND));
+
+        return ShowStoreDetailResponse.from(storeWithDistance,
+                storeLikesRepository.existsByUserIdAndStoreId(user.getId(), storeId));
 
     }
 
