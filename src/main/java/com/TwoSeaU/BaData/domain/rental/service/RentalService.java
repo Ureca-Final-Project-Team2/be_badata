@@ -51,6 +51,11 @@ public class RentalService {
             throw new GeneralException(StoreException.CANT_FIND_STORE);
         }
 
+        if(rentalStartDate == null || rentalEndDate == null){
+            return deviceReservationRepository.findAvailableDevicesByStoreId(storeId).stream()
+                    .map(ShowReservationDeviceInfoResponse::from).toList();
+        }
+
         return deviceReservationRepository.findAvailableDevicesByStoreIdAndPeriod(storeId,rentalStartDate,rentalEndDate)
                 .stream().map(ShowReservationDeviceInfoResponse::from).toList();
     }
