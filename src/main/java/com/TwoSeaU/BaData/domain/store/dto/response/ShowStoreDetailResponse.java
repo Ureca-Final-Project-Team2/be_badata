@@ -43,6 +43,7 @@ public class ShowStoreDetailResponse {
                 .startTime(storeWithDistanceProjection.getStartTime())
                 .endTime(storeWithDistanceProjection.getEndTime())
                 .distanceFromMe(storeWithDistanceProjection.getDistanceFromMe())
+                .isLiked(isLiked)
                 .build();
     }
 
