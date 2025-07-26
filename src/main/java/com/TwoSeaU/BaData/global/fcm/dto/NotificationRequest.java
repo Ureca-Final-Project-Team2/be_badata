@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.global.fcm.dto;
 
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,15 +17,30 @@ public class NotificationRequest {
 
     private String content;
 
-    private String fcmToken;
+    private List<String> fcmTokens;
 
-    public static NotificationRequest of(final String title, final String content, final String fcmToken){
+    private Map<String, String> data;
+
+    public static NotificationRequest forMultipleTokens(String title, String content, List<String> tokens, Map<String, String> data) {
 
         return NotificationRequest.builder()
                 .title(title)
                 .content(content)
-                .fcmToken(fcmToken)
+                .fcmTokens(tokens)
+                .data(data)
                 .build();
     }
+
+    public static NotificationRequest forSingleToken(String title, String content, String token, Map<String, String> data) {
+
+        return NotificationRequest.builder()
+                .title(title)
+                .content(content)
+                .fcmTokens(List.of(token))
+                .data(data)
+                .build();
+    }
+
+
 
 }

@@ -18,7 +18,7 @@ public class AlarmController {
     @GetMapping("/test/alarm")
     public ResponseEntity<ApiResponse<String>> sendAlarm(@RequestParam("token") String token) {
 
-         fcmService.send(NotificationRequest.of("테스트 타이틀","테스트 컨텐츠", token));
+         fcmService.send(NotificationRequest.forSingleToken("테스트 타이틀","테스트 컨텐츠", token,null));
 
          return ResponseEntity.ok(ApiResponse.success("성공"));
     }
