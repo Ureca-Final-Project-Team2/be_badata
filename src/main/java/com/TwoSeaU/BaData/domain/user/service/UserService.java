@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.service;
 
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserLikesRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
@@ -50,6 +52,7 @@ public class UserService {
 	private final StoreLikesRepository storeLikesRepository;
 	private final ReservationRepository reservationRepository;
 	private final ReStockRepository reStockRepository;
+	private final CoinHistoryRepository coinHistoryRepository;
 
 	public DataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
@@ -63,6 +66,13 @@ public class UserService {
 			 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return CoinResponse.of(user.getCoin());
+	}
+
+	public CursorPageResponse<GetCoinHistoryResponse> getAllCoinsByCursor(final Long cursor, final int size, final String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		return coinHistoryRepository.getAllCoinsResponse(cursor, size, user.getId());
 	}
 
 	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final ReportStatus reportStatus, final Long cursor, final int size, final String username) {

@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 import com.TwoSeaU.BaData.domain.trade.dto.request.GetMerchantUidRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.CreatePaymentResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.GetValidatePaymentResponse;
+import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.PayMethod;
@@ -135,7 +136,12 @@ public class PaymentService {
         }
 
         payment.updatePaymentStatus(PaymentStatus.PAID);
-        coinHistoryRepository.save(CoinHistory.of(user, CoinSource.PAYMENT, payment.getUseCoin().intValue()));
+
+        coinHistoryRepository.save(CoinHistory.of(
+            user,
+            post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
+            payment.getUseCoin().intValue()
+        ));
         user.updateUsedCoin(payment.getUseCoin().intValue());
         post.updateIsSold(true);
 

@@ -17,6 +17,7 @@ import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
 
+import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
@@ -47,6 +48,14 @@ public class UserController {
 	@GetMapping("/coin")
 	public ResponseEntity<ApiResponse<CoinResponse>> getCoin(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getCoin(user.getUsername())));
+	}
+
+	@GetMapping("/coin/history")
+	public ResponseEntity<ApiResponse<CursorPageResponse<GetCoinHistoryResponse>>> getAllCoinsByCursor(
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "10") int size,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllCoinsByCursor(cursor, size, user.getUsername())));
 	}
 
 	@GetMapping("/reports")
