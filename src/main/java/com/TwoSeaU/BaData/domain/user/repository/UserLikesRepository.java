@@ -10,4 +10,6 @@ public interface UserLikesRepository extends JpaRepository<UserLikes, Long>, Use
 
     Optional<UserLikes> findByFollowerUserAndFollowingUser(final User follower, final User followingUser);
 
+
+
 }

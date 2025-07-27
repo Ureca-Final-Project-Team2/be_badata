@@ -124,6 +124,26 @@ public class UserService {
 				});
 	}
 
+	@Transactional
+	public Long deleteFollow(final Long followId, final String username){
+
+		final User loginUser = userRepository.findByUsername(username)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final UserLikes userLikes = userLikesRepository.findById(followId).orElseThrow(
+				()-> new GeneralException(UserException.LIKES_USER_NOT_FOUND));
+
+		if(!userLikes.getFollowerUser().getUsername().equals(loginUser.getUsername()) &&
+		    !userLikes.getFollowingUser().getUsername().equals(loginUser.getUsername())){
+
+			throw new GeneralException(UserException.CANT_DELETE_OTHER_FOLLOW);
+		}
+
+		userLikesRepository.delete(userLikes);
+
+		return followId;
+	}
+
 	public CursorPageResponse<GetFollowsResponse> getFollowsByCursor(final FollowType followType, final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));

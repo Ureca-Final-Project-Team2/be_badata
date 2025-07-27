@@ -35,8 +35,8 @@ public class ShowStoreResponse {
 
         return ShowStoreResponse.builder()
                 .id(store.getId())
-                .longititude(store.getPosition().getY())
-                .latitude(store.getPosition().getX())
+                .longititude(store.getPosition().getX())
+                .latitude(store.getPosition().getY())
                 .name(store.getName())
                 .openTime(store.getStartTime())
                 .closeTime(store.getEndTime())
