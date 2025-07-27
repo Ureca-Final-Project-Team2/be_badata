@@ -44,6 +44,22 @@ public class RestockService {
         return reStock.getId();
     }
 
+    @Transactional
+    public Long deleteRestock(final Long restockId, final String username){
+
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
+
+        final ReStock reStock = reStockRepository.findById(restockId).orElseThrow(()-> new GeneralException(RentalException.CANT_FIND_RESTOCK));
+
+        if(!reStock.getUser().getId().equals(loginUser.getId())){
+            throw new GeneralException(RentalException.CANT_DELETE_OTHER_RESTOCK);
+        }
+
+        reStockRepository.delete(reStock);
+
+        return restockId;
+    }
+
 
     // 해당 기간에 예약 가능하다면 예외 처리
     private void validateRestock(final RestockDeviceRequest restockDeviceRequest, final StoreDevice storeDevice){
