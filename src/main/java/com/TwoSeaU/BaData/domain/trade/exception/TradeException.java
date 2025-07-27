@@ -41,6 +41,7 @@ public enum TradeException implements BaseException {
     COIN_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3029, "포인트는 소수점 이하를 사용할 수 없습니다."),
     COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, 3030, "포인트가 부족합니다."),
     AMOUNT_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3031, "금액은 소수점 이하를 사용할 수 없습니다."),
+    COIN_EXCEED_PRICE(HttpStatus.BAD_REQUEST, 3032, "포인트는 게시글 가격을 초과할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
