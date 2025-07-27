@@ -3,6 +3,8 @@ package com.TwoSeaU.BaData.domain.trade.dto.response;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,7 +16,7 @@ public class GetDataDetailResponse {
     private Long id;
     private String title;
     private String comment;
-    private Integer price;
+    private BigDecimal price;
     private LocalDate deadLine;
     private String postImage;
     private Boolean isSold;

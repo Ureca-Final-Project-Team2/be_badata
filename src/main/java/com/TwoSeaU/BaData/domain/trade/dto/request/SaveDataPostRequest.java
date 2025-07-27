@@ -6,7 +6,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -26,7 +27,7 @@ public class SaveDataPostRequest {
 
     @NotNull(message = "가격은 필수 작성입니다.")
     @PositiveOrZero(message = "가격은 양수여야 합니다.")
-    private Integer price;
+    private BigDecimal price;
 
     private String comment;
 }
