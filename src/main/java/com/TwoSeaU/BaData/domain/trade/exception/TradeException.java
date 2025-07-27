@@ -42,8 +42,8 @@ public enum TradeException implements BaseException {
     COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, 3030, "포인트가 부족합니다."),
     AMOUNT_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3031, "금액은 소수점 이하를 사용할 수 없습니다."),
     COIN_EXCEED_PRICE(HttpStatus.BAD_REQUEST, 3032, "포인트는 게시글 가격을 초과할 수 없습니다."),
-    REALTIME_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3020, "실시간 검색 처리에 실패했습니다."),
-    REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3024, "실시간 검색 내용이 없습니다.")
+    REALTIME_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3033, "실시간 검색 처리에 실패했습니다."),
+    REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3034, "실시간 검색 내용이 없습니다.")
     ;
 
     private final HttpStatus httpStatus;
