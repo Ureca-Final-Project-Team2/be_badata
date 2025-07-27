@@ -4,6 +4,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,6 +97,12 @@ public class UserController {
 	public ResponseEntity<ApiResponse<CreateFollowResponse>> createFollow(@PathVariable("userId") Long userId, @AuthenticationPrincipal User user){
 
 		return ResponseEntity.ok().body(ApiResponse.success(userService.createFollow(userId, user.getUsername())));
+	}
+
+	@DeleteMapping("/follows/{followId}")
+	public ResponseEntity<ApiResponse<Long>> deleteFollow(@PathVariable("followId") Long followId, @AuthenticationPrincipal User user){
+
+		return ResponseEntity.ok().body(ApiResponse.success(userService.deleteFollow(followId, user.getUsername())));
 	}
 
 	@GetMapping("/follows")
