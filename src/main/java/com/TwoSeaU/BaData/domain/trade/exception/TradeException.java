@@ -36,7 +36,8 @@ public enum TradeException implements BaseException {
     NOT_FOUND_GIFTICON_PARTNER(HttpStatus.NOT_FOUND, 3024, "해당 제휴처를 찾을 수 없습니다."),
     EXPIRED_EXPIRATION_DATE(HttpStatus.BAD_REQUEST, 3025, "유효 기간이 지난 기프티콘입니다."),
     CANNOT_READ_FROM_IMAGE(HttpStatus.BAD_REQUEST, 3026, "이미지 파일을 읽어올 수 없습니다."),
-    CANNOT_PARSE_DATE(HttpStatus.BAD_REQUEST, 3027, "날짜 파싱 처리에 실패하였습니다.")
+    CANNOT_PARSE_DATE(HttpStatus.BAD_REQUEST, 3027, "날짜 파싱 처리에 실패하였습니다."),
+    PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, 3028, "결제 금액이 게시글 가격과 일치하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
