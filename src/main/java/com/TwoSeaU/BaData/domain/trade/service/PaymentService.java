@@ -50,12 +50,20 @@ public class PaymentService {
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
 
-        if(post.getIsSold()){
+        if (post.getIsSold()) {
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
-        if(Objects.equals(post.getSeller().getId(), user.getId())) {
+        if (Objects.equals(post.getSeller().getId(), user.getId())) {
             throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
+        }
+
+        if (getMerchantUidRequest.getUseCoin().intValue() > user.getCoin()) {
+            throw new GeneralException(TradeException.COIN_NOT_ENOUGH);
+        }
+
+        if (getMerchantUidRequest.getUseCoin().stripTrailingZeros().scale() > 0) {
+            throw new GeneralException(TradeException.COIN_DECIMAL_NOT_ALLOWED);
         }
 
         final Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD,
@@ -95,6 +103,10 @@ public class PaymentService {
 
         final Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
+
+        if (payment.getUseCoin().intValue() > user.getCoin()) {
+            throw new GeneralException(TradeException.COIN_NOT_ENOUGH);
+        }
 
         payment.updatePaymentStatus(PaymentStatus.PAID);
         coinHistoryRepository.save(CoinHistory.of(user, CoinSource.PAYMENT, payment.getUseCoin().intValue()));

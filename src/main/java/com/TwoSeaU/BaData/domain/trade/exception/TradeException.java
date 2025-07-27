@@ -38,6 +38,9 @@ public enum TradeException implements BaseException {
     CANNOT_READ_FROM_IMAGE(HttpStatus.BAD_REQUEST, 3026, "이미지 파일을 읽어올 수 없습니다."),
     CANNOT_PARSE_DATE(HttpStatus.BAD_REQUEST, 3027, "날짜 파싱 처리에 실패하였습니다."),
     PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, 3028, "결제 금액이 게시글 가격과 일치하지 않습니다."),
+    COIN_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3029, "포인트는 소수점 이하를 사용할 수 없습니다."),
+    COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, 3030, "포인트가 부족합니다."),
+    AMOUNT_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3031, "금액은 소수점 이하를 사용할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
