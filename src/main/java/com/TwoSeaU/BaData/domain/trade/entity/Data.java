@@ -4,6 +4,8 @@ import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -20,7 +22,7 @@ public class Data extends Post {
 
     private Integer capacity;
 
-    public Data(final User user, final String title, final String comment, final Integer price,
+    public Data(final User user, final String title, final String comment, final BigDecimal price,
                 final LocalDate deadLine, final String postImage, final Boolean isSold,
                 final MobileCarrier mobileCarrier, final Integer capacity) {
         super(user, title, comment, price, deadLine, postImage, isSold);

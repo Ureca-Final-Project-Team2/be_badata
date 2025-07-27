@@ -3,12 +3,9 @@ package com.TwoSeaU.BaData.domain.user.dto.response;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -19,7 +16,7 @@ public class GetSaleResponse {
 	private PostCategory postCategory;
 	private String partner;
 	private String title;
-	private Integer price;
+	private BigDecimal price;
 	private int postLikes;
 	private String postImage;
 	private Boolean isSold;
