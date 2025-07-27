@@ -31,7 +31,7 @@ public class AddressService {
 
         final Address address = addressRepository.save(Address.of(addressCreateRequest.getDetailAddress(),
                                           loginUser,
-                                          GeoUtils.makeByCoordinate(addressCreateRequest.getLongitude(), addressCreateRequest.getLatitude()) ));
+                                          GeoUtils.makeByCoordinate(addressCreateRequest.getLongititude(), addressCreateRequest.getLatitude()) ));
 
         return address.getId();
     }
