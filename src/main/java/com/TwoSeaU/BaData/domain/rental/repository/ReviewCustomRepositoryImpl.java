@@ -60,7 +60,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             }
         }
 
-        return new OrderSpecifier(Order.DESC, store.id);
+        return new OrderSpecifier(Order.DESC, review.id);
     }
 
 
