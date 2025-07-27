@@ -12,7 +12,6 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,8 @@ public class RestockService {
                 UserException.USER_NOT_FOUND));
 
         final ReStock reStock = reStockRepository.save(
-                ReStock.of(storeDevice, user, restockDeviceRequest.getDesiredStartDate(), restockDeviceRequest.getDesiredEndDate()));
+                ReStock.of(storeDevice, user, restockDeviceRequest.getDesiredStartDate(), restockDeviceRequest.getDesiredEndDate(),
+                        restockDeviceRequest.getCount()));
 
         return reStock.getId();
     }

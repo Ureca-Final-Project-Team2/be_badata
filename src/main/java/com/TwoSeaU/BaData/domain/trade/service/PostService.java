@@ -4,12 +4,14 @@ import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
 import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.entity.Data;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
+import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
 import com.TwoSeaU.BaData.domain.user.entity.SearchHistory;
@@ -22,7 +24,6 @@ import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,18 +43,19 @@ public class PostService {
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
     private final SearchHistoryRepository searchHistoryRepository;
+    private final PaymentRepository paymentRepository;
     private final ELAService elaService;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
 
-    public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
+    public PostsResponse postsToPostResponse(final List<Post> posts, final String username) {
         Optional<Long> optionalUserId;
 
-        if(userdetails != null) {
-            optionalUserId = userRepository.findByUsername(userdetails.getUsername()).map(User::getId);
+        if(username != null) {
+            optionalUserId = userRepository.findByUsername(username).map(User::getId);
         }
         else {
-            optionalUserId = null;
+            optionalUserId = Optional.empty();
         }
 
         final List<PostResponse> allPosts = posts
@@ -61,7 +63,7 @@ public class PostService {
                 .map(post -> PostResponse.from(
                         post,
                         postLikesRepository.countByPostId(post.getId()),
-                        userdetails == null ? false : postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
+                        username != null && postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
                 ))
                 .toList();
 
@@ -77,32 +79,32 @@ public class PostService {
         return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
-    public PostsResponse findAllPosts(final UserDetails userdetails) {
+    public PostsResponse findAllPosts(final String username) {
 
-        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), userdetails);
+        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), username);
     }
 
 
-    public UserPostsResponse getPostsByUserId(final Long userId, final UserDetails userdetails) {
+    public UserPostsResponse getPostsByUserId(final Long userId, final String username) {
 
         return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), userdetails),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), userdetails));
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), username),
+                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), username));
     }
 
 
-    public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
+    public PostsResponse getPostsByDeadLine(final String username) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), userdetails);
+        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), username);
 
     }
 
 
-    public PostsResponse searchPosts(final String query, final UserDetails userdetails) {
+    public PostsResponse searchPosts(final String query, final String username) {
         log.info("event-keyword-search, {}", query);
 
-        if(userdetails != null) {
-            final User user = userRepository.findByUsername(userdetails.getUsername())
+        if(username != null) {
+            final User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
             try {
@@ -112,7 +114,7 @@ public class PostService {
             }
         }
 
-        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), userdetails);
+        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), username);
     }
 
 
@@ -129,8 +131,6 @@ public class PostService {
             throw new GeneralException(TradeException.SUSPICIOUS_IMAGE_DETECTED);
         }
 
-        final OCRResult ocrResult = ocrService.extractTextFromImageFile(saveGifticonPostRequest.getFile());
-
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
 
         final Gifticon gifticon = new Gifticon(
@@ -141,7 +141,6 @@ public class PostService {
                 saveGifticonPostRequest.getDeadLine(),
                 imageUrl,
                 false,
-                saveGifticonPostRequest.getIssueDate(),
                 saveGifticonPostRequest.getCouponNumber(),
                 saveGifticonPostRequest.getPartner(),
                 category
@@ -179,7 +178,7 @@ public class PostService {
                 .build();
     }
 
-    public GetPostDetailResponse getPost(final Long postId, final UserDetails user) {
+    public GetPostDetailResponse getPost(final Long postId, final String username) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
@@ -187,13 +186,22 @@ public class PostService {
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
 
+        if (post.getIsSold() && username != null) {
+            final User loginUser = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+            if (!post.getSeller().getId().equals(loginUser.getId()) && paymentRepository.findByUserIdAndPostIdAndPaymentStatus(loginUser.getId(), postId, PaymentStatus.PAID).isEmpty()) {
+                throw new GeneralException(TradeException.POST_ACCESS_DENIED);
+            }
+        }
+
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
         final int likesCount = postLikesRepository.countByPostId(postId);
         boolean isLiked = false;
 
-        if(user != null) {
-            final User loginUser = userRepository.findByUsername(user.getUsername())
+        if(username != null) {
+            final User loginUser = userRepository.findByUsername(username)
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
             isLiked = postLikesRepository.existsByUserIdAndPostId(loginUser.getId(), postId);
         }
@@ -214,11 +222,8 @@ public class PostService {
     }
 
     public DeletePostResponse deletePost(final Long postId, final String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-        final Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+        final User user = getUserByUsername(username);
+        final Post post = validateAndGetPost(postId, username);
 
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
@@ -237,14 +242,50 @@ public class PostService {
         return DeletePostResponse.of(postId);
     }
 
-    public SavePostResponse modifyPost(final Long postId, final UpdatePostRequest updatePostRequest, final String username) {
+    public SavePostResponse modifyPostData(final Long postId, final UpdateDataPostRequest updateDataPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
 
-        final User user = userRepository.findByUsername(username)
+        post.updateCommentAndPriceAndTitle(
+                updateDataPostRequest.getComment(),
+                updateDataPostRequest.getPrice(),
+                updateDataPostRequest.getTitle()
+        );
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
+
+        post.updateCommentAndPrice(
+                updateGifticonPostRequest.getComment(),
+                updateGifticonPostRequest.getPrice()
+        );
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    private Post validateAndGetPost(final Long postId, final String username) {
+        final User user = getUserByUsername(username);
+        final Post post = getPostById(postId);
+
+        validatePostStatus(post);
+        validatePostOwnership(post, user);
+
+        return post;
+    }
+
+    private User getUserByUsername(final String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+    }
 
-        final Post post = postRepository.findById(postId)
+    private Post getPostById(final Long postId) {
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+    }
 
+    private void validatePostStatus(final Post post) {
         if (post.getIsDeleted()) {
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
@@ -252,16 +293,11 @@ public class PostService {
         if (post.getIsSold()) {
             throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
         }
+    }
 
+    private void validatePostOwnership(final Post post, final User user) {
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
-
-        post.updateCommentAndPrice(
-                updatePostRequest.getComment(),
-                updatePostRequest.getPrice()
-        );
-
-        return SavePostResponse.of(post.getId());
     }
 }

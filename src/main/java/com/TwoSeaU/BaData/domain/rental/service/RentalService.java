@@ -11,7 +11,6 @@ import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
-import com.TwoSeaU.BaData.domain.store.entity.Device;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
@@ -21,10 +20,10 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +38,22 @@ public class RentalService {
     private final UserRepository userRepository;
     private final StoreDeviceRepository storeDeviceRepository;
     private final ReservationRepository reservationRepository;
+    private final RestockNotificationService restockNotificationService;
+    private final EntityManager em;
+
+
 
     public List<ShowReservationDeviceInfoResponse> getReservationDeviceInfoResponse(final LocalDateTime rentalStartDate,
                                                                                     final LocalDateTime rentalEndDate,
                                                                                     final Long storeId){
 
-        if(!storeRepository.existsById(storeId)){
+        if (!storeRepository.existsById(storeId)){
             throw new GeneralException(StoreException.CANT_FIND_STORE);
+        }
+
+        if (rentalStartDate == null || rentalEndDate == null){
+            return deviceReservationRepository.findAvailableDevicesByStoreId(storeId).stream()
+                    .map(ShowReservationDeviceInfoResponse::from).toList();
         }
 
         return deviceReservationRepository.findAvailableDevicesByStoreIdAndPeriod(storeId,rentalStartDate,rentalEndDate)
@@ -121,11 +129,19 @@ public class RentalService {
 
         validateCancelReservation(loginUser, reservation);
 
+        final List<DeviceReservation> deviceReservations = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(reservationId);
+
         deviceReservationRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
 
+        em.flush();
+
+        restockNotificationService.sendRestockNotification(reservation,deviceReservations);
+
         return reservation.getId();
     }
+
+
 
     private void validateCancelReservation(final User loginUser, final Reservation reservation) {
 
@@ -150,6 +166,10 @@ public class RentalService {
 
             if(!storeDevice.getStore().getId().equals(reserveRentalRequest.getStoreId())){
                 throw new GeneralException(RentalException.DONT_MATCH_STORE_DEVICE_STORE);
+            }
+
+            if(storeDevice.getCount() < reserveDeviceRequest.getCount()){
+                throw new GeneralException(RentalException.CANT_RESERVATION_MORE_THAN_COUNT);
             }
 
             Long availableCount = deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(

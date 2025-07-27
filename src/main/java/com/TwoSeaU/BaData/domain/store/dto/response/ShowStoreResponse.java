@@ -27,16 +27,23 @@ public class ShowStoreResponse {
 
     public static ShowStoreResponse from(final Store store,final Double distanceFromMe,final int leftDeviceCount){
 
+        final LocalTime now = LocalTime.now();
+        final LocalTime open = store.getStartTime();
+        final LocalTime close = store.getEndTime();
+
+        final boolean isOpening = !now.isBefore(open) && !now.isAfter(close);
+
         return ShowStoreResponse.builder()
                 .id(store.getId())
-                .longititude(store.getPosition().getY())
-                .latitude(store.getPosition().getX())
+                .longititude(store.getPosition().getX())
+                .latitude(store.getPosition().getY())
                 .name(store.getName())
                 .openTime(store.getStartTime())
                 .closeTime(store.getEndTime())
                 .distanceFromMe(distanceFromMe)
                 .detailAddress(store.getDetailAddress())
                 .leftDeviceCount(leftDeviceCount)
+                .isOpening(isOpening)
                 .build();
     }
 

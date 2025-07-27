@@ -2,6 +2,8 @@ package com.TwoSeaU.BaData.domain.trade.dto.response;
 
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,12 +15,11 @@ public class GetGifticonDetailResponse {
     private Long id;
     private String title;
     private String comment;
-    private Integer price;
+    private BigDecimal price;
     private LocalDate deadLine;
     private String postImage;
     private Boolean isSold;
     private LocalDateTime createdAt;
-    private LocalDateTime issueDate;
     private String partner;
     private Integer likesCount;
     private Boolean isLiked;
@@ -33,7 +34,6 @@ public class GetGifticonDetailResponse {
                 .postImage(gifticon.getPostImage())
                 .isSold(gifticon.getIsSold())
                 .createdAt(gifticon.getCreatedAt())
-                .issueDate(gifticon.getIssueDate())
                 .partner(gifticon.getPartner())
                 .likesCount(likesCount)
                 .isLiked(isLiked)

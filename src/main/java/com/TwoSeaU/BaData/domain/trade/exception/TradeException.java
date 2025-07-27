@@ -29,10 +29,20 @@ public enum TradeException implements BaseException {
     ELA_IMAGE_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3017, "ELA 이미지 처리에 실패했습니다."),
     SUSPICIOUS_IMAGE_DETECTED(HttpStatus.BAD_REQUEST, 3018, "조작이 감지되었습니다."),
     REPORT_COMMENT_REQUIRED(HttpStatus.BAD_REQUEST, 3019, "신고 사유가 기타일 경우 상세 사유를 작성해야 합니다."),
+    DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3020, "삭제된 게시글에 접근할 수 없습니다."),
+    ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3021, "이미 찜한 게시글입니다."),
+    SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3022, "판매 완료된 게시글은 삭제할 수 없습니다."),
+    SELF_PAYMENT_DENIED(HttpStatus.FORBIDDEN, 3023, "본인 게시글은 구매할 수 없습니다."),
+    NOT_FOUND_GIFTICON_PARTNER(HttpStatus.NOT_FOUND, 3024, "해당 제휴처를 찾을 수 없습니다."),
+    EXPIRED_EXPIRATION_DATE(HttpStatus.BAD_REQUEST, 3025, "유효 기간이 지난 기프티콘입니다."),
+    CANNOT_READ_FROM_IMAGE(HttpStatus.BAD_REQUEST, 3026, "이미지 파일을 읽어올 수 없습니다."),
+    CANNOT_PARSE_DATE(HttpStatus.BAD_REQUEST, 3027, "날짜 파싱 처리에 실패하였습니다."),
+    PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, 3028, "결제 금액이 게시글 가격과 일치하지 않습니다."),
+    COIN_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3029, "포인트는 소수점 이하를 사용할 수 없습니다."),
+    COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, 3030, "포인트가 부족합니다."),
+    AMOUNT_DECIMAL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 3031, "금액은 소수점 이하를 사용할 수 없습니다."),
+    COIN_EXCEED_PRICE(HttpStatus.BAD_REQUEST, 3032, "포인트는 게시글 가격을 초과할 수 없습니다."),
     REALTIME_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3020, "실시간 검색 처리에 실패했습니다."),
-    DELETED_POST_ACCESS_DENIED(HttpStatus.GONE, 3021, "삭제된 게시글에 접근할 수 없습니다."),
-    ALREADY_LIKED_POST(HttpStatus.CONFLICT, 3022, "이미 찜한 게시글입니다."),
-    SOLD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, 3023, "판매 완료된 게시글은 삭제할 수 없습니다."),
     REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3024, "실시간 검색 내용이 없습니다.")
     ;
 

@@ -51,3 +51,7 @@ jwt:
 
 logging:
   config: classpath:logback-spring.xml
+
+
+fcm:
+  certification: firebase.json

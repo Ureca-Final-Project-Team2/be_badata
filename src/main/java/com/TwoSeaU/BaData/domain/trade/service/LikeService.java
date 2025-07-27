@@ -33,6 +33,10 @@ public class LikeService {
             throw new GeneralException(TradeException.ALREADY_LIKED_POST);
         }
 
+        if (user.getId().equals(post.getSeller().getId())) {
+            throw new GeneralException(TradeException.LIKES_UNAUTHORIZED);
+        }
+
         final PostLikes p = postLikesRepository.save(PostLikes.of(post, user));
         return SavePostLikesResponse.of(p.getId());
     }

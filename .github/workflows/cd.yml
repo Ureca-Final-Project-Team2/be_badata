@@ -67,6 +67,8 @@ jobs:
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "S3_BUCKET_URL=${{ secrets.S3_BUCKET_URL }}" >> $GITHUB_ENV
           echo "LOGSTASH_URL=${{ secrets.LOGSTASH_URL }}" >> $GITHUB_ENV
+          echo "OCR_JSON=${{ secrets.OCR_JSON }}" >> $GITHUB_ENV
+          echo "FIRE_BASE_JSON=${{ secrets.FIRE_BASE_JSON }}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -76,6 +78,10 @@ jobs:
 
       - name: 실행 권한 부여
         run: chmod +x ./gradlew
+
+      - name: firebase.json 복원
+        run: |
+          echo "${{ secrets.FIRE_BASE_BASE_64_JSON }}" | base64 -d > src/main/resources/firebase.json
 
       - name: 빌드 테스트
         run: ./gradlew clean build -x test
@@ -103,4 +109,4 @@ jobs:
             
             echo "새로운 이미지 빌드"
             docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
-            docker run --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -v ~/be_badata${{ secrets.FIRE_BASE_JSON }}:/BaData/src/main/resources${{ secrets.FIRE_BASE_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
+            docker run --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest

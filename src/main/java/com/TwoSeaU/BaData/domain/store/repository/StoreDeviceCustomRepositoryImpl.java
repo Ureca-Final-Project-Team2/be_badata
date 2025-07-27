@@ -46,6 +46,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     private final JPAQueryFactory queryFactory;
     private static final String review_count="reviewCount";
     public static final String distance = "distance";
+    public static final String likeCount = "likeCount";
 
     @Override
     public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest, final String username){
@@ -122,6 +123,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                                                 )
                                 ).sum()))
                 .from(storeDevice)
+                .join(storeDevice.store, store)
+                .leftJoin(storeLikes).on(storeLikes.store.eq(storeDevice.store))
                 .where(minPriceGoe(storeSearchRequest.getMinPrice()))
                 .where(maxPriceLoe(storeSearchRequest.getMaxPrice()))
                 .where(inDataCapacity(storeSearchRequest.getDataCapacity()))
@@ -131,7 +134,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .where(isOpeningNow(storeSearchRequest.getIsOpeningNow()))
                 .where(filterReviewRating(storeSearchRequest.getReviewRating()))
                 .groupBy(storeDevice.store)
-                .orderBy(storeSort(pageable, storeSearchRequest))
+                .orderBy(storeSort(pageable, storeSearchRequest),distanceOrderSpecifier(storeSearchRequest))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -268,34 +271,47 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         if(!pageable.getSort().isEmpty()){
 
             for(Sort.Order order: pageable.getSort()){
-                Order direction  = order.getDirection().isAscending()? Order.ASC:Order.DESC;
 
-                switch (order.getProperty()){
+                        Order direction  = order.getDirection().isAscending()? Order.ASC:Order.DESC;
 
-                    case review_count:
-                        return new OrderSpecifier(direction,store.reviewCount);
+                        switch (order.getProperty()){
 
-                    case distance:
+                            case review_count:
+                                return new OrderSpecifier(direction,store.reviewCount);
 
-                        if(storeSearchRequest.getCenterLng() == null || storeSearchRequest.getCenterLat() == null){
-                            return new OrderSpecifier(Order.DESC,store.id);
+                            case distance:
+
+                                if (storeSearchRequest.getCenterLng() == null || storeSearchRequest.getCenterLat() == null) {
+                                    return new OrderSpecifier<>(Order.DESC, store.id);
+                                }
+
+                                return distanceOrderSpecifier(storeSearchRequest);
+
+                            case likeCount:
+                                return new OrderSpecifier<>(direction, storeLikes.count());
                         }
-
-                        return new OrderSpecifier<>(
-                                direction,
-                                Expressions.numberTemplate(Double.class,
-                                        "ST_DistanceSphere({0}, {1})",
-                                        store.position,
-                                        Expressions.constant(GeoUtils.makeByCoordinate(storeSearchRequest.getCenterLng(),
-                                                                                       storeSearchRequest.getCenterLat()))
-                                )
-                        );
 
                 }
             }
+           return distanceOrderSpecifier(storeSearchRequest);
+    }
+
+
+
+    private OrderSpecifier<?> distanceOrderSpecifier(StoreSearchRequest storeSearchRequest) {
+        if (storeSearchRequest.getCenterLng() == null || storeSearchRequest.getCenterLat() == null) {
+            return new OrderSpecifier<>(Order.DESC, store.id); // fallback
         }
 
-        return new OrderSpecifier(Order.DESC, store.id);
+        return new OrderSpecifier<>(
+                Order.ASC, // 기본 거리 오름차순
+                Expressions.numberTemplate(Double.class,
+                        "ST_DistanceSphere({0}, ST_MakePoint({1}, {2}))",
+                        store.position,
+                        storeSearchRequest.getCenterLng(),
+                        storeSearchRequest.getCenterLat()
+                )
+        );
     }
 
     private Set<Long> getUserLikedStoreIds(final String username) {

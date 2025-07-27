@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreLikesRepository extends JpaRepository<StoreLikes, Long>, StoreLikesQueryRepository {
     Optional<StoreLikes> findByUserAndStore(final User user, final Store store);
+
+    boolean existsByUserIdAndStoreId(final Long userId, final Long storeId);
 }

@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 public class GetReportResponse {
 	private Long id;
 	private Long postId;
+	private String title;
+	private String thumbnailUrl;
 	private ReportStatus reportStatus;
 	private ReportType reportTypeCode;
 	private String reportReason;
@@ -30,6 +32,8 @@ public class GetReportResponse {
 		return GetReportResponse.builder()
 			.id(report.getId())
 			.postId(post.getId())
+			.title(post.getTitle())
+			.thumbnailUrl(post.getPostImage())
 			.reportStatus(report.getReportStatus())
 			.reportTypeCode(report.getReportTypeCode())
 			.reportReason(report.getReportReason())

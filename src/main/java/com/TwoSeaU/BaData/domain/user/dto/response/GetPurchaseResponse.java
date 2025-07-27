@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +23,7 @@ public class GetPurchaseResponse {
 	private PostCategory postCategory;
 	private String partner;
 	private String title;
-	private Integer price;
+	private BigDecimal price;
 	private int postLikes;
 	private String postImage;
 	private Boolean isSold;
