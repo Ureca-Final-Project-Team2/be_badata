@@ -97,7 +97,7 @@ public class PaymentService {
             throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
         }
 
-        if (!post.getPrice().equals(iamportClient.paymentByImpUid(impUid).getResponse().getAmount())) {
+        if (post.getPrice().compareTo(iamportClient.paymentByImpUid(impUid).getResponse().getAmount()) != 0) {
             throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
         }
 
