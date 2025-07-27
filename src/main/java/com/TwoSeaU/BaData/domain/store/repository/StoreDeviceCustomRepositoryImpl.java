@@ -57,8 +57,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         LocalDateTime rentalEndDate = storeMapSearchRequest.getRentalEndDate();
 
         if( rentalStartDate == null || rentalEndDate == null){
-            rentalStartDate = LocalDateTime.now();
-            rentalEndDate = LocalDate.now().atTime(23, 59, 59);
+            rentalStartDate = LocalDateTime.of(2100,3,1,0,0);
+            rentalEndDate = LocalDateTime.of(2100,3,1,0,1);
         }
 
         final List<Tuple> results =  queryFactory.select(
@@ -103,6 +103,14 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     @Override
     public Slice<ShowStoreWithLeftDeviceAndDistanceResponse> findStoresByPage(final StoreSearchRequest storeSearchRequest, final Pageable pageable){
 
+        LocalDateTime rentalStartDate = storeSearchRequest.getRentalStartDate();
+        LocalDateTime rentalEndDate = storeSearchRequest.getRentalEndDate();
+
+        if( rentalStartDate == null || rentalEndDate == null){
+            rentalStartDate = LocalDateTime.of(2100,3,1,0,0);
+            rentalEndDate = LocalDateTime.of(2100,3,1,0,1);
+        }
+
         List<ShowStoreWithLeftDeviceAndDistanceResponse> content = queryFactory
                 .select(Projections.constructor(ShowStoreWithLeftDeviceAndDistanceResponse.class,
                                 storeDevice.store,
@@ -118,8 +126,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                                                 .join(deviceReservation.reservation, reservation)
                                                 .where(
                                                         deviceReservation.storeDevice.eq(storeDevice),
-                                                        reservation.rentalStartDate.loe(storeSearchRequest.getRentalEndDate()),
-                                                        reservation.rentalEndDate.goe(storeSearchRequest.getRentalStartDate())
+                                                        reservation.rentalStartDate.loe(rentalEndDate),
+                                                        reservation.rentalEndDate.goe(rentalStartDate)
                                                 )
                                 ).sum()))
                 .from(storeDevice)
@@ -129,7 +137,7 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .where(maxPriceLoe(storeSearchRequest.getMaxPrice()))
                 .where(inDataCapacity(storeSearchRequest.getDataCapacity()))
                 .where(is5GEq(storeSearchRequest.getIs5G()))
-                .where(availableDuringPeriod(storeSearchRequest.getRentalStartDate(), storeSearchRequest.getRentalEndDate()))
+                .where(availableDuringPeriod(rentalStartDate, rentalEndDate))
                 .where(inMaxSupportConnection(storeSearchRequest.getMaxSupportConnection()))
                 .where(isOpeningNow(storeSearchRequest.getIsOpeningNow()))
                 .where(filterReviewRating(storeSearchRequest.getReviewRating()))
@@ -158,8 +166,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
         LocalDateTime rentalEndDate = deviceSearchRequest.getRentalEndDate();
 
         if( rentalStartDate == null || rentalEndDate == null){
-            rentalStartDate = LocalDateTime.now();
-            rentalEndDate = LocalDate.now().atTime(23, 59, 59);
+            rentalStartDate = LocalDateTime.of(2100,3,1,0,0);
+            rentalEndDate = LocalDateTime.of(2100,3,1,0,1);
         }
 
         NumberExpression<Integer> reservedCountSum = new CaseBuilder()
