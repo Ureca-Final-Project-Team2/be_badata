@@ -73,4 +73,8 @@ public class User extends BaseEntity {
 
     }
 
+    public void updateUsedCoin(final Integer usedCoin) {
+        this.coin -= usedCoin;
+    }
+
 }

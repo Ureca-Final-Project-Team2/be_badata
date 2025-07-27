@@ -6,6 +6,8 @@ import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -17,7 +19,7 @@ public class PostResponse {
     private Long id;
     private String title;
     private String partner;
-    private Integer price;
+    private BigDecimal price;
     private LocalDateTime createdAt;
     private String postImage;
     private PostCategory postCategory;
@@ -26,6 +28,7 @@ public class PostResponse {
     private MobileCarrier mobileCarrier;
     private Integer likesCount;
     private Boolean isLiked;
+    private Integer capacity;
 
     public static PostResponse from(final Post post, final Integer likesCount, final Boolean isLiked) {
 
@@ -42,6 +45,7 @@ public class PostResponse {
                 .mobileCarrier(post instanceof Data data ? data.getMobileCarrier() : null)
                 .likesCount(likesCount)
                 .isLiked(isLiked)
+                .capacity(post instanceof Data data ? data.getCapacity() : null)
                 .build();
     }
 }

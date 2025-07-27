@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UpdateDataPostRequest {
@@ -14,5 +16,5 @@ public class UpdateDataPostRequest {
     private String comment;
 
     @NotNull(message = "가격은 비워둘 수 없습니다.")
-    private Integer price;
+    private BigDecimal price;
 }
