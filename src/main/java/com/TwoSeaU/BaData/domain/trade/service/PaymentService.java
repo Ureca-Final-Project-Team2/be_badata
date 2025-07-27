@@ -22,6 +22,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import  com.siot.IamportRestClient.request.PrepareData;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -68,6 +69,18 @@ public class PaymentService {
 
         final Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD,
                 post.getPrice(), getMerchantUidRequest.getUseCoin());
+
+        PrepareData prepareData = new PrepareData(
+                payment.getMerchantUid(),
+                payment.getAmount()
+        );
+
+        try {
+            iamportClient.postPrepare(prepareData);
+        }
+        catch (IamportResponseException | IOException e){
+            throw new GeneralException(TradeException.PAYMENT_FAILED);
+        }
 
         paymentRepository.save(payment);
 
