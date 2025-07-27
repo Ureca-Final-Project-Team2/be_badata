@@ -18,11 +18,14 @@ public class ShowRentalResponse {
 
     private List<ShowReservedDeviceResponse> showReservedDeviceResponses = new ArrayList<>();
 
-    public static ShowRentalResponse of(final String storeName, final List<ShowReservedDeviceResponse> showReservedDeviceResponses){
+    private Integer countOfVisit;
+
+    public static ShowRentalResponse of(final String storeName, final List<ShowReservedDeviceResponse> showReservedDeviceResponses, final Integer countOfVisit){
 
         return ShowRentalResponse.builder()
                 .storeName(storeName)
                 .showReservedDeviceResponses(showReservedDeviceResponses)
+                .countOfVisit(countOfVisit)
                 .build();
     }
 
