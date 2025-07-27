@@ -67,12 +67,22 @@ public class PaymentService {
             throw new GeneralException(TradeException.COIN_DECIMAL_NOT_ALLOWED);
         }
 
-        final Payment payment = Payment.of(user, post, generateMerchantUid(), PayMethod.CARD,
-                post.getPrice(), getMerchantUidRequest.getUseCoin());
+        if (post.getPrice().compareTo(getMerchantUidRequest.getUseCoin()) < 0) {
+            throw new GeneralException(TradeException.COIN_EXCEED_PRICE);
+        }
+
+        final Payment payment = Payment.of(
+                user,
+                post,
+                generateMerchantUid(),
+                PayMethod.CARD,
+                post.getPrice().subtract(getMerchantUidRequest.getUseCoin()),
+                getMerchantUidRequest.getUseCoin()
+        );
 
         PrepareData prepareData = new PrepareData(
                 payment.getMerchantUid(),
-                payment.getAmount()
+                post.getPrice().subtract(getMerchantUidRequest.getUseCoin())
         );
 
         try {
@@ -84,7 +94,10 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-        return CreatePaymentResponse.of(payment.getMerchantUid());
+        return CreatePaymentResponse.of(
+                payment.getMerchantUid(),
+                post.getPrice().subtract(getMerchantUidRequest.getUseCoin())
+        );
     }
 
     public GetValidatePaymentResponse validateIamport(final String impUid, final Long postId, final String username) throws IamportResponseException, IOException {
@@ -110,12 +123,12 @@ public class PaymentService {
             throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
         }
 
-        if (post.getPrice().compareTo(iamportClient.paymentByImpUid(impUid).getResponse().getAmount()) != 0) {
-            throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
-        }
-
         final Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
+
+        if (payment.getAmount().compareTo(iamportClient.paymentByImpUid(impUid).getResponse().getAmount()) != 0) {
+            throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
+        }
 
         if (payment.getUseCoin().intValue() > user.getCoin()) {
             throw new GeneralException(TradeException.COIN_NOT_ENOUGH);
