@@ -110,13 +110,15 @@ public class RentalService {
             throw new GeneralException(RentalException.CANT_ACCESS_TO_OTHER_RESERVATION);
         }
 
+        final Integer countOfVisit = reservationRepository.countByReservationAndStore(reservation.getStore(), loginUser);
+
         // 특정 예약에 대한 장치 가져오기
         final List<ShowReservedDeviceResponse> reservedStoreDevice = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(reservationId).stream().map(deviceReservation -> {
             final StoreDevice storeDevice = deviceReservation.getStoreDevice();
             return ShowReservedDeviceResponse.from(storeDevice, deviceReservation, reservation);
         }).toList();
 
-        return ShowRentalResponse.of(reservation.getStore().getName(), reservedStoreDevice);
+        return ShowRentalResponse.of(reservation.getStore().getName(), reservedStoreDevice, countOfVisit);
 
     }
 
