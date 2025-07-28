@@ -27,6 +27,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
@@ -145,5 +146,10 @@ public class UserController {
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllRestocksByCursor(cursor, size, user.getUsername())));
+	}
+
+	@PostMapping("/notification")
+	public ResponseEntity<ApiResponse<UpdateNotificationSettingResponse>> updateNotificationSetting(@RequestParam Boolean isEnabled, @AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.updateNotificationSetting(isEnabled, user.getUsername())));
 	}
 }
