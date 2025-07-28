@@ -45,6 +45,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    private Boolean isNotificationEnabled;
+
     private String email;
 
     private String profileImageUrl;
@@ -67,6 +69,7 @@ public class User extends BaseEntity {
                 .coin(coin)
                 .role(role)
                 .socialType(socialType)
+                .isNotificationEnabled(true)
                 .email(email)
                 .profileImageUrl(profileImageUrl)
                 .build();
@@ -77,4 +80,5 @@ public class User extends BaseEntity {
         this.coin -= usedCoin;
     }
 
+    public void updateNotificationSetting(final Boolean isEnabled) { this.isNotificationEnabled = isEnabled; }
 }

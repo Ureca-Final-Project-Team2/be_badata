@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.user.service;
 
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,5 +186,14 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return reStockRepository.getAllRestocksByCursor(cursor, size, user.getId());
+	}
+
+	@Transactional
+	public UpdateNotificationSettingResponse updateNotificationSetting(final Boolean isEnabled, final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		user.updateNotificationSetting(isEnabled);
+		return UpdateNotificationSettingResponse.from(user);
 	}
 }
