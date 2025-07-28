@@ -17,7 +17,6 @@ public class AddressCreateRequest {
     @NotBlank(message = "카카오 주소 아이디는 빈 값이 될 수 없습니다.")
     private String id;
 
-    @NotBlank(message = "핸드폰 번호는 빈 값이 될 수 없습니다.")
     private String phone;
 
     @NotBlank(message = "장소 이름은 빈 값이 될 수 없습니다.")
