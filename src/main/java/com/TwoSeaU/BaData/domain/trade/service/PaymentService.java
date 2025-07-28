@@ -130,7 +130,7 @@ public class PaymentService {
         final Payment payment = paymentRepository.findByMerchantUid(portOnePayment.getResponse().getMerchantUid())
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
 
-        if (payment.getAmount().compareTo(iamportClient.paymentByImpUid(impUid).getResponse().getAmount()) != 0) {
+        if (payment.getAmount().compareTo(portOnePayment.getResponse().getAmount()) != 0) {
             throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
         }
 
