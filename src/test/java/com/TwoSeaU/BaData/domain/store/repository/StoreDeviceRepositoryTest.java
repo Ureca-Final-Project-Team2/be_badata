@@ -277,8 +277,6 @@ class StoreDeviceRepositoryTest {
                         request, "kakao1234");
 
                 //then
-                System.out.println(storeWithLeftDeviceResponses.get(0).getStore().getName());
-                System.out.println(storeWithLeftDeviceResponses.get(1).getStore().getName());
                 assertThat(storeWithLeftDeviceResponses.size()).isEqualTo(2);
                 assertThat(storeWithLeftDeviceResponses.get(0).getStore().getName()).isEqualTo(
                         "서울 강남점");
