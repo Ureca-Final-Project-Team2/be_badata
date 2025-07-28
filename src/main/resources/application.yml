@@ -1,0 +1,66 @@
+spring:
+  profiles:
+    active: local
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        hibernate.format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 10
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${SOCIAL_CLIENT_ID}
+            client-secret: ${SOCIAL_SECRET}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+    s3:
+      bucketName: ${S3_BUCKET_NAME}
+      bucketUrl: ${S3_BUCKET_URL}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  validationTime: ${JWT_VALIDATION_TIME}
+
+logging:
+  config: classpath:logback-spring.xml
+
+
+fcm:
+  certification: firebase.json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  endpoint:
+    prometheus:
+      enabled: true
