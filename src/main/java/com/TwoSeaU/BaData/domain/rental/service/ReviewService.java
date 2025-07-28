@@ -6,17 +6,21 @@ import com.TwoSeaU.BaData.domain.rental.dto.response.ShowCountPerQuickReplyRespo
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
+import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
 import com.TwoSeaU.BaData.domain.rental.entity.QuickReply;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.rental.entity.ReviewQuickReply;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
+import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.QuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewRepository;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
+import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
+import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
@@ -24,6 +28,8 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -41,6 +47,8 @@ public class ReviewService {
     private final ReviewQuickReplyRepository reviewQuickReplyRepository;
     private final QuickReplyRepository quickReplyRepository;
     private final StoreRepository storeRepository;
+    private final StoreDeviceRepository storeDeviceRepository;
+    private final DeviceReservationRepository deviceReservationRepository;
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
 
@@ -130,19 +138,25 @@ public class ReviewService {
     public ShowReviewWithMetaResponse getReviewsResponse(final Long storeId, final Pageable pageable){
 
         Slice<Review> reviewSlice = reviewRepository.getReviewSlice(storeId, pageable);
+        List<ReviewQuickReply> reviewQuickReplies = reviewQuickReplyRepository.findByReviewInWithFetchQuickReply(reviewSlice.getContent());
+
+        final Map<Long, List<String>> reviewIdToQuickReplyNames = reviewQuickReplies.stream()
+                .collect(Collectors.groupingBy(
+                        rr -> rr.getReview().getId(),
+                        Collectors.mapping(rr -> rr.getQuickReply().getName(), Collectors.toList())
+                ));
 
         return ShowReviewWithMetaResponse.of(reviewSlice.getContent().stream()
                 .map(review -> {
 
-
                     final User user = review.getReservation().getUser();
                     final Integer countOfVisit = reservationRepository.countByReservationAndStore(review.getReservation().getStore(), user);
 
-                    final List<String> quickReplyName = reviewQuickReplyRepository.findByReviewWithFetchQuickReply(review).stream().map(reviewQuickReply->{
-                        return reviewQuickReply.getQuickReply().getName();
-                    }).toList();
+                    final List<String> quickReplyNames = reviewIdToQuickReplyNames.getOrDefault(review.getId(), List.of());
 
-                    return ShowReviewResponse.from(review, countOfVisit, quickReplyName);
+                    final List<DeviceReservation> deviceReservations = review.getReservation().getDeviceReservations();
+
+                    return ShowReviewResponse.from(review, countOfVisit, quickReplyNames, deviceReservations);
                 }).toList(), reviewSlice.hasNext());
     }
 
