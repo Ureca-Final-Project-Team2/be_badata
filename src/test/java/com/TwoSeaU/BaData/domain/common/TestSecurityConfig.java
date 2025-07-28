@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.common;
 import com.TwoSeaU.BaData.domain.auth.jwt.handler.JwtAccessDeniedHandler;
 import com.TwoSeaU.BaData.domain.auth.jwt.handler.JwtAuthenticationEntryPointHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,7 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
-@Configuration
+@TestConfiguration
 public class TestSecurityConfig {
 
     private final JwtAuthenticationEntryPointHandler authenticationEntryPointHandler;
