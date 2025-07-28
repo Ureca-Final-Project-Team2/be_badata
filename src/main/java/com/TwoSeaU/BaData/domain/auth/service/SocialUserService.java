@@ -5,12 +5,18 @@ import com.TwoSeaU.BaData.domain.auth.jwt.ServiceTokenProvider;
 import com.TwoSeaU.BaData.domain.auth.dto.oauth2.request.GetOAuth2UserProfileRequest;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueTokenUserStatusResponse;
 import com.TwoSeaU.BaData.domain.auth.dto.response.IssueServiceTokenResponse;
+import com.TwoSeaU.BaData.domain.user.entity.PlanData;
 import com.TwoSeaU.BaData.domain.user.enums.Role;
 import com.TwoSeaU.BaData.domain.user.enums.SocialType;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.PlanDataRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.redis.RedisUtil;
+import com.TwoSeaU.BaData.global.response.GeneralException;
+
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +29,7 @@ public class SocialUserService {
 
     private final ServiceTokenProvider serviceTokenProvider;
     private final UserRepository userRepository;
+    private final PlanDataRepository planDataRepository;
     private final RedisUtil redisUtil;
 
     @Transactional
@@ -39,16 +46,23 @@ public class SocialUserService {
         }
         else{
             isNewUser = true;
+            final Long planDataId = generateRandomValue(1, 11);
+            final PlanData planData = planDataRepository.findById(planDataId)
+                .orElseThrow(() -> new GeneralException(UserException.PLAN_NOT_FOUND));
+
+            final Integer dataAmount = generateRandomValue(1000, planData.getDataAmount()+1).intValue();
+
             user = userRepository.save(User.of(
                     getOAuth2UserProfileRequest.getNickName(),
                     socialType+getOAuth2UserProfileRequest.getId(),
                     null,
-                    150,
+                    dataAmount,
                     0,
                     Role.GENERAL,
                     socialType,
                     getOAuth2UserProfileRequest.getEmail(),
-                    getOAuth2UserProfileRequest.getProfileImageUrl()
+                    getOAuth2UserProfileRequest.getProfileImageUrl(),
+                    planData
             ));
         }
 
@@ -56,6 +70,11 @@ public class SocialUserService {
         saveRefreshTokenAtRedis(user.getUsername(), issueServiceTokenResponse);
 
         return IssueTokenUserStatusResponse.of(issueServiceTokenResponse, LoginUserResponse.from(user,isNewUser));
+    }
+
+    private Long generateRandomValue(final Integer start, final Integer end) {
+
+		return ThreadLocalRandom.current().nextLong(start, end);
     }
 
     private void saveRefreshTokenAtRedis(String key, IssueServiceTokenResponse issueServiceTokenResponse){
