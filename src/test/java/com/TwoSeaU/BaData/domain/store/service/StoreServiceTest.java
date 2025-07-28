@@ -164,7 +164,7 @@ class StoreServiceTest {
             given(storeLikesRepository.getUserLikedStoreIds(any())).willReturn(new HashSet<>());
 
             // when
-            ShowStoreWithMetaResponse response = storeService.getStoresResponse(request, PageRequest.of(0, 10),null);
+            ShowStoreWithMetaResponse response = storeService.getStoresResponse(request, PageRequest.of(0, 10), null);
 
             // then
             assertThat(response.getShowStoreResponses()).hasSize(1);
