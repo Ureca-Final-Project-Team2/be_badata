@@ -7,9 +7,12 @@ import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,6 +54,10 @@ public class User extends BaseEntity {
 
     private String profileImageUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
+    private PlanData planData;
+
     public static User of(final String nickName,
                           final String userName,
                           final String password,
@@ -59,7 +66,8 @@ public class User extends BaseEntity {
                           final Role role,
                           final SocialType socialType,
                           final String email,
-                          final String profileImageUrl){
+                          final String profileImageUrl,
+                          final PlanData planData){
 
         return User.builder()
                 .nickName(nickName)
@@ -72,6 +80,7 @@ public class User extends BaseEntity {
                 .isNotificationEnabled(true)
                 .email(email)
                 .profileImageUrl(profileImageUrl)
+                .planData(planData)
                 .build();
 
     }
