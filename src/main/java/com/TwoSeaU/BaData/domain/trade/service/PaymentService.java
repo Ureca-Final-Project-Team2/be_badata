@@ -20,6 +20,7 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -102,7 +103,9 @@ public class PaymentService {
     }
 
     public GetValidatePaymentResponse validateIamport(final String impUid, final Long postId, final String username) throws IamportResponseException, IOException {
-        if(!iamportClient.paymentByImpUid(impUid).getResponse().getStatus().equals("paid")) {
+        IamportResponse<com.siot.IamportRestClient.response.Payment> portOnePayment = iamportClient.paymentByImpUid(impUid);
+
+        if(!portOnePayment.getResponse().getStatus().equals("paid")) {
             throw new GeneralException(TradeException.PAYMENT_FAILED);
         }
 
@@ -124,7 +127,7 @@ public class PaymentService {
             throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
         }
 
-        final Payment payment = paymentRepository.findByUserIdAndPostId(user.getId(), postId)
+        final Payment payment = paymentRepository.findByMerchantUid(portOnePayment.getResponse().getMerchantUid())
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
 
         if (payment.getAmount().compareTo(iamportClient.paymentByImpUid(impUid).getResponse().getAmount()) != 0) {
