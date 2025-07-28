@@ -29,4 +29,11 @@ public class PlanData {
 
 	@Column(nullable = false)
 	private Integer dataAmount;
+
+	public static PlanData of(final String planName, final Integer dataAmount) {
+		return PlanData.builder()
+			.planName(planName)
+			.dataAmount(dataAmount)
+			.build();
+	}
 }
