@@ -59,10 +59,10 @@ public class UserService {
 	private final CoinHistoryRepository coinHistoryRepository;
 
 	public GetDataResponse getData(String username) {
-		User user = userRepository.findByUsername(username)
+		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		PlanData planData = planDataRepository.findById(user.getPlanData().getId())
+		final PlanData planData = planDataRepository.findById(user.getPlanData().getId())
 			.orElseThrow(() -> new GeneralException(UserException.PLAN_NOT_FOUND));
 
 		return GetDataResponse.from(user, planData);
