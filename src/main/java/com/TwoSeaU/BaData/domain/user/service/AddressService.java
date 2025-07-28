@@ -29,9 +29,13 @@ public class AddressService {
 
         final User loginUser = userRepository.findByUsername(username).orElseThrow(()-> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Address address = addressRepository.save(Address.of(addressCreateRequest.getDetailAddress(),
-                                          loginUser,
-                                          GeoUtils.makeByCoordinate(addressCreateRequest.getLongititude(), addressCreateRequest.getLatitude()) ));
+        final Address address = addressRepository.save(Address.of(addressCreateRequest.getAddress_name(),
+                                                                  addressCreateRequest.getId(),
+                                                                  addressCreateRequest.getPhone(),
+                                                                  addressCreateRequest.getPlace_name(),
+                                                                  addressCreateRequest.getRoad_address_name(),
+                                                                  GeoUtils.makeByCoordinate(addressCreateRequest.getX(),addressCreateRequest.getY()),
+                                                                  loginUser));
 
         return address.getId();
     }
