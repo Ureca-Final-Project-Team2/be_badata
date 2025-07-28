@@ -3,6 +3,7 @@ package com.TwoSeaU.BaData.domain.user.service;
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
+import com.TwoSeaU.BaData.domain.user.entity.PlanData;
 import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.ReportRepository;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetDataResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
@@ -32,6 +33,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
+import com.TwoSeaU.BaData.domain.user.repository.PlanDataRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserLikesRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
@@ -44,6 +46,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class UserService {
 	private final UserRepository userRepository;
+	private final PlanDataRepository planDataRepository;
 	private final ReportRepository reportRepository;
 	private final PaymentRepository paymentRepository;
 	private final PostRepository postRepository;
@@ -55,11 +58,14 @@ public class UserService {
 	private final ReStockRepository reStockRepository;
 	private final CoinHistoryRepository coinHistoryRepository;
 
-	public DataResponse getData(String username) {
+	public GetDataResponse getData(String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		return DataResponse.of(user.getDataAmount());
+		PlanData planData = planDataRepository.findById(user.getPlanData().getId())
+			.orElseThrow(() -> new GeneralException(UserException.PLAN_NOT_FOUND));
+
+		return GetDataResponse.from(user, planData);
 	}
 
 	public CoinResponse getCoin(String username) {
