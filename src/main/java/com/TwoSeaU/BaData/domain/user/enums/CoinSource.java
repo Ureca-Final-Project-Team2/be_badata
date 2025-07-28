@@ -1,5 +1,5 @@
 package com.TwoSeaU.BaData.domain.user.enums;
 
 public enum CoinSource {
-	SOS, REVIEW, PAYMENT
+	DATA_PURCHASE, GIFTICON_PURCHASE, SOS, REVIEW_REWARD, DATA_CHARGE
 }

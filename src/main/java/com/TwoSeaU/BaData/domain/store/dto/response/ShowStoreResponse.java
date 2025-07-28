@@ -24,6 +24,7 @@ public class ShowStoreResponse {
     private Double distanceFromMe;
     private String detailAddress;
     private int leftDeviceCount;
+    private String storeImageUrl;
 
     public static ShowStoreResponse from(final Store store,final Double distanceFromMe,final int leftDeviceCount){
 
@@ -44,6 +45,7 @@ public class ShowStoreResponse {
                 .detailAddress(store.getDetailAddress())
                 .leftDeviceCount(leftDeviceCount)
                 .isOpening(isOpening)
+                .storeImageUrl(store.getStoreImage())
                 .build();
     }
 
