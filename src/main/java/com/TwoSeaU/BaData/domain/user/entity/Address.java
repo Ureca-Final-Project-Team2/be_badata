@@ -29,7 +29,19 @@ public class Address extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String detailAddress;
+    @Column(nullable = false)
+    private String addressName;
+
+    @Column(nullable = false)
+    private String kaKaoAddressId;
+
+    private String phone;
+
+    @Column(nullable = false)
+    private String placeName;
+
+    @Column(nullable = false)
+    private String roadAddressName;
 
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point location;
@@ -38,14 +50,22 @@ public class Address extends BaseEntity {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    public static Address of(final String detailAddress,
-                             final User user,
-                             final Point location){
+    public static Address of(final String addressName,
+                             final String kaKaoAddressId,
+                             final String phone,
+                             final String placeName,
+                             final String roadAddressName,
+                             final Point location,
+                             final User user){
 
         return Address.builder()
-                .detailAddress(detailAddress)
-                .user(user)
+                .addressName(addressName)
+                .kaKaoAddressId(kaKaoAddressId)
+                .phone(phone)
+                .placeName(placeName)
+                .roadAddressName(roadAddressName)
                 .location(location)
+                .user(user)
                 .build();
     }
 }
