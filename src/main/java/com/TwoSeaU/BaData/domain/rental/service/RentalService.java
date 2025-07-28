@@ -118,7 +118,7 @@ public class RentalService {
             return ShowReservedDeviceResponse.from(storeDevice, deviceReservation, reservation);
         }).toList();
 
-        return ShowRentalResponse.of(reservation.getStore().getName(), reservedStoreDevice, countOfVisit);
+        return ShowRentalResponse.of(reservation.getStore(), reservedStoreDevice, countOfVisit);
 
     }
 
