@@ -44,7 +44,7 @@ public class ShowReviewResponse {
 
     public static ShowReviewResponse from(final Review review, final Integer countOfVisit, final List<String> quickReplyName, final List<DeviceReservation> deviceReservations){
 
-        final Reservation reservation = deviceReservations.get(0).getReservation();
+        final Reservation reservation = review.getReservation();
 
         return ShowReviewResponse.builder()
                 .reviewId(review.getId())
