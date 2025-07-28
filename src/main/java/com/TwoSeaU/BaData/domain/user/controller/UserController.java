@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
-import com.TwoSeaU.BaData.domain.user.dto.response.DataResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetDataResponse;
 
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetFollowsResponse;
@@ -42,7 +42,7 @@ public class UserController {
 	private final UserService userService;
 
 	@GetMapping("/data")
-	public ResponseEntity<ApiResponse<DataResponse>> getData(@AuthenticationPrincipal User user) {
+	public ResponseEntity<ApiResponse<GetDataResponse>> getData(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getData(user.getUsername())));
 	}
 
