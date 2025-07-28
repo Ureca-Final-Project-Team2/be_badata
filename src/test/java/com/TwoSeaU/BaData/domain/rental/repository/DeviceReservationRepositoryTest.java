@@ -176,7 +176,7 @@ class DeviceReservationRepositoryTest {
 
 
         User user = User.of("jinu","kakao1234","pw",20,20, Role.GENERAL, SocialType.KAKAO,
-                "dionisos198@gmail.com","imageUrl.com" );
+                "dionisos198@gmail.com","imageUrl.com", null );
 
         userRepository.save(user);
 

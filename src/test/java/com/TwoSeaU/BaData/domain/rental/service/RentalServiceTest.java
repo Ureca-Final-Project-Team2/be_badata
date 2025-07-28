@@ -146,7 +146,7 @@ class RentalServiceTest {
         private final LocalDateTime start = LocalDateTime.of(2025, 7, 10, 10, 0);
         private final LocalDateTime end = LocalDateTime.of(2025, 7, 12, 10, 0);
 
-        private final User user = User.of(username, "id", "pw", 10, 10, Role.GENERAL, SocialType.KAKAO, "email", "img");
+        private final User user = User.of(username, "id", "pw", 10, 10, Role.GENERAL, SocialType.KAKAO, "email", "img", null);
         private final Store store = Store.of("가맹점", null, "02", "주소", 10, "img", LocalTime.of(9, 0), LocalTime.of(21, 0));
         private final StoreDevice storeDevice = StoreDevice.of(store, Device.of("5G", 1000, 5, true, "img"), 10, 5000, 10);
 
@@ -306,7 +306,7 @@ class RentalServiceTest {
         final Long userId = 10L;
 
         private final Store store = Store.of("서울 강남점", null, "02-123", "주소", 10, "img", LocalTime.of(9, 0), LocalTime.of(21, 0));
-        private final User user = User.of(username, "socialId", "pw", 10, 10, Role.GENERAL, SocialType.KAKAO, "email", "img");
+        private final User user = User.of(username, "socialId", "pw", 10, 10, Role.GENERAL, SocialType.KAKAO, "email", "img", null);
 
         @Test
         @DisplayName("예약이 존재하지 않으면 예외를 던진다")
