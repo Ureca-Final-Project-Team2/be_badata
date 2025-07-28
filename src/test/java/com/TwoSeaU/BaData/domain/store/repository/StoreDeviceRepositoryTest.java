@@ -209,7 +209,7 @@ class StoreDeviceRepositoryTest {
     }
 
     @Nested
-    @DisplayName("특정 범위 내에 있는 가맹점을 확인할 떄")
+    @DisplayName("특정 범위 내에 있는 가맹점을 확인할 때")
     class Describe_findStoresInBoundingBox {
 
         @Nested
@@ -354,7 +354,7 @@ class StoreDeviceRepositoryTest {
             }
         }
         @Nested
-        @DisplayName("대한민국 일부 지역 요청을 보낼 떄")
+        @DisplayName("대한민국 일부 지역 요청을 보낼 때")
         class Context_with_partial_korea_range {
 
             @Test
