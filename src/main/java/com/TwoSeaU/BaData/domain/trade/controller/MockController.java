@@ -20,9 +20,4 @@ public class MockController {
     public ResponseEntity<ApiResponse<PostsResponse>> getHotPosts() {
         return ResponseEntity.ok().body(ApiResponse.success(mockService.getHotPosts()));
     }
-
-    @GetMapping("search/trending")
-    public ResponseEntity<ApiResponse<GetTrendingResponse>> getRecommendPosts() {
-        return ResponseEntity.ok().body(ApiResponse.success(mockService.getTrendingSearch()));
-    }
 }
