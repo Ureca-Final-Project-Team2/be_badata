@@ -173,8 +173,6 @@ class DeviceReservationRepositoryTest {
         storeDevice1A = storeDeviceRepository.save(StoreDevice.of(store1,deviceA,5,3900,20));
         storeDevice1B = storeDeviceRepository.save(StoreDevice.of(store1,deviceB,10,7800,10));
         storeDevice2C = storeDeviceRepository.save(StoreDevice.of(store2,deviceC, 20, 10900, 99));
-        //   StoreDevice storeDevice3D = storeDeviceRepository.save(StoreDevice.of(store3,deviceD, 30,500,10));
-
 
 
         User user = User.of("jinu","kakao1234","pw",20,20, Role.GENERAL, SocialType.KAKAO,
