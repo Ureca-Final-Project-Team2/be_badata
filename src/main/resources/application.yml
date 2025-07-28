@@ -49,5 +49,9 @@ jwt:
   secret: ${JWT_SECRET_KEY}
   validationTime: ${JWT_VALIDATION_TIME}
 
+logging:
+  config: classpath:logback-spring.xml
+
+
 fcm:
   certification: firebase.json

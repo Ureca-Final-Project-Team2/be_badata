@@ -28,20 +28,4 @@ public class MockService {
 
         return PostsResponse.of(postResponses);
     }
-
-    public GetTrendingResponse getTrendingSearch() {
-        return GetTrendingResponse.of(new String[]{
-                "스타벅스",
-                "배달의 민족",
-                "CU",
-                "편의점",
-                "GS25",
-
-                "급처",
-                "파리바게뜨",
-                "카카오페이지",
-                "아이스 아메리카노",
-                "10GB"
-        });
-    }
 }
