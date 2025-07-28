@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AddressCreateRequest {
 
-    @NotBlank(message = "상세 주소는 빈 값이 될 수 없습니다.")
+    @NotBlank(message = "주소 이름은 빈 값이 될 수 없습니다.")
     private String address_name;
 
     @NotBlank(message = "카카오 주소 아이디는 빈 값이 될 수 없습니다.")
@@ -22,7 +22,7 @@ public class AddressCreateRequest {
     @NotBlank(message = "장소 이름은 빈 값이 될 수 없습니다.")
     private String place_name;
 
-    @NotBlank(message = "상세 주소는 빈 값이 될 수 없습니다.")
+    @NotBlank(message = "도로명 주소는 빈 값이 될 수 없습니다.")
     private String road_address_name;
 
     @DecimalMin(value = "-180.0", message = "경도는 -180 이상이어야 합니다.")
