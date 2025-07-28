@@ -157,6 +157,6 @@ public class PaymentService {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         final String formattedDay = today.format(formatter).replace("-", "");
 
-        return formattedDay +'-'+ uniqueString;
+        return formattedDay + uniqueString;
     }
 }
