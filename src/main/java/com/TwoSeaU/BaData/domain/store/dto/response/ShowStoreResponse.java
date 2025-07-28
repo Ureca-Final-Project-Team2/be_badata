@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.store.dto.response;
 
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import java.time.LocalTime;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,10 @@ public class ShowStoreResponse {
     private Double distanceFromMe;
     private String detailAddress;
     private int leftDeviceCount;
+    private boolean isLiked;
 
-    public static ShowStoreResponse from(final Store store,final Double distanceFromMe,final int leftDeviceCount){
+    public static ShowStoreResponse from(final Store store,final Double distanceFromMe,final int leftDeviceCount, final
+            Set<Long> userLikedStore){
 
         final LocalTime now = LocalTime.now();
         final LocalTime open = store.getStartTime();
@@ -44,6 +47,7 @@ public class ShowStoreResponse {
                 .detailAddress(store.getDetailAddress())
                 .leftDeviceCount(leftDeviceCount)
                 .isOpening(isOpening)
+                .isLiked(userLikedStore.contains(store.getId()))
                 .build();
     }
 
