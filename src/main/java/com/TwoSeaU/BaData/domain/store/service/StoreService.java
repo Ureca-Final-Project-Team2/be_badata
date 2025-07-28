@@ -19,6 +19,7 @@ import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -44,13 +45,15 @@ public class StoreService {
     }
 
     public ShowStoreWithMetaResponse getStoresResponse(final StoreSearchRequest storeSearchRequest,final
-            Pageable pageable){
+            Pageable pageable, final String username){
+
+        Set<Long> userLikedStore = storeLikesRepository.getUserLikedStoreIds(username);
 
         Slice<ShowStoreWithLeftDeviceAndDistanceResponse> storesWithSlice = storeDeviceRepository.findStoresByPage(storeSearchRequest,pageable);
 
         return ShowStoreWithMetaResponse.of(storesWithSlice.getContent().stream().map(
                 showStoreWithLeftDeviceAndDistanceResponse ->
-            ShowStoreResponse.from(showStoreWithLeftDeviceAndDistanceResponse.getStore(), showStoreWithLeftDeviceAndDistanceResponse.getDistance(), showStoreWithLeftDeviceAndDistanceResponse.getLeftDeviceCount())
+            ShowStoreResponse.from(showStoreWithLeftDeviceAndDistanceResponse.getStore(), showStoreWithLeftDeviceAndDistanceResponse.getDistance(), showStoreWithLeftDeviceAndDistanceResponse.getLeftDeviceCount(),userLikedStore)
         ).toList(),storesWithSlice.hasNext());
 
     }
