@@ -26,6 +26,7 @@ public class ShowStoreResponse {
     private String detailAddress;
     private int leftDeviceCount;
     private boolean isLiked;
+    private String storeImageUrl;
 
     public static ShowStoreResponse from(final Store store,final Double distanceFromMe,final int leftDeviceCount, final
             Set<Long> userLikedStore){
@@ -48,6 +49,7 @@ public class ShowStoreResponse {
                 .leftDeviceCount(leftDeviceCount)
                 .isOpening(isOpening)
                 .isLiked(userLikedStore.contains(store.getId()))
+                .storeImageUrl(store.getStoreImage())
                 .build();
     }
 
