@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class DeviceSearchRequest {
 
     private final Boolean isOpeningNow;
