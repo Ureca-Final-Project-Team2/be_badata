@@ -19,7 +19,7 @@ public class MockService {
     private final PostLikesRepository postLikesRepository;
 
     public PostsResponse getHotPosts() {
-        PageRequest pageRequest = PageRequest.of(0, 10);
+        PageRequest pageRequest = PageRequest.of(0, 5);
         List<Post> postList = postRepository.findAll(pageRequest).getContent();
 
         List<PostResponse> postResponses = postList.stream()
