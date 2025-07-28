@@ -46,12 +46,12 @@ public class SocialUserService {
         }
         else{
             isNewUser = true;
-            final Long planDataId = getTotalDataAmount(1, 11);
+            final Long planDataId = generateRandomValue(1, 11);
             final PlanData planData = planDataRepository.findById(planDataId)
                 .orElseThrow(() -> new GeneralException(UserException.PLAN_NOT_FOUND));
 
-            final Integer dataAmount = getTotalDataAmount(1000, planData.getDataAmount()+1).intValue();
-            System.out.println(dataAmount);
+            final Integer dataAmount = generateRandomValue(1000, planData.getDataAmount()+1).intValue();
+
             user = userRepository.save(User.of(
                     getOAuth2UserProfileRequest.getNickName(),
                     socialType+getOAuth2UserProfileRequest.getId(),
@@ -72,7 +72,7 @@ public class SocialUserService {
         return IssueTokenUserStatusResponse.of(issueServiceTokenResponse, LoginUserResponse.from(user,isNewUser));
     }
 
-    private Long getTotalDataAmount(final Integer start, final Integer end) {
+    private Long generateRandomValue(final Integer start, final Integer end) {
 
 		return ThreadLocalRandom.current().nextLong(start, end);
     }
