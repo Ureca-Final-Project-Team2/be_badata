@@ -12,21 +12,20 @@ import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.rental.entity.ReviewQuickReply;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
-import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.QuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewRepository;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
-import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
-import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
+import com.TwoSeaU.BaData.domain.user.entity.CoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.enums.CoinSource;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +47,8 @@ public class ReviewService {
     private final ReviewQuickReplyRepository reviewQuickReplyRepository;
     private final QuickReplyRepository quickReplyRepository;
     private final StoreRepository storeRepository;
-    private final StoreDeviceRepository storeDeviceRepository;
-    private final DeviceReservationRepository deviceReservationRepository;
+    private final CoinHistoryRepository coinHistoryRepository;
+
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
 
@@ -67,7 +66,15 @@ public class ReviewService {
 
         reservation.getStore().adjustReviewRatingByAdd(review);
 
-        loginUser.addCoin(reservation.getPrice()/10);
+        final Integer rewardCoin = reservation.getPrice()/10;
+        loginUser.addCoin(rewardCoin);
+
+        coinHistoryRepository.save(CoinHistory.of(
+            loginUser,
+            CoinSource.REVIEW_REWARD,
+            rewardCoin,
+            loginUser.getCoin()
+        ));
 
         return review.getId();
     }
