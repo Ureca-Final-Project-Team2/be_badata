@@ -6,7 +6,6 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.entity.CoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.QCoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.QUser;
-import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -43,11 +42,7 @@ public class CoinHistoryQueryRepositoryImpl implements CoinHistoryQueryRepositor
 			? fetchedList.subList(0, size) : fetchedList;
 
 		final List<GetCoinHistoryResponse> responseList = qCoinHistoryList.stream()
-			.map(coinHistory -> {
-				final User user = coinHistory.getUser();
-
-				return GetCoinHistoryResponse.of(coinHistory, user);
-			})
+			.map(GetCoinHistoryResponse::of)
 			.toList();
 
 		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
