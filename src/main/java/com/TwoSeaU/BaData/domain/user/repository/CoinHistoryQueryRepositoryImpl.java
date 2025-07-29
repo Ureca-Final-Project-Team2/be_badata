@@ -42,7 +42,7 @@ public class CoinHistoryQueryRepositoryImpl implements CoinHistoryQueryRepositor
 			? fetchedList.subList(0, size) : fetchedList;
 
 		final List<GetCoinHistoryResponse> responseList = qCoinHistoryList.stream()
-			.map(GetCoinHistoryResponse::of)
+			.map(GetCoinHistoryResponse::from)
 			.toList();
 
 		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
