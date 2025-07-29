@@ -22,7 +22,7 @@ public class GetCoinHistoryResponse {
 	private Integer totalCoin;
 	private LocalDateTime createdAt;
 
-	public static GetCoinHistoryResponse of(final CoinHistory coinHistory) {
+	public static GetCoinHistoryResponse from(final CoinHistory coinHistory) {
 		return GetCoinHistoryResponse.builder()
 			.id(coinHistory.getId())
 			.usedCoin(coinHistory.getAmount())
