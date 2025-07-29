@@ -28,4 +28,15 @@ public class MockService {
 
         return PostsResponse.of(postResponses);
     }
+
+    public PostsResponse getRecommendPosts() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<Post> postList = postRepository.findAll(pageRequest).getContent();
+
+        List<PostResponse> postResponses = postList.stream()
+                .map(post -> PostResponse.from(post, postLikesRepository.countByPostId(post.getId()), false))
+                .toList();
+
+        return PostsResponse.of(postResponses);
+    }
 }
