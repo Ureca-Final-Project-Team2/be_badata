@@ -1,6 +1,5 @@
 package com.TwoSeaU.BaData.domain.trade.controller;
 
-import com.TwoSeaU.BaData.domain.trade.dto.response.GetTrendingResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
 import com.TwoSeaU.BaData.domain.trade.service.MockService;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -18,6 +17,11 @@ public class MockController {
 
     @GetMapping("posts/trending")
     public ResponseEntity<ApiResponse<PostsResponse>> getHotPosts() {
+        return ResponseEntity.ok().body(ApiResponse.success(mockService.getHotPosts()));
+    }
+
+    @GetMapping("posts/recommend")
+    public ResponseEntity<ApiResponse<PostsResponse>> getRecommendPosts() {
         return ResponseEntity.ok().body(ApiResponse.success(mockService.getHotPosts()));
     }
 }
