@@ -89,5 +89,9 @@ public class User extends BaseEntity {
         this.coin -= usedCoin;
     }
 
+    public void addCoin(final Integer coin){
+        this.coin += coin;
+    }
+
     public void updateNotificationSetting(final Boolean isEnabled) { this.isNotificationEnabled = isEnabled; }
 }

@@ -17,6 +17,8 @@ public class ShowRentalResponse {
 
     private Long storeId;
 
+    private String storeImageUrl;
+
     private String storeName;
 
     private List<ShowReservedDeviceResponse> showReservedDeviceResponses = new ArrayList<>();
@@ -27,6 +29,7 @@ public class ShowRentalResponse {
 
         return ShowRentalResponse.builder()
                 .storeId(store.getId())
+                .storeImageUrl(store.getStoreImage())
                 .storeName(store.getName())
                 .showReservedDeviceResponses(showReservedDeviceResponses)
                 .countOfVisit(countOfVisit)
