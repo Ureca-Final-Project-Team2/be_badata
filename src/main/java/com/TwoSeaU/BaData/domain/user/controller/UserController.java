@@ -27,6 +27,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
@@ -49,6 +50,11 @@ public class UserController {
 	@GetMapping("/coin")
 	public ResponseEntity<ApiResponse<CoinResponse>> getCoin(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getCoin(user.getUsername())));
+	}
+
+	@GetMapping("/info")
+	public ResponseEntity<ApiResponse<GetUserInfoResponse>> getUserInfo(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getUserInfo(user.getUsername())));
 	}
 
 	@GetMapping("/coin/history")

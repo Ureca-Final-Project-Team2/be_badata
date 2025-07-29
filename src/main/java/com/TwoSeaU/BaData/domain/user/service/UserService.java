@@ -1,7 +1,11 @@
 package com.TwoSeaU.BaData.domain.user.service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.entity.PlanData;
 import com.TwoSeaU.BaData.domain.user.entity.UserLikes;
@@ -73,6 +77,17 @@ public class UserService {
 			 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		return CoinResponse.of(user.getCoin());
+	}
+
+	public GetUserInfoResponse getUserInfo(final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final LocalDate now = LocalDate.now();
+		final LocalDate createdDate = user.getCreatedAt().toLocalDate();
+
+		final Long diffDays = ChronoUnit.DAYS.between(createdDate, now)+1;
+		return GetUserInfoResponse.from(user, diffDays);
 	}
 
 	public CursorPageResponse<GetCoinHistoryResponse> getAllCoinsByCursor(final Long cursor, final int size, final String username) {
