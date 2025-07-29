@@ -69,6 +69,8 @@ jobs:
           echo "LOGSTASH_URL=${{ secrets.LOGSTASH_URL }}" >> $GITHUB_ENV
           echo "OCR_JSON=${{ secrets.OCR_JSON }}" >> $GITHUB_ENV
           echo "FIRE_BASE_JSON=${{ secrets.FIRE_BASE_JSON }}" >> $GITHUB_ENV
+          echo "ELK_SERVER_URL=${{ secrets.ELK_SERVER_URL }}" >> $GITHUB_ENV
+          echo "ELK_PEM_KEY=${{ secrets.ELK_PEM_KEY }}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -110,3 +112,13 @@ jobs:
             echo "새로운 이미지 빌드"
             docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
             docker run --add-host host.docker.internal:host-gateway --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
+
+            echo "elasticsearch, logstash ssh 연결"
+            cd be_badata
+            docker cp ${{ secrets.ELK_PEM_KEY }} badata_be:/
+            docker exec -it badata_be bash
+            apt update && apt install -y openssh-client
+            ssh -i ${{ secrets.ELK_PEM_KEY }} -L 9200:localhost:9200 ${{ secrets.ELK_SERVER_URL }} -f -N
+            ssh -i ${{ secrets.ELK_PEM_KEY }} -L 5000:localhost:5000 ${{ secrets.ELK_SERVER_URL }} -f -N
+            
+            echo "배포 완료"
