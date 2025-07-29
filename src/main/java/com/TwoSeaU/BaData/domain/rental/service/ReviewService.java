@@ -27,6 +27,7 @@ import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,6 +67,8 @@ public class ReviewService {
 
         reservation.getStore().adjustReviewRatingByAdd(review);
 
+        loginUser.addCoin(reservation.getPrice()/10);
+
         return review.getId();
     }
 
@@ -76,6 +79,7 @@ public class ReviewService {
         final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
 
         checkReviewOwner(loginUser, review);
+        checkValidateReviewDelete(review);
 
         final Store store = review.getReservation().getStore();
 
@@ -107,6 +111,17 @@ public class ReviewService {
 
         return reviewId;
     }
+
+    private void checkValidateReviewDelete(final Review review) {
+
+        final LocalDateTime now = LocalDateTime.now();
+
+        // 리뷰 작성일이 현재로부터 7일 이내인지 확인
+        if (review.getCreatedAt().isAfter(now.minusDays(7))) {
+            throw new GeneralException(RentalException.CANT_DELETE_REVIEW_IN_7_DAYS);
+        }
+    }
+
     private void saveQuickReply(final List<Long> quickReplyIds, final Review review){
 
         quickReplyIds.forEach(quickReplyId->{
