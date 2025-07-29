@@ -19,9 +19,4 @@ public class MockController {
     public ResponseEntity<ApiResponse<PostsResponse>> getHotPosts() {
         return ResponseEntity.ok().body(ApiResponse.success(mockService.getHotPosts()));
     }
-
-    @GetMapping("posts/recommend")
-    public ResponseEntity<ApiResponse<PostsResponse>> getRecommendPosts() {
-        return ResponseEntity.ok().body(ApiResponse.success(mockService.getHotPosts()));
-    }
 }
