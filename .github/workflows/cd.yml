@@ -115,8 +115,8 @@ jobs:
 
             echo "elasticsearch, logstash ssh 연결"
             docker cp /home/ubuntu/be_badata/${{ secrets.ELK_PEM_KEY }} badata_be:/
-            docker exec -it badata_be bash -c "apt update && apt install -y openssh-client"
-            docker exec -it badata_be bash -c "ssh -o StrictHostKeyChecking=no -i ${{ secrets.ELK_PEM_KEY }} -L 5000:localhost:5000 ${{ secrets.ELK_SERVER_URL }} -f -N"
-            docker exec -it badata_be bash -c "ssh -o StrictHostKeyChecking=no -i ${{ secrets.ELK_PEM_KEY }} -L 9200:localhost:9200 ${{ secrets.ELK_SERVER_URL }} -f -N"
+            docker exec -i badata_be bash -c "apt update && apt install -y openssh-client"
+            docker exec -i badata_be bash -c "ssh -o StrictHostKeyChecking=no -i ${{ secrets.ELK_PEM_KEY }} -L 5000:localhost:5000 ${{ secrets.ELK_SERVER_URL }} -f -N"
+            docker exec -i badata_be bash -c "ssh -o StrictHostKeyChecking=no -i ${{ secrets.ELK_PEM_KEY }} -L 9200:localhost:9200 ${{ secrets.ELK_SERVER_URL }} -f -N"
             
             echo "배포 완료"
