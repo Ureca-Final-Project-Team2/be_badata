@@ -3,8 +3,15 @@ package com.TwoSeaU.BaData.domain.user.service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import com.TwoSeaU.BaData.domain.trade.entity.Payment;
+import com.TwoSeaU.BaData.domain.trade.entity.Report;
+import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
+import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
+import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetReportInfoResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalReportCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.entity.PlanData;
@@ -17,7 +24,6 @@ import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
-import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
@@ -97,11 +103,35 @@ public class UserService {
 		return coinHistoryRepository.getAllCoinsResponse(cursor, size, user.getId());
 	}
 
-	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final ReportStatus reportStatus, final Long cursor, final int size, final String username) {
+	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final Long cursor, final int size, final String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException((UserException.USER_NOT_FOUND)));
 
-		return reportRepository.getAllReportsByCursor(reportStatus, cursor, size, user.getId());
+		return reportRepository.getAllReportsByCursor(cursor, size, user.getId());
+	}
+
+	public GetReportInfoResponse getReportInfo(final Long reportId, final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final Report report = reportRepository.findById(reportId)
+			.orElseThrow(() -> new GeneralException(TradeException.REPORT_NOT_FOUND));
+
+		final Payment payment = paymentRepository.findByUserIdAndPostIdAndPaymentStatus(user.getId(), report.getPost().getId(), PaymentStatus.PAID)
+			.orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
+
+		return GetReportInfoResponse.from(report, payment.getCreatedAt());
+	}
+
+	public GetTotalReportCountResponse getTotalReportCount(final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final Long questionCount = reportRepository.countByUserIdAndReportStatus(user.getId(), ReportStatus.QUESTION);
+		final Long answerCount = reportRepository.countByUserIdAndReportStatus(user.getId(), ReportStatus.ANSWER);
+		final Long completeCount = reportRepository.countByUserIdAndReportStatus(user.getId(), ReportStatus.COMPLETE);
+
+		return GetTotalReportCountResponse.of(questionCount, answerCount, completeCount);
 	}
 
 	public CursorPageResponse<GetPurchaseResponse> getAllPurchasesByCursor(final Long cursor, final int size, final String username) {

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
-import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.CoinResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetDataResponse;
 
@@ -23,10 +22,12 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesStoreResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRentalResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetReportInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalReportCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
@@ -67,11 +68,22 @@ public class UserController {
 
 	@GetMapping("/reports")
 	public ResponseEntity<ApiResponse<CursorPageResponse<GetReportResponse>>> getAllReportsByCursor(
-		@RequestParam ReportStatus reportStatus,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "10") int size,
 		@AuthenticationPrincipal User user) {
-		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllReportsByCursor(reportStatus, cursor, size, user.getUsername())));
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getAllReportsByCursor(cursor, size, user.getUsername())));
+	}
+
+	@GetMapping("/{reportId}/report/info")
+	public ResponseEntity<ApiResponse<GetReportInfoResponse>> getReportInfo(
+		@PathVariable Long reportId,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getReportInfo(reportId, user.getUsername())));
+	}
+
+	@GetMapping("/report/totalCount")
+	public ResponseEntity<ApiResponse<GetTotalReportCountResponse>> getTotalReportCount(@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getTotalReportCount(user.getUsername())));
 	}
 
 	@GetMapping("/purchases")
