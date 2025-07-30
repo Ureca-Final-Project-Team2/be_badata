@@ -76,7 +76,13 @@ public class RecommendService {
                 .toList();
 
         List<PostResponse> finalResult = results.stream()
-                .map(result -> PostResponse.from(result.getPost(), 0, false))
+                .map(result ->
+                        PostResponse.from(
+                                result.getPost(),
+                                postLikesRepository.countByPostId(result.getPost().getId()),
+                                postLikesRepository.existsByUserIdAndPostId(user.getId(), result.getPost().getId())
+                        )
+                )
                 .collect(Collectors.toList());
 
         return PostsResponse.of(finalResult);
