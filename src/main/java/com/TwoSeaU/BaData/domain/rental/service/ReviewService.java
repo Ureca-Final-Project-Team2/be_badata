@@ -13,6 +13,7 @@ import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
 import com.TwoSeaU.BaData.domain.rental.entity.ReviewQuickReply;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
+import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.QuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
@@ -49,6 +50,7 @@ public class ReviewService {
     private final QuickReplyRepository quickReplyRepository;
     private final StoreRepository storeRepository;
     private final CoinHistoryRepository coinHistoryRepository;
+    private final DeviceReservationRepository deviceReservationRepository;
 
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
