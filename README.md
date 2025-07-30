@@ -3,7 +3,8 @@
 ## 🛠 기술적 특징
 
 ### - ERD 🔗[ERDCloud에서 열기](https://www.erdcloud.com/d/NnvfEkHaQgXSXHWCm)
-<img src="https://github.com/user-attachments/assets/0a8563e0-43b0-4050-aba6-bbd1b884ee54" style="width:100%; height:auto;" />
+
+<img src="https://github.com/user-attachments/assets/7721441f-692e-497a-a105-c09021ddb369" style="width:100%; height:auto;" />
 
 <br>
 
