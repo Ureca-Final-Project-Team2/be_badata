@@ -1,21 +1,16 @@
 package com.TwoSeaU.BaData.domain.trade.repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.TwoSeaU.BaData.domain.trade.entity.Payment;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.QPayment;
-import com.TwoSeaU.BaData.domain.trade.entity.QPost;
-import com.TwoSeaU.BaData.domain.trade.entity.QPostLikes;
+import com.TwoSeaU.BaData.domain.trade.entity.*;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetPurchaseResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PaymentQueryRepositoryImpl implements PaymentQueryRepository{
@@ -77,5 +72,18 @@ public class PaymentQueryRepositoryImpl implements PaymentQueryRepository{
 		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
 
 		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public List<Long> findBoughtPostIdByUserId(Long userId) {
+		QPayment payment = QPayment.payment;
+
+		return queryFactory.select(payment.post.id)
+				.from(payment)
+				.where(
+						payment.user.id.eq(userId),
+						payment.paymentStatus.eq(PaymentStatus.PAID)
+				)
+				.fetch();
 	}
 }

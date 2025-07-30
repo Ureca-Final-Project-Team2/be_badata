@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
-import com.TwoSeaU.BaData.domain.trade.entity.QPost;
-import com.TwoSeaU.BaData.domain.trade.entity.QPostLikes;
+import com.TwoSeaU.BaData.domain.trade.entity.*;
+import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetLikesPostResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -75,5 +74,27 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
 
 		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public List<Long> findDistinctPostIdsByUserId(Long userId) {
+		QPostLikes postLikes = QPostLikes.postLikes;
+		QPayment payment = QPayment.payment;
+
+		return queryFactory.select(postLikes.post.id)
+				.from(postLikes)
+				.where(
+						postLikes.user.id.eq(userId),
+						postLikes.post.id.notIn(
+								JPAExpressions
+										.select(payment.post.id)
+										.from(payment)
+										.where(
+												payment.user.id.eq(userId),
+												payment.paymentStatus.eq(PaymentStatus.PAID)
+										)
+						)
+				)
+				.fetch();
 	}
 }

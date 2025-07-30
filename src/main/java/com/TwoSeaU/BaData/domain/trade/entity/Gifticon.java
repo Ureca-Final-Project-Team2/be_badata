@@ -20,16 +20,20 @@ public class Gifticon extends Post{
 
     private String partner;
 
+    private double[] vector;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
 
     public Gifticon(final User user, final String title, final String comment, final BigDecimal price,
                     final LocalDate deadLine, final String postImage, final Boolean isSold,
-                    final String couponNumber, final String partner, final GifticonCategory category) {
+                    final String couponNumber, final String partner, final GifticonCategory category,
+                    final double[] vector) {
         super(user, title, comment, price, deadLine, postImage, isSold);
         this.couponNumber = couponNumber;
         this.partner = partner;
         this.category = category;
+        this.vector = vector;
     }
 }
