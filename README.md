@@ -31,7 +31,8 @@
 | AWS RDS          | <img src="https://github.com/user-attachments/assets/3b6db2b5-10ae-4196-81b8-3450f7c3005b" width="40"/> | 관리형 DB          | 간편한 DB 관리 및 자동 백업과 확장성 제공                    |
 | Grafana          | <img src="https://github.com/user-attachments/assets/437994d4-0f2d-457b-bf66-2bda16aee882" width="40"/> | 모니터링 도구	      | 시스템/애플리케이션 지표 실시간 모니터링                    |
 | Prometheus       | <img src="https://github.com/user-attachments/assets/d2dc8ac8-ec42-48bc-a59e-822bc1fb3eee" width="40"/> | 메트릭 수집 도구 	  | 메트릭 수집 및 경고 기능 제공                    |
-
+| elasticsearch    | <img src="https://github.com/user-attachments/assets/261d34e3-dd6b-4591-b3a3-b684eb122a09" width="40"/> | 모니터링 및 검색 엔진	      | 대용량 데이터 검색에 적합                    |
+| logstash         | <img src="https://github.com/user-attachments/assets/f91b58ef-7b1f-4cd2-9d69-80ef930acfca" width="40"/> | 데이터 수집 도구 	  | 로그 수집 및 ES 연동에 적절                    |
 
 
 <br>
