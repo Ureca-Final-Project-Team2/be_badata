@@ -22,8 +22,6 @@ public class GetRestockResponse {
 	private String deviceName;
 	private String storeName;
 	private Integer desiredCount;
-	private String storeAddress;
-	private Integer storeDeviceCount;
 	private Boolean is5G;
 
 	public static GetRestockResponse from(final ReStock reStock, final StoreDevice storeDevice, final Device device, final Store store) {
@@ -35,8 +33,6 @@ public class GetRestockResponse {
 			.is5G(device.getIs5G())
 			.storeName(store.getName())
 			.desiredCount(reStock.getDesiredCount())
-			.storeAddress(store.getDetailAddress())
-			.storeDeviceCount(storeDevice.getCount())
 			.build();
 	}
 }
