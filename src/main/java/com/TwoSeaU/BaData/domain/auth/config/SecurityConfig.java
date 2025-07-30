@@ -41,7 +41,7 @@ public class SecurityConfig {
                                 .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/trades/**").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies"
-                                ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta","/test/alarm").permitAll()
+                                ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta","/test/alarm","/api/v1/reviews/{reviewId}").permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter,
