@@ -73,7 +73,7 @@ public class PostService {
                 .build();
     }
 
-    public GetImageUploadResponse E3Test(final MultipartFile file){
+    public GetImageUploadResponse analyzeImage(final MultipartFile file){
         ELAResult elaResult = elaService.analyzeImage(file);
         OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
 

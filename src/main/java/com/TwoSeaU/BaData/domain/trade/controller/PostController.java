@@ -55,7 +55,7 @@ public class PostController {
 
     @PostMapping(path = "/posts/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<GetImageUploadResponse>> postImage(@ModelAttribute MultipartFile file) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.E3Test(file)));
+        return ResponseEntity.ok().body(ApiResponse.success(postService.analyzeImage(file)));
     }
 
     @PostMapping(path = "/posts/data")
