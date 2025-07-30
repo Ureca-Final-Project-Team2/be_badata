@@ -36,7 +36,7 @@ public class TrendingService {
     private static final String INDEX_NAME = "keyword-index-v2";
     private static final int DEFAULT_TOP_COUNT = 10;
     private static final int MESSAGE_KEYWORD_OFFSET = 22;
-    private static final int AGGREGATION_INTERVAL_HOURS = 6;
+    private static final int AGGREGATION_INTERVAL_HOURS = 1;
     private static final String KEYWORD_EXTRACTION_SCRIPT = "doc['message.keyword'].value.substring(" + MESSAGE_KEYWORD_OFFSET + ");";
 
     public GetTrendingResponse getTrendingKeyword() {

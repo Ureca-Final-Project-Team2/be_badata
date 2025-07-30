@@ -6,7 +6,6 @@ import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.QPost;
 import com.TwoSeaU.BaData.domain.trade.entity.QReport;
 import com.TwoSeaU.BaData.domain.trade.entity.Report;
-import com.TwoSeaU.BaData.domain.trade.enums.ReportStatus;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -18,9 +17,10 @@ import lombok.RequiredArgsConstructor;
 public class ReportQueryRepositoryImpl implements ReportQueryRepository{
 
 	private final JPAQueryFactory queryFactory;
+	private final PostLikesRepository postLikesRepository;
 
 	@Override
-	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final ReportStatus reportStatus, final Long cursor, final int size, final Long userId) {
+	public CursorPageResponse<GetReportResponse> getAllReportsByCursor(final Long cursor, final int size, final Long userId) {
 		final QReport qReport = QReport.report;
 		final QPost qPost = QPost.post;
 		final BooleanBuilder where = new BooleanBuilder();
@@ -30,12 +30,6 @@ public class ReportQueryRepositoryImpl implements ReportQueryRepository{
 		}
 
 		where.and(qReport.user.id.eq(userId));
-
-		if(reportStatus == ReportStatus.COMPLETE) {
-			where.and(qReport.reportStatus.eq(ReportStatus.COMPLETE));
-		} else {
-			where.and(qReport.reportStatus.notIn(ReportStatus.COMPLETE));
-		}
 
 		final List<Report> fetchedList = queryFactory.selectFrom(qReport)
 			.join(qReport.post, qPost).fetchJoin()
@@ -51,8 +45,8 @@ public class ReportQueryRepositoryImpl implements ReportQueryRepository{
 		final List<GetReportResponse> responseList = qReportList.stream()
 			.map(report -> {
 				final Post post = report.getPost();
-
-				return GetReportResponse.from(report, post);
+				final Integer postLikes = postLikesRepository.countByPostId(post.getId());
+				return GetReportResponse.from(report, post, postLikes);
 			})
 			.toList();
 

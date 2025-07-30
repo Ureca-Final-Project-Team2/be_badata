@@ -21,14 +21,16 @@ public class GetRentalResponse {
 	private String storeName;
 	private LocalDateTime rentalStartDate;
 	private Integer price;
+	private Boolean isReviewed;
 	private ReservationStatus reservationStatus;
 
-	public static GetRentalResponse from(final Reservation reservation, final Store store) {
+	public static GetRentalResponse from(final Reservation reservation, final Store store, final Boolean isReviewed) {
 		return GetRentalResponse.builder()
 			.id(reservation.getId())
 			.storeName(store.getName())
 			.rentalStartDate(reservation.getRentalStartDate())
 			.price(reservation.getPrice())
+			.isReviewed(isReviewed)
 			.reservationStatus(reservation.getStatus())
 			.build();
 	}

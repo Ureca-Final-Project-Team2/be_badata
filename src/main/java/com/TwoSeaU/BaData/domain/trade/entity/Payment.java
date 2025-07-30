@@ -3,6 +3,8 @@ package com.TwoSeaU.BaData.domain.trade.entity;
 import com.TwoSeaU.BaData.domain.trade.enums.PayMethod;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.global.common.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +16,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
 @Table(name = "payment")
-public class Payment {
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
