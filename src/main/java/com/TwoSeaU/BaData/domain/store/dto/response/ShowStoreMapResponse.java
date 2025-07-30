@@ -31,4 +31,16 @@ public class ShowStoreMapResponse {
                 .isLiked(isLiked)
                 .build();
     }
+
+    public static ShowStoreMapResponse of(final Long id, final double longititude, final double latitude, final String name, final int leftDeviceCount, final boolean isLiked){
+
+        return ShowStoreMapResponse.builder()
+                .id(id)
+                .longititude(longititude)
+                .latitude(latitude)
+                .name(name)
+                .leftDeviceCount(leftDeviceCount)
+                .isLiked(isLiked)
+                .build();
+    }
 }

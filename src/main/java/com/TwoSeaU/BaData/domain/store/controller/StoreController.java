@@ -33,9 +33,10 @@ public class StoreController {
 
     @GetMapping("/map")
     public ResponseEntity<ApiResponse<List<ShowStoreMapResponse>>> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest,
+                                                                                       @RequestParam int zoomLevel,
                                                                                        @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest, user == null ? null : user.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest, user == null ? null : user.getUsername(), zoomLevel)));
     }
 
     @GetMapping
