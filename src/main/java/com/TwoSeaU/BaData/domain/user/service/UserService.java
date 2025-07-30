@@ -91,7 +91,7 @@ public class UserService {
 		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		final int totalCount = tradeType.equals(TradeType.SALE)
+		final int totalCount = tradeType == TradeType.SALE
 			? postRepository.countBySellerId(user.getId()) : paymentRepository.countByUserId(user.getId());
 
 		return GetTotalPostCountResponse.of(totalCount);
