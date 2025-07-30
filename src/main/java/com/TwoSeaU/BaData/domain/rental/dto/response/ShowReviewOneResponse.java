@@ -31,7 +31,7 @@ public class ShowReviewOneResponse {
 
 
 
-    public static ShowReviewOneResponse of(final Review review, final List<DeviceReservation> deviceReservations, final List<Long> reviewQuickReplyIds,
+    public static ShowReviewOneResponse from(final Review review, final List<DeviceReservation> deviceReservations, final List<Long> reviewQuickReplyIds,
                                            final Integer countOfVisit){
 
         return ShowReviewOneResponse.builder()

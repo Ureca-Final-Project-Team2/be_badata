@@ -211,7 +211,7 @@ public class ReviewService {
         final Integer countOfVisit = reservationRepository.countByReservationAndStore(review.getReservation().getStore(), review.getReservation()
                 .getUser());
 
-        return ShowReviewOneResponse.of(review, deviceReservations, reviewQuickReplyIds, countOfVisit);
+        return ShowReviewOneResponse.from(review, deviceReservations, reviewQuickReplyIds, countOfVisit);
     }
 
 
