@@ -102,7 +102,7 @@ class StoreServiceTest {
                     .willReturn(storeList);
 
             // when
-            List<ShowStoreMapResponse> result = storeService.getStoreMapResponse(request,"kakao12345");
+            List<ShowStoreMapResponse> result = storeService.getStoreMapResponse(request,"kakao12345",3);
 
             // then
             assertThat(result).hasSize(1);

@@ -65,7 +65,7 @@ class StoreControllerTest {
             @WithMockUser(username = "userId")
             void it_returns_200_ok_with_user() throws Exception {
                 // given
-                given(storeService.getStoreMapResponse(any(), any())).willReturn(List.of());
+                given(storeService.getStoreMapResponse(any(), any(),3)).willReturn(List.of());
 
                 // when
                 ResultActions result = mockMvc.perform(get(STORE_URL + "/map")
@@ -80,7 +80,7 @@ class StoreControllerTest {
 
                 // then
                 result.andExpect(status().isOk());
-                verify(storeService).getStoreMapResponse(any(), eq("userId"));
+                verify(storeService).getStoreMapResponse(any(), eq("userId"),3);
             }
         }
 
