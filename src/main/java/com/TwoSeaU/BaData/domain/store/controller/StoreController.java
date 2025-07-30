@@ -36,7 +36,7 @@ public class StoreController {
                                                                                        @RequestParam int zoomLevel,
                                                                                        @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest, user == null ? null : user.getUsername(),zoomLevel)));
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest, user == null ? null : user.getUsername(), zoomLevel)));
     }
 
     @GetMapping
