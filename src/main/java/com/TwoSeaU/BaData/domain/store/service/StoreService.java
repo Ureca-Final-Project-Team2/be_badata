@@ -99,42 +99,50 @@ public class StoreService {
 
         if(zoomLevel == 4){
 
-            return 1000;
+            return 100;
         }
 
         if(zoomLevel == 5){
-            return 2000;
+            return 200;
         }
 
         if(zoomLevel == 6){
-            return 4000;
+            return 300;
         }
 
         if(zoomLevel == 7){
-            return 8000;
+            return 400;
         }
 
         if(zoomLevel == 8){
-            return 12000;
+            return 500;
         }
 
         if(zoomLevel == 9){
-            return 14000;
+            return 700;
         }
 
         if(zoomLevel == 10){
-            return 16000;
+            return 1000;
         }
 
         if(zoomLevel == 11){
-            return 18000;
+            return 2000;
         }
 
         if(zoomLevel == 12){
-            return 20000;
+            return 3000;
         }
 
-        return 0;
+        if(zoomLevel == 13){
+            return 4000;
+        }
+
+        if(zoomLevel == 14){
+            return 5000;
+        }
+
+        return 1000;
     }
 
 }
