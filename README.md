@@ -29,8 +29,8 @@
 | AWS S3           | <img src="https://github.com/user-attachments/assets/dcd0111d-e598-4b05-9f76-0d7f033f85c3" width="40"/> | 객체 스토리지      | 이미지 파일 저장 및 관리                                     |
 | AWS EC2          | <img src="https://github.com/user-attachments/assets/0db85e5d-7497-4874-8ecb-9fa711ac72f3" width="40"/> | 컴퓨팅 서비스      | 유연한 서버 인프라 제공                                     |
 | AWS RDS          | <img src="https://github.com/user-attachments/assets/3b6db2b5-10ae-4196-81b8-3450f7c3005b" width="40"/> | 관리형 DB          | 간편한 DB 관리 및 자동 백업과 확장성 제공                    |
-| Grafana          | <img src="https://github.com/user-attachments/assets/437994d4-0f2d-457b-bf66-2bda16aee882" width="40"/> | 관리형 DB          | 간편한 DB 관리 및 자동 백업과 확장성 제공                    |
-| Prometheus          | <img src="https://github.com/user-attachments/assets/d2dc8ac8-ec42-48bc-a59e-822bc1fb3eee" width="40"/> | 관리형 DB          | 간편한 DB 관리 및 자동 백업과 확장성 제공                    |
+| Grafana          | <img src="https://github.com/user-attachments/assets/437994d4-0f2d-457b-bf66-2bda16aee882" width="40"/> | 모니터링 도구	      | 시스템/애플리케이션 지표 실시간 모니터링                    |
+| Prometheus       | <img src="https://github.com/user-attachments/assets/d2dc8ac8-ec42-48bc-a59e-822bc1fb3eee" width="40"/> | 메트릭 수집 도구 	  | 메트릭 수집 및 경고 기능 제공                    |
 
 
 
