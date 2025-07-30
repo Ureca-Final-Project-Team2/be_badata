@@ -46,7 +46,7 @@ public class PaymentService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Post post = postRepository.findById(postId)
+        final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (post.getIsDeleted()) {
@@ -112,7 +112,7 @@ public class PaymentService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Post post = postRepository.findById(postId)
+        final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (post.getIsDeleted()) {
