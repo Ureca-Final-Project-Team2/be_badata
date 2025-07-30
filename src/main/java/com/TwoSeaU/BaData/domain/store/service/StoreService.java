@@ -36,13 +36,18 @@ public class StoreService {
     private final StoreLikesRepository storeLikesRepository;
     private final UserRepository userRepository;
 
-    public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest, final String username){
+    public List<ShowStoreMapResponse> getStoreMapResponse(final StoreMapSearchRequest storeMapSearchRequest, final String username, final int zoomLevel){
 
-        return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest, username).stream().map(
-                showStoreWithLeftDeviceResponse ->
-            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getLeftDeviceCount(), showStoreWithLeftDeviceResponse.isLiked())
-        ).toList();
+        if(zoomLevel <= 3){
+            return storeDeviceRepository.findStoresInBoundingBox(storeMapSearchRequest, username).stream().map(
+                    showStoreWithLeftDeviceResponse ->
+                            ShowStoreMapResponse.from(showStoreWithLeftDeviceResponse.getStore(), showStoreWithLeftDeviceResponse.getLeftDeviceCount(), showStoreWithLeftDeviceResponse.isLiked())
+            ).toList();
+        }
+
+        return storeDeviceRepository.findClustersDynamically(storeMapSearchRequest, getEpochByZoomLevel(zoomLevel), 1);
     }
+
 
     public ShowStoreWithMetaResponse getStoresResponse(final StoreSearchRequest storeSearchRequest,final
             Pageable pageable, final String username){
@@ -88,6 +93,48 @@ public class StoreService {
         return ShowStoreDetailResponse.from(storeWithDistance,
                 storeLikesRepository.existsByUserIdAndStoreId(user.getId(), storeId));
 
+    }
+
+    private int getEpochByZoomLevel(final int zoomLevel){
+
+        if(zoomLevel == 4){
+
+            return 1000;
+        }
+
+        if(zoomLevel == 5){
+            return 2000;
+        }
+
+        if(zoomLevel == 6){
+            return 4000;
+        }
+
+        if(zoomLevel == 7){
+            return 8000;
+        }
+
+        if(zoomLevel == 8){
+            return 12000;
+        }
+
+        if(zoomLevel == 9){
+            return 14000;
+        }
+
+        if(zoomLevel == 10){
+            return 16000;
+        }
+
+        if(zoomLevel == 11){
+            return 18000;
+        }
+
+        if(zoomLevel == 12){
+            return 20000;
+        }
+
+        return 0;
     }
 
 }

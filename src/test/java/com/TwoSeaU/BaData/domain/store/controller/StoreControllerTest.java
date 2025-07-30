@@ -1,6 +1,7 @@
 package com.TwoSeaU.BaData.domain.store.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -65,7 +66,7 @@ class StoreControllerTest {
             @WithMockUser(username = "userId")
             void it_returns_200_ok_with_user() throws Exception {
                 // given
-                given(storeService.getStoreMapResponse(any(), any())).willReturn(List.of());
+                given(storeService.getStoreMapResponse(any(), any(),anyInt())).willReturn(List.of());
 
                 // when
                 ResultActions result = mockMvc.perform(get(STORE_URL + "/map")
@@ -75,12 +76,13 @@ class StoreControllerTest {
                                 .param("neLng", "128.0")
                                 .param("rentalStartDate", "2025-08-01T00:00:00")
                                 .param("rentalEndDate", "2025-08-02T00:00:00")
+                                .param("zoomLevel",String.valueOf(3))
                         )
                         .andDo(print());
 
                 // then
                 result.andExpect(status().isOk());
-                verify(storeService).getStoreMapResponse(any(), eq("userId"));
+                verify(storeService).getStoreMapResponse(any(), eq("userId"),anyInt());
             }
         }
 
