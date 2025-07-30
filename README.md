@@ -70,8 +70,8 @@
 
 <details>
   <summary>렌탈 API</summary>
-  <img src="https://github.com/user-attachments/assets/a5025c38-ca18-42c5-8236-8f6f4cc38017" style="width:100%; height:auto;" />
-  <img src="https://github.com/user-attachments/assets/b5bb88b9-3e0d-47af-9e43-60c045dc570b" style="width:100%; height:auto;" />
+  <img src="https://github.com/user-attachments/assets/b27e3f8a-361e-41be-98e0-ff04d71f1f7e" style="width:100%; height:auto;" />
+  <img src="https://github.com/user-attachments/assets/cbaf29dd-3116-4318-8d94-d971305b98d9" style="width:100%; height:auto;" />
 </details>
 
 <details>
