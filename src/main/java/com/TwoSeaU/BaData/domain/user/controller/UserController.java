@@ -27,10 +27,12 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetReportResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalPostCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalReportCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
+import com.TwoSeaU.BaData.domain.user.enums.TradeType;
 import com.TwoSeaU.BaData.domain.user.service.UserService;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -46,6 +48,13 @@ public class UserController {
 	@GetMapping("/data")
 	public ResponseEntity<ApiResponse<GetDataResponse>> getData(@AuthenticationPrincipal User user) {
 		return ResponseEntity.ok().body(ApiResponse.success(userService.getData(user.getUsername())));
+	}
+
+	@GetMapping("/post/count")
+	public ResponseEntity<ApiResponse<GetTotalPostCountResponse>> getTotalPostCount(
+		@RequestParam TradeType tradeType,
+		@AuthenticationPrincipal User user) {
+		return ResponseEntity.ok().body(ApiResponse.success(userService.getTotalPostCount(tradeType, user.getUsername())));
 	}
 
 	@GetMapping("/coin")

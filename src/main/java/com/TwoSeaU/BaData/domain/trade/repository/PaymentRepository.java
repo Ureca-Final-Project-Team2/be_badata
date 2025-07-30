@@ -11,4 +11,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, Payment
 	Optional<Payment> findByMerchantUid(final String merchantUid);
 	int countByUserIdAndPaymentStatus(final Long buyerId, final PaymentStatus paymentStatus);
 	Optional<Payment> findByUserIdAndPostIdAndPaymentStatus(final Long buyerId, final Long postId, final PaymentStatus paymentStatus);
+	int countByUserId(final Long buyerId);
 }

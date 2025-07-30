@@ -11,6 +11,7 @@ import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.user.dto.response.CreateFollowResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetCoinHistoryResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetReportInfoResponse;
+import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalPostCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetTotalReportCountResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetUserInfoResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.UpdateNotificationSettingResponse;
@@ -41,6 +42,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSosResponse;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.enums.FollowType;
+import com.TwoSeaU.BaData.domain.user.enums.TradeType;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.PlanDataRepository;
@@ -84,6 +86,17 @@ public class UserService {
 
 		return CoinResponse.of(user.getCoin());
 	}
+
+	public GetTotalPostCountResponse getTotalPostCount(final TradeType tradeType, final String username) {
+		final User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final int totalCount = tradeType == TradeType.SALE
+			? postRepository.countBySellerId(user.getId()) : paymentRepository.countByUserId(user.getId());
+
+		return GetTotalPostCountResponse.of(totalCount);
+	}
+
 
 	public GetUserInfoResponse getUserInfo(final String username) {
 		final User user = userRepository.findByUsername(username)

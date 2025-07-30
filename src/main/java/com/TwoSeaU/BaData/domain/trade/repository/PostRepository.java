@@ -10,4 +10,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepo
     List<Post> findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final Long sellerId, final boolean isDeleted);
     List<Post> findByDeadLineBetweenAndIsDeleted(LocalDate start, LocalDate end, boolean isDeleted);
     List<Post> findByIsDeletedAndTitleContaining(final boolean isDeleted, final String query);
+    int countBySellerId(final Long sellerId);
 }
