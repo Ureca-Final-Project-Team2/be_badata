@@ -67,7 +67,7 @@ public class ReviewController {
     }
 
     @GetMapping("/api/v1/reviews/{reviewId}")
-    public ResponseEntity<ApiResponse<ShowReviewOneResponse>> getReviewById(@PathVariable("reviewId") final Long reviewId){
+    public ResponseEntity<ApiResponse<ShowReviewOneResponse>> getReviewById(@PathVariable("reviewId") Long reviewId){
 
         return ResponseEntity.ok(ApiResponse.success(reviewService.getReviewById(reviewId)));
     }
