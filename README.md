@@ -1,4 +1,4 @@
-<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/0bf12173-e080-48ed-9565-34d86f0eb667" /><img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/ced7cc6a-a575-451f-93c6-576b8ceef84e" /># 📡 BADATA: 백엔드 소개 
+# 📡 BADATA: 백엔드 소개 
 
 ## 🛠 기술적 특징
 
