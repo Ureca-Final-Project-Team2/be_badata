@@ -4,6 +4,7 @@ import com.TwoSeaU.BaData.domain.rental.dto.request.CreateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.request.UpdateReviewRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowCountPerQuickReplyResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewMetaResponse;
+import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewOneResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewResponse;
 import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReviewWithMetaResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
@@ -18,15 +19,15 @@ import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewQuickReplyRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReviewRepository;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
-import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
-import com.TwoSeaU.BaData.domain.store.repository.StoreDeviceRepository;
 import com.TwoSeaU.BaData.domain.store.repository.StoreRepository;
+import com.TwoSeaU.BaData.domain.user.entity.CoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.enums.CoinSource;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,9 @@ public class ReviewService {
     private final ReviewQuickReplyRepository reviewQuickReplyRepository;
     private final QuickReplyRepository quickReplyRepository;
     private final StoreRepository storeRepository;
-    private final StoreDeviceRepository storeDeviceRepository;
+    private final CoinHistoryRepository coinHistoryRepository;
     private final DeviceReservationRepository deviceReservationRepository;
+
     @Transactional
     public Long createReview(final CreateReviewRequest createReviewRequest, final String username, final String imageUrl){
 
@@ -67,7 +69,15 @@ public class ReviewService {
 
         reservation.getStore().adjustReviewRatingByAdd(review);
 
-        loginUser.addCoin(reservation.getPrice()/10);
+        final Integer rewardCoin = reservation.getPrice()/10;
+        loginUser.addCoin(rewardCoin);
+
+        coinHistoryRepository.save(CoinHistory.of(
+            loginUser,
+            CoinSource.REVIEW_REWARD,
+            rewardCoin,
+            loginUser.getCoin()
+        ));
 
         return review.getId();
     }
@@ -188,6 +198,20 @@ public class ReviewService {
         return ShowReviewMetaResponse.of(store.getReviewCount(), showCountPerQuickReplyResponses);
 
 
+    }
+
+    public ShowReviewOneResponse getReviewById(final Long reviewId){
+
+        final Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new GeneralException(RentalException.REVIEW_NOT_FOUND));
+
+        final List<DeviceReservation> deviceReservations = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(review.getReservation().getId());
+
+        final List<Long> reviewQuickReplyIds = reviewQuickReplyRepository.findByReviewWithFetchQuickReply(review).stream().map(reviewQuickReply -> reviewQuickReply.getQuickReply().getId()).toList();
+
+        final Integer countOfVisit = reservationRepository.countByReservationAndStore(review.getReservation().getStore(), review.getReservation()
+                .getUser());
+
+        return ShowReviewOneResponse.from(review, deviceReservations, reviewQuickReplyIds, countOfVisit);
     }
 
 

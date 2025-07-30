@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class ReservationQueryRepositoryImpl implements ReservationQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
+	private final ReviewRepository reviewRepository;
 
 	public CursorPageResponse<GetRentalResponse> getAllRentalsByCursor(final Long cursor, final int size, final Long userId) {
 		final QReservation qReservation = QReservation.reservation;
@@ -44,12 +45,12 @@ public class ReservationQueryRepositoryImpl implements ReservationQueryRepositor
 
 		final List<GetRentalResponse> responseList = qReservationList.stream()
 			.map(reservation -> {
-				Store store = reservation.getStore();
+				final Store store = reservation.getStore();
 				if(store == null) {
 					throw new GeneralException(StoreException.CANT_FIND_STORE);
 				}
-
-				return GetRentalResponse.from(reservation, store);
+				final Boolean isReviewed = reviewRepository.existsByReservationId(reservation.getId());
+				return GetRentalResponse.from(reservation, store, isReviewed);
 			})
 			.toList();
 

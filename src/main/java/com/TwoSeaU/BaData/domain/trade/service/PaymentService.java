@@ -140,12 +140,15 @@ public class PaymentService {
 
         payment.updatePaymentStatus(PaymentStatus.PAID);
 
+        user.updateUsedCoin(payment.getUseCoin().intValue());
+
         coinHistoryRepository.save(CoinHistory.of(
             user,
             post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
-            payment.getUseCoin().intValue()
+            payment.getUseCoin().intValue(),
+            user.getCoin()
         ));
-        user.updateUsedCoin(payment.getUseCoin().intValue());
+
         post.updateIsSold(true);
 
         return GetValidatePaymentResponse.of(payment.getId());

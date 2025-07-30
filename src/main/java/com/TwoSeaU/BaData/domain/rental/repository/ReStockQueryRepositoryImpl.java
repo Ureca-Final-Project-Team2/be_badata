@@ -6,7 +6,9 @@ import com.TwoSeaU.BaData.domain.rental.entity.QReStock;
 import com.TwoSeaU.BaData.domain.rental.entity.ReStock;
 import com.TwoSeaU.BaData.domain.store.entity.Device;
 import com.TwoSeaU.BaData.domain.store.entity.QDevice;
+import com.TwoSeaU.BaData.domain.store.entity.QStore;
 import com.TwoSeaU.BaData.domain.store.entity.QStoreDevice;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetRestockResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
@@ -26,6 +28,7 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 		final QReStock qReStock = QReStock.reStock;
 		final QStoreDevice qStoreDevice = QStoreDevice.storeDevice;
 		final QDevice qDevice = QDevice.device;
+		final QStore qStore = QStore.store;
 		final BooleanBuilder where = new BooleanBuilder();
 
 		if(cursor != null) {
@@ -37,6 +40,7 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 		final List<ReStock> fetchedList = queryFactory.selectFrom(qReStock)
 			.join(qReStock.storeDevice, qStoreDevice).fetchJoin()
 			.join(qStoreDevice.device, qDevice).fetchJoin()
+			.join(qStoreDevice.store, qStore).fetchJoin()
 			.where(where)
 			.orderBy(qReStock.id.desc())
 			.limit(size + 1)
@@ -50,8 +54,8 @@ public class ReStockQueryRepositoryImpl implements ReStockQueryRepository{
 			.map(reStock -> {
 				final StoreDevice storeDevice = reStock.getStoreDevice();
 				final Device device = storeDevice.getDevice();
-
-				return GetRestockResponse.from(reStock, storeDevice, device);
+				final Store store = reStock.getStoreDevice().getStore();
+				return GetRestockResponse.from(reStock, storeDevice, device, store);
 			})
 			.toList();
 
