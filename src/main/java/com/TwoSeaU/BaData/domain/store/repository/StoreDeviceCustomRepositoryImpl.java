@@ -5,16 +5,14 @@ import static com.TwoSeaU.BaData.domain.rental.entity.QReservation.reservation;
 import static com.TwoSeaU.BaData.domain.store.entity.QStore.store;
 import static com.TwoSeaU.BaData.domain.store.entity.QStoreDevice.storeDevice;
 import static com.TwoSeaU.BaData.domain.store.entity.QStoreLikes.storeLikes;
-
 import com.TwoSeaU.BaData.domain.store.dto.request.DeviceSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreMapSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.request.StoreSearchRequest;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreDeviceWithRemainCountResponse;
+import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreMapResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceAndDistanceResponse;
 import com.TwoSeaU.BaData.domain.store.dto.response.ShowStoreWithLeftDeviceResponse;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
-import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
-import com.TwoSeaU.BaData.domain.store.entity.StoreLikes;
 import com.TwoSeaU.BaData.domain.store.service.GeoUtils;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
@@ -30,14 +28,19 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 
 @RequiredArgsConstructor
@@ -47,6 +50,8 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
     private static final String review_count="reviewCount";
     public static final String distance = "distance";
     public static final String likeCount = "likeCount";
+
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
     public List<ShowStoreWithLeftDeviceResponse> findStoresInBoundingBox(final StoreMapSearchRequest storeMapSearchRequest, final String username){
@@ -334,5 +339,137 @@ public class StoreDeviceCustomRepositoryImpl implements StoreDeviceCustomReposit
                 .where(storeLikes.user.username.eq(username))
                 .fetch());
     }
+
+    @Override
+    public List<ShowStoreMapResponse> findClustersDynamically(final StoreMapSearchRequest request,final int eps, final int minPoints) {
+        StringBuilder sql = new StringBuilder("""
+        WITH filtered AS (
+            SELECT
+                s.id,
+                s.name,
+                s.phone_number,
+                s.detail_address,
+                s.start_time,
+                s.end_time,
+                s.review_count,
+                s.review_rating,
+                s.available_device,
+                s.store_image,
+                s.created_at,
+                s.updated_at,
+                ST_Transform(s.position, 5179) AS pos_5179,
+                SUM(
+                    sd.count - COALESCE((
+                        SELECT SUM(dr.reservation_count)
+                        FROM device_reservation dr
+                        JOIN reservation r ON r.id = dr.reservation_id
+                        WHERE dr.store_device_id = sd.id
+                          AND r.rental_start_date <= :rentalEndDate
+                          AND r.rental_end_date >= :rentalStartDate
+                    ), 0)
+                ) AS available_count
+            FROM store_device sd
+            JOIN store s ON s.id = sd.store_id
+            JOIN device d ON d.id = sd.device_id
+            WHERE (
+                (
+                    SELECT SUM(dr2.reservation_count)
+                    FROM device_reservation dr2
+                    JOIN reservation r2 ON r2.id = dr2.reservation_id
+                    WHERE dr2.store_device_id = sd.id
+                      AND r2.rental_start_date <= :rentalEndDate
+                      AND r2.rental_end_date >= :rentalStartDate
+                ) IS NULL
+                OR (
+                    SELECT SUM(dr3.reservation_count)
+                    FROM device_reservation dr3
+                    JOIN reservation r3 ON r3.id = dr3.reservation_id
+                    WHERE dr3.store_device_id = sd.id
+                      AND r3.rental_start_date <= :rentalEndDate
+                      AND r3.rental_end_date >= :rentalStartDate
+                ) < sd.count
+            )
+    """);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("eps", eps);
+        params.put("minPoints", minPoints);
+
+        // 날짜 기본값 설정
+        params.put("rentalStartDate", Optional.ofNullable(request.getRentalStartDate()).orElse(LocalDateTime.of(2100, 1, 1, 0, 0)));
+        params.put("rentalEndDate", Optional.ofNullable(request.getRentalEndDate()).orElse(LocalDateTime.of(2100, 1, 2, 0, 0)));
+
+        // 동적 조건
+        if (request.getMinPrice() != null) {
+            sql.append(" AND sd.price >= :minPrice");
+            params.put("minPrice", request.getMinPrice());
+        }
+        if (request.getMaxPrice() != null) {
+            sql.append(" AND sd.price <= :maxPrice");
+            params.put("maxPrice", request.getMaxPrice());
+        }
+        if (request.getDataCapacity() != null && !request.getDataCapacity().isEmpty()) {
+            sql.append(" AND sd.data_capacity IN (:dataCapacities)");
+            params.put("dataCapacities", request.getDataCapacity());
+        }
+        if (request.getIs5G() != null) {
+            sql.append(" AND d.is5g = :is5G");
+            params.put("is5G", request.getIs5G());
+        }
+        if (request.getMaxSupportConnection() != null && !request.getMaxSupportConnection().isEmpty()) {
+            sql.append(" AND d.support_devices_count IN (:supportCounts)");
+            params.put("supportCounts", request.getMaxSupportConnection());
+        }
+        if (request.getIsOpeningNow() != null) {
+            sql.append(" AND (s.start_time <= :nowTime AND s.end_time >= :nowTime)");
+            params.put("nowTime", LocalTime.now());
+        }
+        if (request.getReviewRating() != null) {
+            sql.append(" AND s.review_rating >= :reviewRating");
+            params.put("reviewRating", request.getReviewRating());
+        }
+        if (request.getSwLat() != null && request.getSwLng() != null && request.getNeLat() != null && request.getNeLng() != null) {
+            String bboxWKT = GeoUtils.createBoundingBoxByCoordinate(
+                    request.getSwLat(), request.getSwLng(),
+                    request.getNeLat(), request.getNeLng()
+            ).toText();
+            sql.append(" AND ST_Within(s.position, ST_GeomFromText(:bbox, 4326))");
+            params.put("bbox", bboxWKT);
+        }
+
+
+        sql.append("""
+        GROUP BY s.id
+        ),
+        clustered AS (
+            SELECT *, ST_ClusterDBSCAN(pos_5179, :eps, :minPoints) OVER () AS cluster_id
+            FROM filtered
+        )
+        SELECT
+            cluster_id,
+            COUNT(*) AS store_count,
+            SUM(available_count) AS available_device_count,
+            ST_AsText(ST_Transform(ST_Centroid(ST_Collect(pos_5179)), 4326)) AS center
+        FROM clustered
+        WHERE cluster_id > 0
+        GROUP BY cluster_id
+        """);
+
+        return namedParameterJdbcTemplate.query(sql.toString(), params, clusterRowMapper);
+    }
+
+    private final RowMapper<ShowStoreMapResponse> clusterRowMapper = (rs, rowNum) -> {
+        Long clusterId = rs.getLong("cluster_id");
+        int leftDeviceCount = rs.getInt("available_device_count");
+
+        // center를 문자열로 받아 파싱
+        String pointText = rs.getString("center");
+        String[] coords = pointText.replace("POINT(", "").replace(")", "").split(" ");
+
+        double longitude = Double.parseDouble(coords[0]);
+        double latitude = Double.parseDouble(coords[1]);
+
+        return ShowStoreMapResponse.of(clusterId, longitude, latitude, null, leftDeviceCount, false);
+    };
 
 }
