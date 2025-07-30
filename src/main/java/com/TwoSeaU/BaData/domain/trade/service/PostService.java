@@ -45,6 +45,7 @@ public class PostService {
     private final SearchHistoryRepository searchHistoryRepository;
     private final PaymentRepository paymentRepository;
     private final ELAService elaService;
+    private final PostVectorizer postVectorizer;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
 
@@ -132,6 +133,11 @@ public class PostService {
         }
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
+        final double[] vector = postVectorizer.vectorizePost(
+                saveGifticonPostRequest.getPrice(),
+                saveGifticonPostRequest.getDeadLine(),
+                category
+        );
 
         final Gifticon gifticon = new Gifticon(
                 user,
@@ -143,7 +149,8 @@ public class PostService {
                 false,
                 saveGifticonPostRequest.getCouponNumber(),
                 saveGifticonPostRequest.getPartner(),
-                category
+                category,
+                vector
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
