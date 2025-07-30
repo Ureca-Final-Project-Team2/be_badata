@@ -64,7 +64,7 @@ public class RecommendService {
                     double[] postVector = post.getVector();
 
                     //유사도 계산
-                    double similarity = vectorUtils.cosineSimilarity(userVector, postVector);
+                    double similarity = vectorUtils.calculateWeightedSimilarity(userVector, postVector);
 
                     //최종 점수 계산 (추후 최종 점수에 인기도 반영)
                     double finalScore = similarity;

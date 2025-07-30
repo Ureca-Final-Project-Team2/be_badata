@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class PostVectorizer {
         // 수치형 특성 정규화 (가격, 마감 기한)
         double[] numericalFeatures = {
                 vectorUtils.normalizePrice(price.intValue()),
-                vectorUtils.normalizeDaysToExpiry(deadLine.getDayOfYear() - LocalDate.now().getDayOfYear())
+                vectorUtils.normalizeDaysToExpiry((int) ChronoUnit.DAYS.between(LocalDate.now(), deadLine))
         };
 
         // 벡터 결합

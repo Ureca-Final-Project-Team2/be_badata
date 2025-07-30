@@ -15,18 +15,18 @@ public class VectorUtils {
     private static final double PRICE_WEIGHT = 0.9;
     private static final double DAYS_TO_EXPIRY_WEIGHT = 0.5;
 
-    public static double calculateNumberProximity (double userPrice, double postPrice) {
+    public double calculateNumberProximity (double userPrice, double postPrice) {
         double priceDiff = Math.abs(userPrice - postPrice);
         return 1.0 / (1.0 + priceDiff / 1000.0);
     }
 
-    public static double calculateCategorySimilarity (double[] user, double[] post) {
+    public double calculateCategorySimilarity (double[] user, double[] post) {
         double dotProduct = 0.0;
         double normA = 0.0;
         double normB = 0.0;
 
         for (int i = 0; i < CATEGORY_COUNT; i++) {
-            dotProduct += user[i] * post[i] * CATEGORY_WEIGHT;
+            dotProduct += user[i] * post[i];
             normA += Math.pow(user[i], 2);
             normB += Math.pow(post[i], 2);
         }
@@ -38,7 +38,7 @@ public class VectorUtils {
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
-    public double cosineSimilarity(double[] vectorA, double[] vectorB) {
+    public double calculateWeightedSimilarity(double[] vectorA, double[] vectorB) {
         if (vectorA.length != vectorB.length) {
             throw new GeneralException(TradeException.RECOMMENDATION_FAILED);
         }
@@ -46,7 +46,7 @@ public class VectorUtils {
         double dotProduct = 0.0;
 
         // 카테고리
-        dotProduct += calculateCategorySimilarity(vectorA, vectorB);
+        dotProduct += calculateCategorySimilarity(vectorA, vectorB) * CATEGORY_WEIGHT;
 
         // 가격 유사도 계산
         dotProduct += calculateNumberProximity(vectorA[CATEGORY_COUNT], vectorB[CATEGORY_COUNT]) * PRICE_WEIGHT;

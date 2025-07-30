@@ -2,9 +2,10 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
-import com.TwoSeaU.BaData.domain.trade.repository.*;
+import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.AllArgsConstructor;
@@ -13,10 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,16 +51,10 @@ public class UserProfileVectorizer {
     }
 
     private List<Gifticon> getPostsByIds(List<Long> postIds) {
-        List<Gifticon> posts = new ArrayList<>();
-
-        for (Long postId : postIds) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
-            if (post instanceof Gifticon) {
-                posts.add((Gifticon) post);
-            }
-        }
-        return posts;
+        return postRepository.findAllById(postIds).stream()
+                .filter(post -> post instanceof Gifticon)
+                .map(post -> (Gifticon) post)
+                .collect(Collectors.toList());
     }
 
 
@@ -74,7 +70,7 @@ public class UserProfileVectorizer {
 
         for (Gifticon post : purchasePosts) {
             tempPreparePrice += post.getPrice().doubleValue() * PURCHASE_POST_WEIGHT;
-            tempMaxAcceptableDaysToExpiry += (post.getDeadLine().getDayOfYear() - LocalDate.now().getDayOfYear()) * PURCHASE_POST_WEIGHT;
+            tempMaxAcceptableDaysToExpiry += ChronoUnit.DAYS.between(LocalDate.now(), post.getDeadLine()) * PURCHASE_POST_WEIGHT;
 
             GifticonCategory category = post.getCategory();
             userProfileCategoryPreferences.put(category.getCategoryName(),
@@ -87,7 +83,7 @@ public class UserProfileVectorizer {
 
         for (Gifticon post : likePosts) {
             tempPreparePrice += post.getPrice().doubleValue() * LIKES_POST_WEIGHT;
-            tempMaxAcceptableDaysToExpiry += (post.getDeadLine().getDayOfYear() - LocalDate.now().getDayOfYear()) * LIKES_POST_WEIGHT;
+            tempMaxAcceptableDaysToExpiry += ChronoUnit.DAYS.between(LocalDate.now(), post.getDeadLine()) * LIKES_POST_WEIGHT;
 
             GifticonCategory category = post.getCategory();
             userProfileCategoryPreferences.put(category.getCategoryName(),
@@ -103,6 +99,10 @@ public class UserProfileVectorizer {
         }
 
         int totalPostCount = likePosts.size() + purchasePosts.size();
+
+        if(totalPostCount == 0) {
+            throw new GeneralException(TradeException.RECOMMENDATION_FAILED);
+        }
 
         return new UserProfile(
                 userProfileCategoryPreferences,
