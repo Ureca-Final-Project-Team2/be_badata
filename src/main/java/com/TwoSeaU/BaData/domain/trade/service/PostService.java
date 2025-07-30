@@ -136,7 +136,7 @@ public class PostService {
         final double[] vector = postVectorizer.vectorizePost(
                 saveGifticonPostRequest.getPrice(),
                 saveGifticonPostRequest.getDeadLine(),
-                saveGifticonPostRequest.getPartner()
+                category
         );
 
         final Gifticon gifticon = new Gifticon(

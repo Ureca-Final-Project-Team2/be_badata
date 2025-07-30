@@ -36,4 +36,8 @@ public class Gifticon extends Post{
         this.category = category;
         this.vector = vector;
     }
+
+    public void updateVector(double[] vector) {
+        this.vector = vector;
+    }
 }
