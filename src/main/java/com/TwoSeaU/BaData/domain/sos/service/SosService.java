@@ -23,7 +23,7 @@ public class SosService {
 	private final UserRepository userRepository;
 	private final SosRepository sosRepository;
 
-	public SaveSosResponse createSos(String username) {
+	public SaveSosResponse requestSos(String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
