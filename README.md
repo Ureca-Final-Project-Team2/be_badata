@@ -33,7 +33,7 @@
 | Prometheus       | <img src="https://github.com/user-attachments/assets/d2dc8ac8-ec42-48bc-a59e-822bc1fb3eee" width="40"/> | 메트릭 수집 도구 	  | 메트릭 수집 및 경고 기능 제공                    |
 | elasticsearch    | <img src="https://github.com/user-attachments/assets/261d34e3-dd6b-4591-b3a3-b684eb122a09" width="40"/> | 모니터링 및 검색 엔진	      | 대용량 데이터 검색에 적합                    |
 | logstash         | <img src="https://github.com/user-attachments/assets/f91b58ef-7b1f-4cd2-9d69-80ef930acfca" width="40"/> | 데이터 수집 도구 	  | 로그 수집 및 ES 연동에 적절                    |
-
+| docker           | <img src="https://github.com/user-attachments/assets/2322657b-c1b3-4a97-b890-14b784fbfe8b" width="40"/> | 애플리케이션 컨테이너화 | 실행 환경 일관성 보장                    |
 
 <br>
 
