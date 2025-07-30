@@ -121,6 +121,10 @@ public class PostService {
 
     public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
 
+        if(gifticonRepository.existsByCouponNumber(saveGifticonPostRequest.getCouponNumber())) {
+            throw new GeneralException(TradeException.DUPLICATE_COUPON_NUMBER);
+        }
+
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         final GifticonCategory category = gifticonCategoryRepository.findByCategoryName(saveGifticonPostRequest.getCategory())

@@ -46,6 +46,7 @@ public enum TradeException implements BaseException {
     REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3034, "실시간 검색 내용이 없습니다."),
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, 3035, "신고 게시글을 찾을 수 없습니다."),
     RECOMMENDATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3036, "추천 게시글 처리에 실패했습니다."),
+    DUPLICATE_COUPON_NUMBER(HttpStatus.BAD_REQUEST, 3037, "이미 등록된 기프티콘입니다.")
     ;
 
     private final HttpStatus httpStatus;
