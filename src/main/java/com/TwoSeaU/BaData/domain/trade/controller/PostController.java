@@ -33,14 +33,22 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query, user == null ? null : user.getUsername(), cursor, size)));
     }
 
-    @GetMapping("/posts/{userId}")
-    public ResponseEntity<ApiResponse<UserPostsResponse>> getPostsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId, user == null ? null : user.getUsername())));
+    @GetMapping("/posts/{userId}/{isSold}")
+    public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPostsByUserId(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size,
+            @PathVariable Long userId,
+            @PathVariable Boolean isSold,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByUserId(userId, isSold, user == null ? null : user.getUsername(), cursor, size)));
     }
 
     @GetMapping("/posts/deadline")
-    public ResponseEntity<ApiResponse<PostsResponse>> getPostsByDeadLine(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine(user == null ? null : user.getUsername())));
+    public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPostsByDeadLine(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPostsByDeadLine(user == null ? null : user.getUsername(), cursor, size)));
     }
 
     @GetMapping("{postId}/post")

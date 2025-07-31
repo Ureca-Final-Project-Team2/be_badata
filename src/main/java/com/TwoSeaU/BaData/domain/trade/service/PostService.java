@@ -28,10 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -50,30 +46,6 @@ public class PostService {
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
 
-    public PostsResponse postsToPostResponse(final List<Post> posts, final String username) {
-        Optional<Long> optionalUserId;
-
-        if(username != null) {
-            optionalUserId = userRepository.findByUsername(username).map(User::getId);
-        }
-        else {
-            optionalUserId = Optional.empty();
-        }
-
-        final List<PostResponse> allPosts = posts
-                .stream()
-                .map(post -> PostResponse.from(
-                        post,
-                        postLikesRepository.countByPostId(post.getId()),
-                        username != null && postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
-                ))
-                .toList();
-
-        return PostsResponse.builder()
-                .postsResponse(allPosts)
-                .build();
-    }
-
     public GetImageUploadResponse analyzeImage(final MultipartFile file){
         ELAResult elaResult = elaService.analyzeImage(file);
         OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
@@ -81,18 +53,15 @@ public class PostService {
         return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
-    public UserPostsResponse getPostsByUserId(final Long userId, final String username) {
+    public CursorPageResponse<PostResponse> getPostsByUserId(final Long userId, final boolean isSold, final String username, final Long cursor, final int size) {
 
-        return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), username),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), username));
+        return postRepository.searchPostsByUserAndIsSold(userId, isSold, username, cursor, size);
     }
 
 
-    public PostsResponse getPostsByDeadLine(final String username) {
+    public CursorPageResponse<PostResponse> getPostsByDeadLine(final String username, final Long cursor, final int size) {
 
-        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), username);
-
+        return postRepository.searchPostsByDeadLine(username, cursor, size);
     }
     private void saveSearchHistoryIfUserExists(final String username, final String query) {
         if (username == null) {

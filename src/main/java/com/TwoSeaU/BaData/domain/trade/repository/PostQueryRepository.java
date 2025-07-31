@@ -9,4 +9,7 @@ public interface PostQueryRepository {
 
 	CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, Long userId);
     CursorPageResponse<PostResponse> searchPostsByKeyword(String keyword, String username, Long cursor, int size);
+    CursorPageResponse<PostResponse> searchPostsByUserAndIsSold(Long userId, boolean isSold, String username, Long cursor, int size);
+
+    CursorPageResponse<PostResponse> searchPostsByDeadLine(String username, Long cursor, int size);
 }
