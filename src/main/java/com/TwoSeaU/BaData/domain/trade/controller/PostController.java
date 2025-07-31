@@ -6,6 +6,7 @@ import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,13 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<PostsResponse>> getPosts(
-            @RequestParam(required = false) String query, @AuthenticationPrincipal User user) {
-        if (query != null && !query.isEmpty()) {
-            return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query, user == null ? null : user.getUsername())));
-        }
+    public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPosts(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String query,
+            @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok().body(ApiResponse.success(postService.findAllPosts(user == null ? null : user.getUsername())));
+        return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query, user == null ? null : user.getUsername(), cursor, size)));
     }
 
     @GetMapping("/posts/{userId}")

@@ -19,6 +19,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
 import jakarta.transaction.Transactional;
@@ -80,12 +81,6 @@ public class PostService {
         return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
-    public PostsResponse findAllPosts(final String username) {
-
-        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), username);
-    }
-
-
     public UserPostsResponse getPostsByUserId(final Long userId, final String username) {
 
         return UserPostsResponse.of(
@@ -99,23 +94,29 @@ public class PostService {
         return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), username);
 
     }
-
-
-    public PostsResponse searchPosts(final String query, final String username) {
-        log.info("event-keyword-search, {}", query);
-
-        if(username != null) {
-            final User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-            try {
-                searchHistoryRepository.save(SearchHistory.of(user, query));
-            } catch (Exception e) {
-                log.info("검색 기록 저장에 실패: {}", e.getMessage());
-            }
+    private void saveSearchHistoryIfUserExists(final String username, final String query) {
+        if (username == null) {
+            return;
         }
 
-        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), username);
+        try {
+            final User user = userRepository.findByUsername(username).orElseThrow(() ->
+                    new GeneralException(UserException.USER_NOT_FOUND));
+
+            searchHistoryRepository.save(SearchHistory.of(user, query));
+        } catch (Exception e) {
+            log.info("검색 기록 저장에 실패: {}", e.getMessage());
+        }
+    }
+
+    public CursorPageResponse<PostResponse> searchPosts(final String query, final String username, final Long cursor, final int size) {
+
+        if (query != null && !query.isEmpty()) {
+            log.info("event-keyword-search, {}", query);
+            saveSearchHistoryIfUserExists(username, query);
+        }
+
+        return postRepository.searchPostsByKeyword(query, username, cursor, size);
     }
 
 
