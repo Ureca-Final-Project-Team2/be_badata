@@ -1,13 +1,16 @@
 package com.TwoSeaU.BaData.domain.trade.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
+import com.TwoSeaU.BaData.domain.trade.entity.*;
+import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.response.GeneralException;
 import org.springframework.stereotype.Repository;
 
-import com.TwoSeaU.BaData.domain.trade.entity.Data;
-import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.QPost;
 import com.TwoSeaU.BaData.domain.trade.enums.PostCategory;
 import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
@@ -22,6 +25,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 	private final PostLikesRepository postLikesRepository;
+	private final UserRepository userRepository;
 
 	@Override
 	public CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, Long userId) {
@@ -67,5 +71,133 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 		Long nextCursor = getSaleResponseList.isEmpty() ? null : posts.get(posts.size() - 1).getId();
 
 		return CursorPageResponse.of(getSaleResponseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public CursorPageResponse<PostResponse> searchPostsByKeyword(final String keyword, final String username, final Long cursor, final int size) {
+		QPost qpost = QPost.post;
+		Optional<User> user = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)));
+		BooleanBuilder where = new BooleanBuilder();
+
+		where.and(qpost.isDeleted.isFalse());
+		where.and(qpost.isSold.isFalse());
+		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+
+		if(keyword != null && !keyword.isEmpty()) {
+			where.and(qpost.title.containsIgnoreCase(keyword)
+					.or(qpost.comment.containsIgnoreCase(keyword)));
+		}
+
+		if(cursor != null) {
+			where.and(qpost.id.lt(cursor));
+		}
+
+		final List<Post> postList = queryFactory.selectFrom(qpost)
+				.where(where)
+				.orderBy(qpost.createdAt.desc())
+				.limit(size + 1)
+				.fetch();
+
+		final boolean hasNext = postList.size() > size;
+		final List<Post> qPostList = hasNext
+				? postList.subList(0, size) : postList;
+
+		final List<PostResponse> responseList = qPostList.stream()
+				.map(post -> PostResponse.from(
+						post,
+						postLikesRepository.countByPostId(post.getId()),
+						username != null && postLikesRepository.existsByUserIdAndPostId(user.get().getId(), post.getId())
+				))
+				.toList();
+
+		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
+
+		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public CursorPageResponse<PostResponse> searchPostsByUserAndIsSold(final Long userId, final boolean isSold, final String username, final Long cursor, final int size) {
+		QPost qpost = QPost.post;
+		Optional<User> loginUser = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)));
+		userRepository.findById(userId)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+		BooleanBuilder where = new BooleanBuilder();
+
+		where.and(qpost.isDeleted.isFalse());
+		if(isSold){
+			where.and(qpost.isSold.isTrue());
+		}
+		else {
+			where.and(qpost.isSold.isFalse());
+		}
+		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+		where.and(qpost.seller.id.eq(userId));
+
+		if(cursor != null) {
+			where.and(qpost.id.lt(cursor));
+		}
+
+		final List<Post> postList = queryFactory.selectFrom(qpost)
+				.where(where)
+				.orderBy(qpost.createdAt.desc())
+				.limit(size + 1)
+				.fetch();
+
+		final boolean hasNext = postList.size() > size;
+		final List<Post> qPostList = hasNext
+				? postList.subList(0, size) : postList;
+
+		final List<PostResponse> responseList = qPostList.stream()
+				.map(post -> PostResponse.from(
+						post,
+						postLikesRepository.countByPostId(post.getId()),
+						username != null && postLikesRepository.existsByUserIdAndPostId(loginUser.get().getId(), post.getId())
+				))
+				.toList();
+
+		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
+
+		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public CursorPageResponse<PostResponse> searchPostsByDeadLine(final String username, final Long cursor, final int size) {
+		QPost qpost = QPost.post;
+		Optional<User> user = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
+				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)));
+		BooleanBuilder where = new BooleanBuilder();
+
+		where.and(qpost.isDeleted.isFalse());
+		where.and(qpost.isSold.isFalse());
+		where.and(qpost.deadLine.goe(java.time.LocalDate.now()))
+				.and(qpost.deadLine.loe(java.time.LocalDate.now().plusDays(2)));
+
+		if(cursor != null) {
+			where.and(qpost.id.lt(cursor));
+		}
+
+		final List<Post> postList = queryFactory.selectFrom(qpost)
+				.where(where)
+				.orderBy(qpost.createdAt.desc())
+				.limit(size + 1)
+				.fetch();
+
+		final boolean hasNext = postList.size() > size;
+		final List<Post> qPostList = hasNext
+				? postList.subList(0, size) : postList;
+
+		final List<PostResponse> responseList = qPostList.stream()
+				.map(post -> PostResponse.from(
+						post,
+						postLikesRepository.countByPostId(post.getId()),
+						username != null && postLikesRepository.existsByUserIdAndPostId(user.get().getId(), post.getId())
+				))
+				.toList();
+
+		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
+
+		return CursorPageResponse.of(responseList, nextCursor, hasNext);
 	}
 }
