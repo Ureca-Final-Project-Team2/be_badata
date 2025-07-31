@@ -25,8 +25,8 @@ public class SosController {
 	private final SimpMessagingTemplate template;
 
 	@MessageMapping("/request")
-	public void requestSos(@AuthenticationPrincipal User user) {
-		sosService.requestSos(user.getUsername());
+	public void requestSos() {
+		// sosService.requestSos(user.getUsername());
 
 		template.convertAndSend(
 			"/topic/request",
