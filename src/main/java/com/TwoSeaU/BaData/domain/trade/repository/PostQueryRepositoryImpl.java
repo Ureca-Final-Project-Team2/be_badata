@@ -126,12 +126,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 		BooleanBuilder where = new BooleanBuilder();
 
 		where.and(qpost.isDeleted.isFalse());
-		if(isSold){
-			where.and(qpost.isSold.isTrue());
-		}
-		else {
-			where.and(qpost.isSold.isFalse());
-		}
+		where.and(qpost.isSold.eq(isSold));
 		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
 		where.and(qpost.seller.id.eq(userId));
 
