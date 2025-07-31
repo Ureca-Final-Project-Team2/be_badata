@@ -53,7 +53,7 @@
 ---
 
 
-## 📑 API 명세서 🔗[Notion에서 열기](https://www.notion.so/API-225672106a2081389214daa0b7ed286d?source=copy_link)
+## 📑 API 명세서 🔗[Swagger에서 열기](http://api.badata.store/swagger-ui/index.html#/)
 
 
 <details>
