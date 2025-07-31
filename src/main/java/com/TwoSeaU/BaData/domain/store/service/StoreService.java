@@ -107,39 +107,39 @@ public class StoreService {
         }
 
         if(zoomLevel == 6){
-            return 100;
+            return 300;
         }
 
         if(zoomLevel == 7){
-            return 500;
+            return 800;
         }
 
         if(zoomLevel == 8){
-            return 1000;
-        }
-
-        if(zoomLevel == 9){
             return 1500;
         }
 
-        if(zoomLevel == 10){
-            return 2000;
-        }
-
-        if(zoomLevel == 11){
-            return 3000;
-        }
-
-        if(zoomLevel == 12){
+        if(zoomLevel == 9){
             return 4000;
         }
 
+        if(zoomLevel == 10){
+            return 5000;
+        }
+
+        if(zoomLevel == 11){
+            return 6500;
+        }
+
+        if(zoomLevel == 12){
+            return 8000;
+        }
+
         if(zoomLevel == 13){
-            return 7000;
+            return 10000;
         }
 
         if(zoomLevel == 14){
-            return 10000;
+            return 13000;
         }
 
         return 1000;
