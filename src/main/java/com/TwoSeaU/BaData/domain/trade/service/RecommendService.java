@@ -2,8 +2,11 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
+import com.TwoSeaU.BaData.domain.trade.dto.response.SaveRecommendLikesResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
+import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
+import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
@@ -33,6 +36,27 @@ public class RecommendService {
     final PostLikesRepository postLikesRepository;
     final GifticonRepository gifticonRepository;
     final MockService mockService;
+
+    public SaveRecommendLikesResponse likeRecommendation(String username, Long postId) {
+        if (username == null) {
+            return SaveRecommendLikesResponse.of(false);
+        }
+
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        final Gifticon post = gifticonRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        PostLikes postLikes = PostLikes.of(post, user);
+
+        if (postLikesRepository.existsByUserIdAndPostId(user.getId(), postId)){
+            return SaveRecommendLikesResponse.of(false);
+        }
+
+        postLikesRepository.save(postLikes);
+        return SaveRecommendLikesResponse.of(true);
+    }
 
     //인기순, 추천순 분기
     public PostsResponse recommendPosts(String username) {
