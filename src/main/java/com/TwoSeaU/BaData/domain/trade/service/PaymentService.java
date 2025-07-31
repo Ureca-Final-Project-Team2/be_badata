@@ -142,12 +142,14 @@ public class PaymentService {
 
         user.updateUsedCoin(payment.getUseCoin().intValue());
 
-        coinHistoryRepository.save(CoinHistory.of(
-            user,
-            post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
-            payment.getUseCoin().intValue(),
-            user.getCoin()
-        ));
+        if (payment.getUseCoin().intValue() > 0){
+            coinHistoryRepository.save(CoinHistory.of(
+                    user,
+                    post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
+                    payment.getUseCoin().intValue(),
+                    user.getCoin()
+            ));
+        }
 
         post.updateIsSold(true);
 
