@@ -30,8 +30,8 @@ public class RestockNotificationService {
     private final FCMService fcmService;
     private final FcmTokenRepository fcmTokenRepository;
 
-    private static final String restockTitle = "재입고 알림";
-    private static final String restockContent = "재입고 알림이 도착하였습니다.";
+    private static final String restockTitle = "찜한 와이파이 왔어요!";
+    private static final String restockContent = " 지금 아니면 또 놓칠지도 몰라요, 파도처럼 \uD83C\uDF0A";
 
 
     public void sendRestockNotification(final Reservation reservation, final List<DeviceReservation> deviceReservations){
