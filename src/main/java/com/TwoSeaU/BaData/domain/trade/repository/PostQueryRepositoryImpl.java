@@ -127,7 +127,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 		where.and(qpost.isDeleted.isFalse());
 		where.and(qpost.isSold.eq(isSold));
-		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+		if(!isSold) {
+			where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+		}
 		where.and(qpost.seller.id.eq(userId));
 
 		if(cursor != null) {
