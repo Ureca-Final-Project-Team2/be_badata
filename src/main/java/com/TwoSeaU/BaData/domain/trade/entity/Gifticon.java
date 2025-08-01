@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -16,8 +17,10 @@ import java.time.LocalDate;
 @Table(name = "gifticon")
 public class Gifticon extends Post{
 
+    @Column(nullable = false)
     private String couponNumber;
 
+    @Column(nullable = false)
     private String partner;
 
     private double[] vector;
@@ -25,6 +28,8 @@ public class Gifticon extends Post{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private GifticonCategory category;
+
+    private LocalDateTime barcodeViewTime;
 
     public Gifticon(final User user, final String title, final String comment, final BigDecimal price,
                     final LocalDate deadLine, final String postImage, final Boolean isSold,
@@ -39,5 +44,9 @@ public class Gifticon extends Post{
 
     public void updateVector(double[] vector) {
         this.vector = vector;
+    }
+
+    public void updateBarcodeViewTime(LocalDateTime barcodeViewTime) {
+        this.barcodeViewTime = barcodeViewTime;
     }
 }

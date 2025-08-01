@@ -2,12 +2,10 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.GetPurchaseGifticonDetailResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.GetPurchaseGifticonImageResponse;
-import com.TwoSeaU.BaData.domain.trade.entity.BarcodeViewTime;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
-import com.TwoSeaU.BaData.domain.trade.repository.BarcodeViewTimeRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.user.entity.User;
@@ -18,13 +16,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class PurchaseService {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
     private final GifticonRepository gifticonRepository;
-    private final BarcodeViewTimeRepository barcodeViewTimeRepository;
 
     public GetPurchaseGifticonDetailResponse getGifticonDetail(final Long gifticonId, final String username) {
         final User user = userRepository.findByUsername(username)
@@ -47,11 +46,11 @@ public class PurchaseService {
         final Gifticon gifticon = gifticonRepository.findById(gifticonId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        final Payment payment = paymentRepository.findByUserIdAndPostIdAndPaymentStatus(user.getId(), gifticonId, PaymentStatus.PAID)
+        paymentRepository.findByUserIdAndPostIdAndPaymentStatus(user.getId(), gifticonId, PaymentStatus.PAID)
                 .orElseThrow(() -> new GeneralException(TradeException.NOT_PURCHASED_GIFTICON));
 
-        if(barcodeViewTimeRepository.findByPaymentId(payment.getId()).isEmpty()) {
-            barcodeViewTimeRepository.save(BarcodeViewTime.of(payment));
+        if(gifticon.getBarcodeViewTime() == null) {
+            gifticon.updateBarcodeViewTime(LocalDateTime.now());
         }
 
         return GetPurchaseGifticonImageResponse.of(gifticon.getPostImage(), gifticon.getCouponNumber());
