@@ -34,9 +34,8 @@ public class TrendingPostService {
         final User loginUser = username == null ? null : userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final String key = REDIS_KEY;
         final Set<Object> members = redisTemplate.opsForZSet()
-                .reverseRange(key, 0, POSTS_LIMIT + 5);
+                .reverseRange(REDIS_KEY, 0, -1);
 
         final List<Long> postIdList = members.stream()
                 .map(member -> Long.parseLong(member.toString().replace("post:", "")))
@@ -63,7 +62,6 @@ public class TrendingPostService {
 
         return resultPosts
                 .stream()
-                .filter(p -> !p.getIsSold() && !p.getIsDeleted())
                 .map(post ->
                         PostResponse.from(
                                 post,

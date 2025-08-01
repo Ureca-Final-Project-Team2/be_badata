@@ -22,7 +22,7 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -178,6 +178,7 @@ public class PostService {
                     if (!cookie.getValue().contains(getCookieValue(postId))) {
                         cookie.setValue(cookie.getValue() + getCookieValue(postId));
                         cookie.setPath("/");
+                        cookie.setHttpOnly(true);
                         response.addCookie(cookie);
 
                         trendingPostService.recordView(postId);
@@ -190,6 +191,7 @@ public class PostService {
 
         final Cookie newCookie = new Cookie(COOKIE_NAME, getCookieValue(postId));
         newCookie.setPath("/");
+        newCookie.setHttpOnly(true);
         response.addCookie(newCookie);
 
         trendingPostService.recordView(postId);
