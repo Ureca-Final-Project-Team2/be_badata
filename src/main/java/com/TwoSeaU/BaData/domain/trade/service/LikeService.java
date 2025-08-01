@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LikeService {
+    private final TrendingPostService trendingPostService;
     private final PostLikesRepository postLikesRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -38,6 +39,9 @@ public class LikeService {
         }
 
         final PostLikes p = postLikesRepository.save(PostLikes.of(post, user));
+
+        trendingPostService.recordLike(postId);
+
         return SavePostLikesResponse.of(p.getId());
     }
 

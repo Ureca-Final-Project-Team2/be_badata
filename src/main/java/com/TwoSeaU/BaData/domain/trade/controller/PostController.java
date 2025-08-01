@@ -8,6 +8,8 @@ import com.TwoSeaU.BaData.domain.trade.dto.response.*;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -52,8 +54,8 @@ public class PostController {
     }
 
     @GetMapping("{postId}/post")
-    public ResponseEntity<ApiResponse<GetPostDetailResponse>> getPostDetail(@PathVariable Long postId, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(ApiResponse.success(postService.getPost(postId, user == null ? null : user.getUsername())));
+    public ResponseEntity<ApiResponse<GetPostDetailResponse>> getPostDetail(@PathVariable Long postId, @AuthenticationPrincipal User user, HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok().body(ApiResponse.success(postService.getPost(postId, user == null ? null : user.getUsername(), request, response)));
     }
 
     @PostMapping(path = "/posts/gifticon", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

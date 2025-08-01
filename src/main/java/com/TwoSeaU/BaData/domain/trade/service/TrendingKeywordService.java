@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TrendingService {
+public class TrendingKeywordService {
     private final ElasticsearchOperations elasticsearchOperations;
     private static final String INDEX_NAME = "keyword-index-v2";
     private static final int DEFAULT_TOP_COUNT = 10;

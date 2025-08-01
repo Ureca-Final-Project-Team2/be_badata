@@ -12,11 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepository {
-    List<Post> findByIsSoldAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final boolean isDeleted);
-    List<Post> findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final Long sellerId, final boolean isDeleted);
-    List<Post> findByDeadLineBetweenAndIsDeleted(LocalDate start, LocalDate end, boolean isDeleted);
-    List<Post> findByIsDeletedAndTitleContaining(final boolean isDeleted, final String query);
     int countBySellerId(final Long sellerId);
+    List<Post> findTop5ByIsSoldAndIsDeletedOrderByCreatedAtDesc(final boolean isSold, final boolean isDeleted);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Post p WHERE p.id = :postId")
