@@ -169,7 +169,7 @@ public class PostService {
         return "[" + postId + "]";
     }
 
-    private void SetCookieAndRecordView(final Long postId, final HttpServletRequest request, final HttpServletResponse response){
+    private void setCookieAndRecordView(final Long postId, final HttpServletRequest request, final HttpServletResponse response){
         final Cookie[] cookies = request.getCookies();
 
         if(cookies != null){
@@ -214,7 +214,7 @@ public class PostService {
             }
         }
 
-        SetCookieAndRecordView(postId, request, response);
+        setCookieAndRecordView(postId, request, response);
 
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
