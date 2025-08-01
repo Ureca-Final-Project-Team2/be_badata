@@ -19,7 +19,7 @@ public class ReservationScheduler {
 
     private final ReservationRepository reservationRepository;
 
-    @Scheduled(cron = "0 50 19 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 1 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void updateReservationStatusForToday() {
 
