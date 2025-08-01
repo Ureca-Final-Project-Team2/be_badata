@@ -118,21 +118,18 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 	@Override
 	public CursorPageResponse<PostResponse> searchPostsByUserAndIsSold(final Long userId, final boolean isSold, final String username, final Long cursor, final int size) {
-		QPost qpost = QPost.post;
-		Optional<User> loginUser = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
+		final QPost qpost = QPost.post;
+		final Optional<User> loginUser = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
 				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)));
 		userRepository.findById(userId)
 				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-		BooleanBuilder where = new BooleanBuilder();
+		final BooleanBuilder where = new BooleanBuilder();
 
 		where.and(qpost.isDeleted.isFalse());
-		if(isSold){
-			where.and(qpost.isSold.isTrue());
+		where.and(qpost.isSold.eq(isSold));
+		if(!isSold) {
+			where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
 		}
-		else {
-			where.and(qpost.isSold.isFalse());
-		}
-		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
 		where.and(qpost.seller.id.eq(userId));
 
 		if(cursor != null) {
@@ -164,10 +161,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
 	@Override
 	public CursorPageResponse<PostResponse> searchPostsByDeadLine(final String username, final Long cursor, final int size) {
-		QPost qpost = QPost.post;
-		Optional<User> user = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
+		final QPost qpost = QPost.post;
+		final Optional<User> user = username == null ? Optional.empty() : Optional.ofNullable(userRepository.findByUsername(username)
 				.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)));
-		BooleanBuilder where = new BooleanBuilder();
+		final BooleanBuilder where = new BooleanBuilder();
 
 		where.and(qpost.isDeleted.isFalse());
 		where.and(qpost.isSold.isFalse());
@@ -199,5 +196,21 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 		final Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
 
 		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public List<Post> getRecentPostsBySize(final int size) {
+		final QPost qpost = QPost.post;
+		final BooleanBuilder where = new BooleanBuilder();
+
+		where.and(qpost.isDeleted.isFalse());
+		where.and(qpost.isSold.isFalse());
+		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+
+		return queryFactory.selectFrom(qpost)
+				.where(where)
+				.orderBy(qpost.createdAt.desc())
+				.limit(size)
+				.fetch();
 	}
 }

@@ -22,17 +22,21 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class PostService {
+    private final TrendingPostService trendingPostService;
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
     private final DataRepository dataRepository;
@@ -45,6 +49,8 @@ public class PostService {
     private final PostVectorizer postVectorizer;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
+
+    private static final String COOKIE_NAME = "View_Post";
 
     public GetImageUploadResponse analyzeImage(final MultipartFile file){
         ELAResult elaResult = elaService.analyzeImage(file);
@@ -159,7 +165,39 @@ public class PostService {
                 .build();
     }
 
-    public GetPostDetailResponse getPost(final Long postId, final String username) {
+    private String getCookieValue(final Long postId) {
+        return "[" + postId + "]";
+    }
+
+    private void setCookieAndRecordView(final Long postId, final HttpServletRequest request, final HttpServletResponse response){
+        final Cookie[] cookies = request.getCookies();
+
+        if(cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_NAME)) {
+                    if (!cookie.getValue().contains(getCookieValue(postId))) {
+                        cookie.setValue(cookie.getValue() + getCookieValue(postId));
+                        cookie.setPath("/");
+                        cookie.setHttpOnly(true);
+                        response.addCookie(cookie);
+
+                        trendingPostService.recordView(postId);
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        final Cookie newCookie = new Cookie(COOKIE_NAME, getCookieValue(postId));
+        newCookie.setPath("/");
+        newCookie.setHttpOnly(true);
+        response.addCookie(newCookie);
+
+        trendingPostService.recordView(postId);
+    }
+
+    public GetPostDetailResponse getPost(final Long postId, final String username, final HttpServletRequest request, final HttpServletResponse response) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
@@ -175,6 +213,8 @@ public class PostService {
                 throw new GeneralException(TradeException.POST_ACCESS_DENIED);
             }
         }
+
+        setCookieAndRecordView(postId, request, response);
 
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
