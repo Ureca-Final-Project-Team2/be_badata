@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface PostQueryRepository {
 
-	CursorPageResponse<GetSaleResponse> getAllSalesByCursor(PostCategory postCategory, Boolean isSold, Long cursor, int size, Long userId);
-    CursorPageResponse<PostResponse> searchPostsByKeyword(String keyword, String username, Long cursor, int size);
-    CursorPageResponse<PostResponse> searchPostsByUserAndIsSold(Long userId, boolean isSold, String username, Long cursor, int size);
+	CursorPageResponse<GetSaleResponse> getAllSalesByCursor(final PostCategory postCategory, final Boolean isSold, final Long cursor, final int size, final Long userId);
+    CursorPageResponse<PostResponse> searchPostsByKeyword(final String keyword, final String username, final Long cursor, final int size);
+    CursorPageResponse<PostResponse> searchPostsByUserAndIsSold(final Long userId, final boolean isSold, final String username, final Long cursor, final int size);
 
-    CursorPageResponse<PostResponse> searchPostsByDeadLine(String username, Long cursor, int size);
+    CursorPageResponse<PostResponse> searchPostsByDeadLine(final String username, final Long cursor, final int size);
 
-    List<Post> getRecentPostsBySize(int size);
+    List<Post> getRecentPostsBySize(final int size);
 }

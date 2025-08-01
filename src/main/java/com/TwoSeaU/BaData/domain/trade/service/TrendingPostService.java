@@ -44,7 +44,7 @@ public class TrendingPostService {
         final List<Post> resultPosts = new LinkedList<>();
 
         for (Long postId : postIdList) {
-            Post post = postsRepository.findById(postId)
+            final Post post = postsRepository.findById(postId)
                     .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
             if (!post.getIsDeleted() && !post.getIsSold()) {
