@@ -81,6 +81,10 @@ public class Reservation extends BaseEntity {
         this.price = price;
     }
 
+    public void updateStatus(final ReservationStatus reservationStatus){
+        this.status = reservationStatus;
+    }
+
 
 
 }
