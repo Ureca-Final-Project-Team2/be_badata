@@ -172,7 +172,7 @@ public class RentalService {
         final LocalDateTime rentalEndDateTime = reserveRentalRequest.getRentalEndDate();
 
         if (rentalStartDateTime == null || rentalEndDateTime == null) {
-            throw new GeneralException(RentalException.CANT_RESERVATION_ON_RENTAL_NULL);
+            throw new GeneralException(RentalException.CANT_RESERVATION_ON_DATE_NULL);
         }
 
         if (rentalStartDateTime.toLocalDate().isEqual(now.toLocalDate()) ||
