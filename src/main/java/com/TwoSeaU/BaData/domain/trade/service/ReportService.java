@@ -18,6 +18,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,7 @@ public class ReportService {
         return SaveReportResponse.of(savedReport.getId());
     }
 
+    @Transactional
     public SaveReportResponse createPurchaseReport(final Long postId, final SavePurchaseReportRequest savePurchaseReportRequest, final String username) {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
