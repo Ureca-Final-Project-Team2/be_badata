@@ -24,6 +24,7 @@ import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import  com.siot.IamportRestClient.request.PrepareData;
 
@@ -33,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -108,6 +110,7 @@ public class PaymentService {
             iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true));
         }
         catch (IamportResponseException | IOException e){
+            log.error("impUid {}에 대한 결제 환불에 실패했습니다. :", impUid, e);
             throw new GeneralException(TradeException.PAYMENT_FAILED);
         }
     }

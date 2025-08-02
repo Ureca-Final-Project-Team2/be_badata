@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReportRepository extends JpaRepository<Report, Long>, ReportQueryRepository {
 
 	boolean existsByUserIdAndPostId(final Long userId, final Long postId);
-	boolean existsByUserIdAndPostIdAndReportType(final Long userId, final Long postId, final ReportType reportType);
+	boolean existsByUserIdAndPostIdAndReportTypeCode(final Long userId, final Long postId, final ReportType reportType);
 	Long countByUserIdAndReportStatus(final Long userId, final ReportStatus status);
 }

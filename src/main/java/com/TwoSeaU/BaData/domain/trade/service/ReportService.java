@@ -82,7 +82,7 @@ public class ReportService {
         paymentRepository.findByUserIdAndPostIdAndPaymentStatus(user.getId(), post.getId(), PaymentStatus.PAID)
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
 
-        if (reportRepository.existsByUserIdAndPostIdAndReportType(user.getId(), post.getId(), ReportType.AFTER_TRADE)) {
+        if (reportRepository.existsByUserIdAndPostIdAndReportTypeCode(user.getId(), post.getId(), ReportType.AFTER_TRADE)) {
             throw new GeneralException(TradeException.REPORT_ALREADY_SUBMITTED);
         }
 
