@@ -64,3 +64,8 @@ management:
   endpoint:
     prometheus:
       enabled: true
+
+mail:
+  google:
+    id: ${GOOGLE_MAIL}
+    password: ${GOOGLE_MAIL_PASSWORD}
