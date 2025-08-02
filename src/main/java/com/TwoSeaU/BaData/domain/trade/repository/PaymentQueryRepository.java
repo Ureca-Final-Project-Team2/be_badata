@@ -9,5 +9,5 @@ public interface PaymentQueryRepository {
 
 	CursorPageResponse<GetPurchaseResponse> getAllPurchasesByCursor(final Long cursor, final int size, final Long userId);
 
-    List<Long> findBoughtPostIdByUserId(Long userId);
+    List<Long> findBoughtPostIdByUserId(final Long userId);
 }
