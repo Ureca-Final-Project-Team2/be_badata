@@ -143,8 +143,8 @@ class RentalServiceTest {
     class Describe_reserveRental {
         private final Long storeId = 1L;
         private final String username = "kakao1234";
-        private final LocalDateTime start = LocalDateTime.of(2025, 7, 10, 10, 0);
-        private final LocalDateTime end = LocalDateTime.of(2025, 7, 12, 10, 0);
+        private final LocalDateTime start = LocalDateTime.of(2026, 7, 10, 10, 0);
+        private final LocalDateTime end = LocalDateTime.of(2026, 7, 12, 10, 0);
 
         private final User user = User.of(username, "id", "pw", 10, 10, Role.GENERAL, SocialType.KAKAO, "email", "img", null);
         private final Store store = Store.of("가맹점", null, "02", "주소", 10, "img", LocalTime.of(9, 0), LocalTime.of(21, 0));
