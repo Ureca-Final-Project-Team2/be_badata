@@ -81,7 +81,7 @@ public class RecommendService {
     private PostsResponse recommendContentBasedFiltering (User user) {
         double[] userVector = userProfileVectorizer.vectorizeUserProfile(user);
 
-        List<Gifticon> candidatePosts = gifticonRepository.findByIsSoldAndDeadLineGreaterThanEqual(false, LocalDate.now());
+        List<Gifticon> candidatePosts = gifticonRepository.findByIsSoldAndIsDeletedAndDeadLineGreaterThanEqual(false, false, LocalDate.now());
 
         List<RecommendationResult> results = candidatePosts.parallelStream()
                 .map(post -> {

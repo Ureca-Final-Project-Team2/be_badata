@@ -8,5 +8,5 @@ import java.util.List;
 public interface PostLikesQueryRepository {
 	CursorPageResponse<GetLikesPostResponse> getAllLikesPostsByCursor(final Long cursor, final int size, final Long userId);
 
-	List<Long> findDistinctPostIdsByUserId(Long userId);
+	List<Long> findDistinctPostIdsByUserId(final Long userId);
 }

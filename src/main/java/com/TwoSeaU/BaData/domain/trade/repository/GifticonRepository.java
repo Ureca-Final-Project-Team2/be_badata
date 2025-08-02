@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface GifticonRepository extends JpaRepository<Gifticon,Long> {
 
-    List<Gifticon> findByIsSoldAndDeadLineGreaterThanEqual(final boolean isSold, final LocalDate time);
+    List<Gifticon> findByIsSoldAndIsDeletedAndDeadLineGreaterThanEqual(final boolean isSold, final boolean isDeleted, final LocalDate time);
     Boolean existsByCouponNumber(final String couponNumber);
 }

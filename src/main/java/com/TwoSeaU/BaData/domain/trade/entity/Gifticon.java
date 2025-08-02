@@ -42,11 +42,11 @@ public class Gifticon extends Post{
         this.vector = vector;
     }
 
-    public void updateVector(double[] vector) {
+    public void updateVector(final double[] vector) {
         this.vector = vector;
     }
 
-    public void updateBarcodeViewTime(LocalDateTime barcodeViewTime) {
+    public void updateBarcodeViewTime(final LocalDateTime barcodeViewTime) {
         this.barcodeViewTime = barcodeViewTime;
     }
 }
