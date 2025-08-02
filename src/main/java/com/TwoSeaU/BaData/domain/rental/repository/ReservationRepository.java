@@ -20,7 +20,7 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long>, 
           WHERE r.rentalEndDate < :now
           AND r.status !=:reservationStatus
           """)
-    List<Reservation> findNotExpiredReservations(@Param("now") final LocalDateTime now,
+    List<Reservation> findExpiredReservationsAndNotComplete(@Param("now") final LocalDateTime now,
                                               @Param("reservationStatus") final ReservationStatus reservationStatus);
 
     @Query("""
@@ -28,7 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long>, 
           WHERE r.rentalEndDate >= :now AND r.rentalStartDate <= :now
           AND r.status =:reservationStatus
           """)
-    List<Reservation> findBurrowingRental(@Param("now") final LocalDateTime now,
+    List<Reservation> findBurrowingRentalAndPending(@Param("now") final LocalDateTime now,
                                           @Param("reservationStatus") final ReservationStatus reservationStatus);
 
 }

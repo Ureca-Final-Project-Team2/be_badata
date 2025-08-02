@@ -185,7 +185,7 @@ public class RentalService {
 
     }
 
-    private void validateReserveCountCondition(ReserveRentalRequest reserveRentalRequest) {
+    private void validateReserveCountCondition(final ReserveRentalRequest reserveRentalRequest) {
         
         reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
 

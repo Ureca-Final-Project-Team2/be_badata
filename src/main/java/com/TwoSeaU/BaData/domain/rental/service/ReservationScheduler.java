@@ -25,15 +25,15 @@ public class ReservationScheduler {
 
         final LocalDateTime now = LocalDateTime.now();
 
-        final List<Reservation> burrowingReservation = reservationRepository.findBurrowingRental(now, ReservationStatus.PENDING);
+        final List<Reservation> burrowingReservation = reservationRepository.findBurrowingRentalAndPending(now, ReservationStatus.PENDING);
 
-        for(final Reservation reservation : burrowingReservation){
+        for (final Reservation reservation : burrowingReservation){
             reservation.updateStatus(ReservationStatus.BURROWING);
         }
 
-        final List<Reservation> todayEndingRentalDate = reservationRepository.findNotExpiredReservations(now, ReservationStatus.COMPLETE);
+        final List<Reservation> todayEndingRentalDate = reservationRepository.findExpiredReservationsAndNotComplete(now, ReservationStatus.COMPLETE);
 
-        for(final Reservation reservation : todayEndingRentalDate){
+        for (final Reservation reservation : todayEndingRentalDate){
             reservation.updateStatus(ReservationStatus.COMPLETE);
         }
 

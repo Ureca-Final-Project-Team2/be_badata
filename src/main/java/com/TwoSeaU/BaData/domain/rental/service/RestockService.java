@@ -1,6 +1,5 @@
 package com.TwoSeaU.BaData.domain.rental.service;
 
-import com.TwoSeaU.BaData.domain.rental.dto.request.ReserveRentalRequest;
 import com.TwoSeaU.BaData.domain.rental.dto.request.RestockDeviceRequest;
 import com.TwoSeaU.BaData.domain.rental.entity.ReStock;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
@@ -65,6 +64,8 @@ public class RestockService {
 
     // 해당 기간에 예약 가능하다면 예외 처리
     private void validateRestock(final RestockDeviceRequest restockDeviceRequest, final StoreDevice storeDevice){
+
+        validateRestockDate(restockDeviceRequest);
 
         // 재입고 알림 요청 댓수가 가맹점이 소유한 기기보다 더 많다면
         if(storeDevice.getCount()<restockDeviceRequest.getCount()){
