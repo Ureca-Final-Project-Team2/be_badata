@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class RecommendService {
     final static String REDIS_KEY = "rec:user:";
     final static int RECOMMEND_LIMIT = 10;
+    final static int TTL_LIMIT = 30;
 
     private final UserProfileVectorizer userProfileVectorizer;
     private final VectorUtils vectorUtils;
@@ -104,7 +105,7 @@ public class RecommendService {
 
             if (Boolean.FALSE.equals(redisTemplate.opsForSet().isMember(key, postId.toString()))) {
                 redisTemplate.opsForSet().add(key, postId.toString());
-                redisTemplate.expire(key, Duration.ofMinutes(30));
+                redisTemplate.expire(key, Duration.ofMinutes(TTL_LIMIT));
             }
         }
     }
@@ -128,8 +129,7 @@ public class RecommendService {
     }
 
     public void clearRecommendationCache(Long userId) {
-        String key = REDIS_KEY + userId;
-        redisTemplate.delete(key);
+        redisTemplate.delete(getKey(userId));
     }
 
     @Data

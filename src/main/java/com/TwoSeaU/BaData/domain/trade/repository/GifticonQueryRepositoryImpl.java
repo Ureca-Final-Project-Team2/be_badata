@@ -21,7 +21,9 @@ public class GifticonQueryRepositoryImpl implements GifticonQueryRepository {
         where.and(qgifticon.isSold.isFalse());
         where.and(qgifticon.deadLine.goe(java.time.LocalDate.now()));
         where.and(qgifticon.seller.username.ne(username));
-        where.and(qgifticon.id.notIn(ignoredIds));
+        if (ignoredIds != null && !ignoredIds.isEmpty()) {
+            where.and(qgifticon.id.notIn(ignoredIds));
+        }
 
         return queryFactory.selectFrom(qgifticon)
                 .where(where)
