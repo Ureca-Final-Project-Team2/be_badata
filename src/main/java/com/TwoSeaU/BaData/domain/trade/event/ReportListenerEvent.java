@@ -17,13 +17,13 @@ public class ReportListenerEvent {
     private final FCMService fcmService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void creatReportEmailEventListener(final ReportEmailEvent reportEmailEvent){
+    public void createReportEmailEventListener(final ReportEmailEvent reportEmailEvent){
 
         mailService.sendMail(reportEmailEvent.getTargetEmail(), reportEmailEvent.getTitle(), reportEmailEvent.getContents());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void creatReportFcmEventListener(final ReportFcmEvent reportFcmEvent){
+    public void createReportFcmEventListener(final ReportFcmEvent reportFcmEvent){
 
         fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(reportFcmEvent.getTitle(),
                                                                         reportFcmEvent.getContents(),
