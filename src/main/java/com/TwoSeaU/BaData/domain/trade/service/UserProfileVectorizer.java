@@ -33,21 +33,27 @@ public class UserProfileVectorizer {
 
     //유저 행동 기반 벡터값 생성
     public double[] vectorizeUserProfile(User user) {
-        UserProfile userProfile = createUserProfile(user);
+        final UserProfile userProfile = createUserProfile(user);
 
         // 1. 카테고리 선호도 벡터
-        double[] categoryPreferences = createPreferenceVector(
+        final double[] categoryPreferences = createPreferenceVector(
                 userProfile.getCategoryPreferences(),
                 PostVectorizer.categoryToIndex
         );
 
-        // 2. 수치형 선호도 (가격, 마감 임박일수 등)
-        double[] numericalPreferences = {
+        // 2. 제휴사 선호도 벡터
+        final double[] partnerPreferences = createPreferenceVector(
+                userProfile.getCategoryPreferences(),
+                PostVectorizer.partnerToIndex
+        );
+
+        // 3. 수치형 선호도 (가격, 마감 임박일수 등)
+        final double[] numericalPreferences = {
                 vectorUtils.normalizePrice((int) userProfile.getPreparePrice()),
                 vectorUtils.normalizeDaysToExpiry((int) userProfile.acceptableDaysToExpiry)
         };
 
-        return vectorUtils.concatenate(categoryPreferences, numericalPreferences);
+        return vectorUtils.concatenate(categoryPreferences, partnerPreferences, numericalPreferences);
     }
 
     private List<Gifticon> getPostsByIds(List<Long> postIds) {
@@ -59,7 +65,8 @@ public class UserProfileVectorizer {
 
 
     public UserProfile createUserProfile (User user) {
-        Map<String, Double> userProfileCategoryPreferences = new HashMap<>();
+        final Map<String, Double> userProfileCategoryPreferences = new HashMap<>();
+        final Map<String, Double> userProfilePartnerPreferences = new HashMap<>();
 
         double tempPreparePrice = 0;
         double tempMaxAcceptableDaysToExpiry = 0;
@@ -75,6 +82,10 @@ public class UserProfileVectorizer {
             GifticonCategory category = post.getCategory();
             userProfileCategoryPreferences.put(category.getCategoryName(),
                     userProfileCategoryPreferences.getOrDefault(category.getCategoryName(), 0.0) + PURCHASE_POST_WEIGHT);
+
+            String partner = post.getPartner();
+            userProfilePartnerPreferences.put(partner,
+                    userProfilePartnerPreferences.getOrDefault(partner, 0.0) + PURCHASE_POST_WEIGHT);
         }
 
         //찜
@@ -88,14 +99,24 @@ public class UserProfileVectorizer {
             GifticonCategory category = post.getCategory();
             userProfileCategoryPreferences.put(category.getCategoryName(),
                     userProfileCategoryPreferences.getOrDefault(category.getCategoryName(), 0.0) + LIKES_POST_WEIGHT);
+
+            String partner = post.getPartner();
+            userProfilePartnerPreferences.put(partner,
+                    userProfilePartnerPreferences.getOrDefault(partner, 0.0) + PURCHASE_POST_WEIGHT);
         }
 
-        double total = userProfileCategoryPreferences.values().stream()
+        //정규화
+        double totalCategory = userProfileCategoryPreferences.values().stream()
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        if (total > 0) {
-            userProfileCategoryPreferences.replaceAll((category, value) -> value / total);
+        double totalPartner = userProfilePartnerPreferences.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+        if (totalCategory > 0) {
+            userProfileCategoryPreferences.replaceAll((category, value) -> value / totalCategory);
+            userProfilePartnerPreferences.replaceAll((partner, value) -> value / totalPartner);
         }
 
         int totalPostCount = likePosts.size() + purchasePosts.size();
@@ -106,6 +127,7 @@ public class UserProfileVectorizer {
 
         return new UserProfile(
                 userProfileCategoryPreferences,
+                userProfilePartnerPreferences,
                 tempPreparePrice / totalPostCount,
                 tempMaxAcceptableDaysToExpiry / totalPostCount
         );
@@ -129,6 +151,7 @@ public class UserProfileVectorizer {
     @AllArgsConstructor
     public static class UserProfile {
         private Map<String, Double> categoryPreferences;
+        private Map<String, Double> partnerPreferences;
         private double preparePrice;
         private double acceptableDaysToExpiry;
     }

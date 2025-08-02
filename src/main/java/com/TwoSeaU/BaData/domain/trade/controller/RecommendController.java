@@ -27,4 +27,9 @@ public class RecommendController {
     public ResponseEntity<ApiResponse<SaveRecommendLikesResponse>> likeRecommendation(@AuthenticationPrincipal User user, @PathVariable Long postId) {
         return ResponseEntity.ok().body(ApiResponse.success(likeService.likesAtRecommendation(user == null ? null : user.getUsername(), postId)));
     }
+
+    @PatchMapping("/vector/update")
+    public ResponseEntity<ApiResponse<Integer>> updatePostVector() {
+        return ResponseEntity.ok().body(ApiResponse.success(recommendService.updatePostVector()));
+    }
 }

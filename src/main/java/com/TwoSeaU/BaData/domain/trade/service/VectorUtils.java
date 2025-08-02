@@ -9,9 +9,11 @@ import java.util.Arrays;
 @Component
 public class VectorUtils {
     private static final int CATEGORY_COUNT = 8;
+    private static final int PARTNER_COUNT = 49;
 
     // 가중치
-    private static final double CATEGORY_WEIGHT = 1.6;
+    private static final double CATEGORY_WEIGHT = 1.3;
+    private static final double PARTNER_WEIGHT = 0.3;
     private static final double PRICE_WEIGHT = 0.9;
     private static final double DAYS_TO_EXPIRY_WEIGHT = 0.5;
 
@@ -38,6 +40,24 @@ public class VectorUtils {
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
+    public double calculatePartnerSimilarity (double[] user, double[] post) {
+        double dotProduct = 0.0;
+        double normA = 0.0;
+        double normB = 0.0;
+
+        for (int i = CATEGORY_COUNT; i < CATEGORY_COUNT + PARTNER_COUNT; i++) {
+            dotProduct += user[i] * post[i];
+            normA += Math.pow(user[i], 2);
+            normB += Math.pow(post[i], 2);
+        }
+
+        if (normA == 0.0 || normB == 0.0) {
+            return 0.0;
+        }
+
+        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+    }
+
     public double calculateWeightedSimilarity(double[] vectorA, double[] vectorB) {
         if (vectorA.length != vectorB.length) {
             throw new GeneralException(TradeException.RECOMMENDATION_FAILED);
@@ -47,6 +67,9 @@ public class VectorUtils {
 
         // 카테고리
         dotProduct += calculateCategorySimilarity(vectorA, vectorB) * CATEGORY_WEIGHT;
+
+        // 제휴사
+        dotProduct += calculatePartnerSimilarity(vectorA, vectorB) * PARTNER_WEIGHT;
 
         // 가격 유사도 계산
         dotProduct += calculateNumberProximity(vectorA[CATEGORY_COUNT], vectorB[CATEGORY_COUNT]) * PRICE_WEIGHT;
