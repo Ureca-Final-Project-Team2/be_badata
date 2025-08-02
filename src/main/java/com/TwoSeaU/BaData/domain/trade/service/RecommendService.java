@@ -14,6 +14,7 @@ import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendService {
@@ -112,16 +114,24 @@ public class RecommendService {
 
     public Set<Long> getRecommendedPostsCache(Long userId) {
         String key = getKey(userId);
-        Set<Object> postSet = redisTemplate.opsForSet().members(key);
 
-        if (postSet == null) {
+        try {
+            Set<Object> postSet = redisTemplate.opsForSet().members(key);
+
+            if (postSet == null) {
+                return Set.of();
+            }
+
+            return postSet.stream()
+                    .map(Object::toString)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toSet());
+        }
+        catch (Exception e) {
+            log.warn("{} userId에 대해 Redis에서 가져오는 것을 실패했습니다.", userId, e);
             return Set.of();
         }
 
-        return postSet.stream()
-                .map(Object::toString)
-                .map(Long::parseLong)
-                .collect(Collectors.toSet());
     }
 
     private String getKey(Long userId) {
@@ -129,7 +139,13 @@ public class RecommendService {
     }
 
     public void clearRecommendationCache(Long userId) {
-        redisTemplate.delete(getKey(userId));
+        try{
+            redisTemplate.delete(getKey(userId));
+        }
+        catch (Exception e) {
+            log.warn("{} userId에 대해 Redis를 clear하는 것을 실패했습니다.", userId, e);
+
+        }
     }
 
     @Data
