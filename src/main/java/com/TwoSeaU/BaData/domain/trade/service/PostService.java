@@ -19,23 +19,24 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class PostService {
+    private final TrendingPostService trendingPostService;
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
     private final DataRepository dataRepository;
@@ -45,80 +46,60 @@ public class PostService {
     private final SearchHistoryRepository searchHistoryRepository;
     private final PaymentRepository paymentRepository;
     private final ELAService elaService;
+    private final PostVectorizer postVectorizer;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
 
-    public PostsResponse postsToPostResponse(final List<Post> posts, final String username) {
-        Optional<Long> optionalUserId;
+    private static final String COOKIE_NAME = "View_Post";
 
-        if(username != null) {
-            optionalUserId = userRepository.findByUsername(username).map(User::getId);
-        }
-        else {
-            optionalUserId = Optional.empty();
-        }
-
-        final List<PostResponse> allPosts = posts
-                .stream()
-                .map(post -> PostResponse.from(
-                        post,
-                        postLikesRepository.countByPostId(post.getId()),
-                        username != null && postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
-                ))
-                .toList();
-
-        return PostsResponse.builder()
-                .postsResponse(allPosts)
-                .build();
-    }
-
-    public GetImageUploadResponse E3Test(final MultipartFile file){
+    public GetImageUploadResponse analyzeImage(final MultipartFile file){
         ELAResult elaResult = elaService.analyzeImage(file);
         OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
 
         return GetImageUploadResponse.from(elaResult, ocrResult);
     }
 
-    public PostsResponse findAllPosts(final String username) {
+    public CursorPageResponse<PostResponse> getPostsByUserId(final Long userId, final boolean isSold, final String username, final Long cursor, final int size) {
 
-        return postsToPostResponse(postRepository.findByIsSoldAndIsDeletedOrderByCreatedAtDesc(false, false), username);
+        return postRepository.searchPostsByUserAndIsSold(userId, isSold, username, cursor, size);
     }
 
 
-    public UserPostsResponse getPostsByUserId(final Long userId, final String username) {
+    public CursorPageResponse<PostResponse> getPostsByDeadLine(final String username, final Long cursor, final int size) {
 
-        return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(false, userId, false), username),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdAndIsDeletedOrderByCreatedAtDesc(true, userId, false), username));
+        return postRepository.searchPostsByDeadLine(username, cursor, size);
     }
-
-
-    public PostsResponse getPostsByDeadLine(final String username) {
-
-        return postsToPostResponse(postRepository.findByDeadLineBetweenAndIsDeleted(LocalDate.now(), LocalDate.now().plusDays(2), false), username);
-
-    }
-
-
-    public PostsResponse searchPosts(final String query, final String username) {
-        log.info("event-keyword-search, {}", query);
-
-        if(username != null) {
-            final User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-            try {
-                searchHistoryRepository.save(SearchHistory.of(user, query));
-            } catch (Exception e) {
-                log.info("검색 기록 저장에 실패: {}", e.getMessage());
-            }
+    private void saveSearchHistoryIfUserExists(final String username, final String query) {
+        if (username == null) {
+            return;
         }
 
-        return postsToPostResponse(postRepository.findByIsDeletedAndTitleContaining(false, query), username);
+        try {
+            final User user = userRepository.findByUsername(username).orElseThrow(() ->
+                    new GeneralException(UserException.USER_NOT_FOUND));
+
+            searchHistoryRepository.save(SearchHistory.of(user, query));
+        } catch (Exception e) {
+            log.info("검색 기록 저장에 실패: {}", e.getMessage());
+        }
+    }
+
+    public CursorPageResponse<PostResponse> searchPosts(final String query, final String username, final Long cursor, final int size) {
+
+        if (query != null && !query.isEmpty()) {
+            log.info("event-keyword-search, {}", query);
+            saveSearchHistoryIfUserExists(username, query);
+        }
+
+        return postRepository.searchPostsByKeyword(query, username, cursor, size);
     }
 
 
     public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
+
+        if(gifticonRepository.existsByCouponNumber(saveGifticonPostRequest.getCouponNumber())) {
+            throw new GeneralException(TradeException.DUPLICATE_COUPON_NUMBER);
+        }
 
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
@@ -132,6 +113,11 @@ public class PostService {
         }
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
+        final double[] vector = postVectorizer.vectorizePost(
+                saveGifticonPostRequest.getPrice(),
+                saveGifticonPostRequest.getDeadLine(),
+                category
+        );
 
         final Gifticon gifticon = new Gifticon(
                 user,
@@ -143,7 +129,8 @@ public class PostService {
                 false,
                 saveGifticonPostRequest.getCouponNumber(),
                 saveGifticonPostRequest.getPartner(),
-                category
+                category,
+                vector
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
@@ -178,7 +165,39 @@ public class PostService {
                 .build();
     }
 
-    public GetPostDetailResponse getPost(final Long postId, final String username) {
+    private String getCookieValue(final Long postId) {
+        return "[" + postId + "]";
+    }
+
+    private void setCookieAndRecordView(final Long postId, final HttpServletRequest request, final HttpServletResponse response){
+        final Cookie[] cookies = request.getCookies();
+
+        if(cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_NAME)) {
+                    if (!cookie.getValue().contains(getCookieValue(postId))) {
+                        cookie.setValue(cookie.getValue() + getCookieValue(postId));
+                        cookie.setPath("/");
+                        cookie.setHttpOnly(true);
+                        response.addCookie(cookie);
+
+                        trendingPostService.recordView(postId);
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        final Cookie newCookie = new Cookie(COOKIE_NAME, getCookieValue(postId));
+        newCookie.setPath("/");
+        newCookie.setHttpOnly(true);
+        response.addCookie(newCookie);
+
+        trendingPostService.recordView(postId);
+    }
+
+    public GetPostDetailResponse getPost(final Long postId, final String username, final HttpServletRequest request, final HttpServletResponse response) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
@@ -194,6 +213,8 @@ public class PostService {
                 throw new GeneralException(TradeException.POST_ACCESS_DENIED);
             }
         }
+
+        setCookieAndRecordView(postId, request, response);
 
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 

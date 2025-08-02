@@ -28,9 +28,11 @@ public class Report extends BaseEntity {
     private User user;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ReportStatus reportStatus;
 
     @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
     private ReportType reportTypeCode;
 
     private String reportReason;

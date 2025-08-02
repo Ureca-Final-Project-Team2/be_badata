@@ -20,9 +20,11 @@ import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import  com.siot.IamportRestClient.request.PrepareData;
 
@@ -32,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -46,7 +49,7 @@ public class PaymentService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Post post = postRepository.findById(postId)
+        final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (post.getIsDeleted()) {
@@ -102,6 +105,16 @@ public class PaymentService {
         );
     }
 
+    private void cancelPayment(final String impUid) {
+        try{
+            iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true));
+        }
+        catch (IamportResponseException | IOException e){
+            log.error("impUid {}에 대한 결제 환불에 실패했습니다. :", impUid, e);
+            throw new GeneralException(TradeException.PAYMENT_FAILED);
+        }
+    }
+
     public GetValidatePaymentResponse validateIamport(final String impUid, final Long postId, final String username) throws IamportResponseException, IOException {
         IamportResponse<com.siot.IamportRestClient.response.Payment> portOnePayment = iamportClient.paymentByImpUid(impUid);
 
@@ -112,14 +125,16 @@ public class PaymentService {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Post post = postRepository.findById(postId)
+        final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (post.getIsDeleted()) {
+            cancelPayment(impUid);
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
 
         if (post.getIsSold()) {
+            cancelPayment(impUid);
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
@@ -131,10 +146,12 @@ public class PaymentService {
                 .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
 
         if (payment.getAmount().compareTo(portOnePayment.getResponse().getAmount()) != 0) {
+            cancelPayment(impUid);
             throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
         }
 
         if (payment.getUseCoin().intValue() > user.getCoin()) {
+            cancelPayment(impUid);
             throw new GeneralException(TradeException.COIN_NOT_ENOUGH);
         }
 
@@ -142,12 +159,14 @@ public class PaymentService {
 
         user.updateUsedCoin(payment.getUseCoin().intValue());
 
-        coinHistoryRepository.save(CoinHistory.of(
-            user,
-            post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
-            payment.getUseCoin().intValue(),
-            user.getCoin()
-        ));
+        if (payment.getUseCoin().intValue() > 0){
+            coinHistoryRepository.save(CoinHistory.of(
+                    user,
+                    post instanceof Gifticon ? CoinSource.GIFTICON_PURCHASE : CoinSource.DATA_PURCHASE,
+                    payment.getUseCoin().intValue(),
+                    user.getCoin()
+            ));
+        }
 
         post.updateIsSold(true);
 

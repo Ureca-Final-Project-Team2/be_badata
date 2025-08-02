@@ -44,7 +44,12 @@ public enum TradeException implements BaseException {
     COIN_EXCEED_PRICE(HttpStatus.BAD_REQUEST, 3032, "포인트는 게시글 가격을 초과할 수 없습니다."),
     REALTIME_SEARCH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3033, "실시간 검색 처리에 실패했습니다."),
     REALTIME_SEARCH_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, 3034, "실시간 검색 내용이 없습니다."),
-    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, 3035, "신고 게시글을 찾을 수 없습니다.")
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, 3035, "신고 게시글을 찾을 수 없습니다."),
+    RECOMMENDATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 3036, "추천 게시글 처리에 실패했습니다."),
+    DUPLICATE_COUPON_NUMBER(HttpStatus.BAD_REQUEST, 3037, "이미 등록된 기프티콘입니다."),
+    NOT_PURCHASED_GIFTICON(HttpStatus.BAD_REQUEST, 3038, "구매하지 않은 기프티콘은 조회할 수 없습니다."),
+    GIFTICON_NOT_FOUND(HttpStatus.NOT_FOUND, 3039, "신고하려는 게시글이 기프티콘이 아닙니다."),
+    BARCODE_NOT_VIEWED(HttpStatus.BAD_REQUEST, 3040, "바코드를 조회하지 않은 기프티콘은 신고할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

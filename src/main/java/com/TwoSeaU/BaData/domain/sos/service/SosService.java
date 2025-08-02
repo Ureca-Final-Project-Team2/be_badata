@@ -11,6 +11,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import com.TwoSeaU.BaData.global.sse.SseService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +23,35 @@ public class SosService {
 
 	private final UserRepository userRepository;
 	private final SosRepository sosRepository;
+	private final SseService sseService;
 
-	public SaveSosResponse createSos(String username) {
-		User user = userRepository.findByUsername(username)
+	private final String sosMessage = "누군가 SOS를 요청하였습니다.";
+
+	public SaveSosResponse requestSos(final String username) {
+		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		Sos savedSos = sosRepository.save(Sos.of(user));
+		final Sos savedSos = sosRepository.save(Sos.of(user));
+
+		sseService.broadcast(sosMessage);
 
 		return SaveSosResponse.of(savedSos.getId());
 	}
 
-	public RespondSosResponse respondSos(Long sosId, String username) {
-		User user = userRepository.findByUsername(username)
+	public RespondSosResponse respondSos(final Long sosId, final String username) {
+		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-		Sos sos = sosRepository.findById(sosId)
+		final Sos sos = sosRepository.findById(sosId)
 			.orElseThrow(() -> new GeneralException(SosException.SOS_NOT_FOUND));
 
-		return RespondSosResponse.of(sos.getId(), sos.respond(user));
+		final Boolean isSuccess = sos.respond(user);
+
+		if(isSuccess) {
+			sseService.sendToClient(sos.getRequester().getId(), "누군가 요청을 수락하였습니다.");
+			sseService.sendToClient(user.getId(), "SOS 요청을 수락하였습니다.");
+		}
+
+		return RespondSosResponse.of(sos.getId(), isSuccess);
 	}
 }

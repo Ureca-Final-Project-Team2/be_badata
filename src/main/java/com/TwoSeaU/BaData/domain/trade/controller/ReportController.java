@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.trade.controller;
 
+import com.TwoSeaU.BaData.domain.trade.dto.request.SavePurchaseReportRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveReportRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.SaveReportResponse;
 import com.TwoSeaU.BaData.domain.trade.service.ReportService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/trades")
+@RequestMapping("/api/v1/trades/")
 public class ReportController {
     private final ReportService reportService;
 
@@ -22,4 +23,8 @@ public class ReportController {
         return ResponseEntity.ok().body(ApiResponse.success(reportService.createReport(postId, saveReportRequest, user.getUsername())));
     }
 
+    @PostMapping("{postId}/reports/purchases")
+    public ResponseEntity<ApiResponse<SaveReportResponse>> createPurchaseReport(@PathVariable Long postId, @Valid @RequestBody SavePurchaseReportRequest savePurchaseReportRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(reportService.createPurchaseReport(postId, savePurchaseReportRequest, user.getUsername())));
+    }
 }

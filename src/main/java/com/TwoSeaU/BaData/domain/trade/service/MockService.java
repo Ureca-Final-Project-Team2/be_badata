@@ -1,6 +1,5 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
-import com.TwoSeaU.BaData.domain.trade.dto.response.GetTrendingResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
@@ -20,17 +19,6 @@ public class MockService {
 
     public PostsResponse getHotPosts() {
         PageRequest pageRequest = PageRequest.of(0, 5);
-        List<Post> postList = postRepository.findAll(pageRequest).getContent();
-
-        List<PostResponse> postResponses = postList.stream()
-                .map(post -> PostResponse.from(post, postLikesRepository.countByPostId(post.getId()), false))
-                .toList();
-
-        return PostsResponse.of(postResponses);
-    }
-
-    public PostsResponse getRecommendPosts() {
-        PageRequest pageRequest = PageRequest.of(0, 10);
         List<Post> postList = postRepository.findAll(pageRequest).getContent();
 
         List<PostResponse> postResponses = postList.stream()

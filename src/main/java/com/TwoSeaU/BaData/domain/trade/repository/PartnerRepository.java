@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PartnerRepository extends JpaRepository<Partner, Long> {
-    List<Partner> findByCategoryId(Long categoryId);
+    List<Partner> findByCategoryId(final Long categoryId);
 }
