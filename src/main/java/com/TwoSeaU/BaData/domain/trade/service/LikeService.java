@@ -2,9 +2,12 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.DeletePostLikesResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.SavePostLikesResponse;
+import com.TwoSeaU.BaData.domain.trade.dto.response.SaveRecommendLikesResponse;
+import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
+import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.user.entity.User;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LikeService {
     private final TrendingPostService trendingPostService;
+    private final GifticonRepository gifticonRepository;
     private final PostLikesRepository postLikesRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -55,5 +59,26 @@ public class LikeService {
 
         postLikesRepository.delete(postLikes);
         return DeletePostLikesResponse.of(postLikes.getId());
+    }
+
+    public SaveRecommendLikesResponse likesAtRecommendation(String username, Long postId) {
+        if (username == null) {
+            return SaveRecommendLikesResponse.of(false);
+        }
+
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        final Gifticon post = gifticonRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        PostLikes postLikes = PostLikes.of(post, user);
+
+        if (postLikesRepository.existsByUserIdAndPostId(user.getId(), postId)){
+            return SaveRecommendLikesResponse.of(false);
+        }
+
+        postLikesRepository.save(postLikes);
+        return SaveRecommendLikesResponse.of(true);
     }
 }

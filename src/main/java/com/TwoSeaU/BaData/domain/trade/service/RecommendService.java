@@ -2,11 +2,8 @@ package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostsResponse;
-import com.TwoSeaU.BaData.domain.trade.dto.response.SaveRecommendLikesResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
-import com.TwoSeaU.BaData.domain.trade.entity.PostLikes;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
-import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.GifticonRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
@@ -17,71 +14,56 @@ import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendService {
+    final static String REDIS_KEY = "rec:user:";
     final static int RECOMMEND_LIMIT = 10;
 
-    final UserProfileVectorizer userProfileVectorizer;
-    final VectorUtils vectorUtils;
-    final UserRepository userRepository;
-    final PaymentRepository paymentRepository;
-    final PostLikesRepository postLikesRepository;
-    final GifticonRepository gifticonRepository;
-    final MockService mockService;
+    private final UserProfileVectorizer userProfileVectorizer;
+    private final VectorUtils vectorUtils;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
+    private final PostLikesRepository postLikesRepository;
+    private final GifticonRepository gifticonRepository;
+    private final TrendingPostService trendingPostService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public SaveRecommendLikesResponse likeRecommendation(String username, Long postId) {
+    //인기순, 추천순 분기
+    public PostsResponse recommendPosts(String username, final boolean isStart) {
         if (username == null) {
-            return SaveRecommendLikesResponse.of(false);
+            return PostsResponse.of(trendingPostService.getTrendingPosts(null));
         }
 
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Gifticon post = gifticonRepository.findById(postId)
-                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
-
-        PostLikes postLikes = PostLikes.of(post, user);
-
-        if (postLikesRepository.existsByUserIdAndPostId(user.getId(), postId)){
-            return SaveRecommendLikesResponse.of(false);
+        if (postLikesRepository.countByUserId(user.getId()) == 0
+                && paymentRepository.countByUserIdAndPaymentStatus(user.getId(), PaymentStatus.PAID) == 0) {
+            return PostsResponse.of(trendingPostService.getTrendingPosts(username));
         }
 
-        postLikesRepository.save(postLikes);
-        return SaveRecommendLikesResponse.of(true);
+        return recommendContentBasedFiltering(user, isStart);
+
     }
 
-    //인기순, 추천순 분기
-    public PostsResponse recommendPosts(String username) {
-        if (username == null) {
-            return mockService.getHotPosts();
-        }
-
-        else {
-            final User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-            if (postLikesRepository.countByUserId(user.getId()) == 0
-                    && paymentRepository.countByUserIdAndPaymentStatus(user.getId(), PaymentStatus.PAID) == 0) {
-                return mockService.getHotPosts();
-            }
-
-            return recommendContentBasedFiltering(user);
-        }
-    }
-
-    //추천순
-    private PostsResponse recommendContentBasedFiltering (User user) {
+    private PostsResponse recommendContentBasedFiltering (User user, final boolean isStart) {
         double[] userVector = userProfileVectorizer.vectorizeUserProfile(user);
 
-        List<Gifticon> candidatePosts = gifticonRepository.findByIsSoldAndIsDeletedAndDeadLineGreaterThanEqual(false, false, LocalDate.now());
+        if(isStart){
+            clearRecommendationCache(user.getId());
+        }
+
+        List<Gifticon> candidatePosts = gifticonRepository.getAllSales(user.getUsername(), getRecommendedPostsCache(user.getId()));
 
         List<RecommendationResult> results = candidatePosts.parallelStream()
                 .map(post -> {
@@ -109,14 +91,45 @@ public class RecommendService {
                 )
                 .collect(Collectors.toList());
 
+        addRecommendedPostCache(user.getId(), results);
+
         return PostsResponse.of(finalResult);
     }
 
-    //인기순
-    private PostsResponse recommendPopularPosts() {
-        // 인기순으로 게시글을 가져오는 메소드.
-        // 추후 인기순 게시글 개발 예정이므로 지금은 null을 return합니다
-        return null;
+    public void addRecommendedPostCache(Long userId, List<RecommendationResult> postList) {
+        String key = getKey(userId);
+
+        for( RecommendationResult result : postList) {
+            Long postId = result.getPost().getId();
+
+            if (Boolean.FALSE.equals(redisTemplate.opsForSet().isMember(key, postId.toString()))) {
+                redisTemplate.opsForSet().add(key, postId.toString());
+                redisTemplate.expire(key, Duration.ofMinutes(30));
+            }
+        }
+    }
+
+    public Set<Long> getRecommendedPostsCache(Long userId) {
+        String key = getKey(userId);
+        Set<Object> postSet = redisTemplate.opsForSet().members(key);
+
+        if (postSet == null) {
+            return Set.of();
+        }
+
+        return postSet.stream()
+                .map(Object::toString)
+                .map(Long::parseLong)
+                .collect(Collectors.toSet());
+    }
+
+    private String getKey(Long userId) {
+        return REDIS_KEY + userId;
+    }
+
+    public void clearRecommendationCache(Long userId) {
+        String key = REDIS_KEY + userId;
+        redisTemplate.delete(key);
     }
 
     @Data
