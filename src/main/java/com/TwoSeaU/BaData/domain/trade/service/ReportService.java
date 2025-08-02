@@ -3,7 +3,7 @@ package com.TwoSeaU.BaData.domain.trade.service;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SavePurchaseReportRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveReportRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.SaveReportResponse;
-import com.TwoSeaU.BaData.domain.trade.entity.Payment;
+import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.entity.Report;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
@@ -66,12 +66,15 @@ public class ReportService {
             throw new GeneralException(TradeException.NOT_PURCHASED_GIFTICON);
         }
 
-        if(!gifticonRepository.existsById(post.getId())){
-            throw new GeneralException(TradeException.GIFTICON_NOT_FOUND);
-        }
+        final Gifticon gifticon = gifticonRepository.findById(post.getId())
+                .orElseThrow(() -> new GeneralException(TradeException.GIFTICON_NOT_FOUND));
 
         if(post.getDeadLine().isBefore(LocalDate.now())) {
             throw new GeneralException(TradeException.EXPIRED_EXPIRATION_DATE);
+        }
+
+        if(gifticon.getBarcodeViewTime() == null){
+            throw new GeneralException(TradeException.BARCODE_NOT_VIEWED);
         }
 
         paymentRepository.findByUserIdAndPostIdAndPaymentStatus(user.getId(), post.getId(), PaymentStatus.PAID)

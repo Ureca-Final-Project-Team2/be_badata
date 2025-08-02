@@ -49,6 +49,7 @@ public enum TradeException implements BaseException {
     DUPLICATE_COUPON_NUMBER(HttpStatus.BAD_REQUEST, 3037, "이미 등록된 기프티콘입니다."),
     NOT_PURCHASED_GIFTICON(HttpStatus.BAD_REQUEST, 3038, "구매하지 않은 기프티콘은 조회할 수 없습니다."),
     GIFTICON_NOT_FOUND(HttpStatus.NOT_FOUND, 3039, "데이터 게시글은 구매 후 신고할 수 없습니다."),
+    BARCODE_NOT_VIEWED(HttpStatus.BAD_REQUEST, 3040, "바코드를 조회하지 않은 기프티콘은 신고할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
