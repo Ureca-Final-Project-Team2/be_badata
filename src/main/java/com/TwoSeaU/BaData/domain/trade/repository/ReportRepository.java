@@ -11,5 +11,5 @@ public interface ReportRepository extends JpaRepository<Report, Long>, ReportQue
 	boolean existsByUserIdAndPostId(final Long userId, final Long postId);
 	boolean existsByUserIdAndPostIdAndReportTypeCode(final Long userId, final Long postId, final ReportType reportType);
 	Long countByUserIdAndReportStatus(final Long userId, final ReportStatus status);
-	int countByPost(final Post post);
+	Long countByPost(final Post post);
 }

@@ -5,6 +5,7 @@ import com.TwoSeaU.BaData.domain.trade.entity.Report;
 import com.TwoSeaU.BaData.domain.trade.event.ReportEmailEvent;
 import com.TwoSeaU.BaData.domain.trade.event.ReportFcmEvent;
 import com.TwoSeaU.BaData.domain.trade.repository.ReportRepository;
+import com.TwoSeaU.BaData.domain.user.entity.FcmToken;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.repository.FcmTokenRepository;
 import java.util.List;
@@ -27,17 +28,21 @@ public class ReportNotificationService {
     private static final String REPORT_CONTENT_PREFIX = "제목: ";
     private static final String REPORT_CONTENT_POSTFIX = " 게시물에 대해 신고접수가 완료되었습니다. 추가 문의 사항은 고객센터로 문의 주세요";
 
+    private static long REPORT_THRESHOLD = 3;
+
     @Transactional(readOnly = true)
     public void sendReportNotification(final Report report){
 
-        int reportCount = reportRepository.countByPost(report.getPost());
+        final long reportCount = reportRepository.countByPost(report.getPost());
         final Post post = report.getPost();
         final User reporter = report.getUser();
         final User reportedUser = post.getSeller();
-        final List<String> reporterFcmTokens = fcmTokenRepository.findByUser(reporter).stream().map(fcmToken -> fcmToken.getToken()).toList();
-        final List<String> reportedUserFcmTokens = fcmTokenRepository.findByUser(reportedUser).stream().map(fcmToken -> fcmToken.getToken()).toList();
+        final List<String> reporterFcmTokens = fcmTokenRepository.findByUser(reporter).stream().map(
+                FcmToken::getToken).toList();
+        final List<String> reportedUserFcmTokens = fcmTokenRepository.findByUser(reportedUser).stream().map(
+                FcmToken::getToken).toList();
 
-        if(reportCount == 3){
+        if (reportCount == REPORT_THRESHOLD){
             applicationEventPublisher.publishEvent(
                     ReportEmailEvent.of(REPORTED_TITLE,REPORTED_CONTENTS_PREFIX+post.getTitle()+REPORTED_CONTENTS_POSTFIX,reportedUser.getEmail()));
             applicationEventPublisher.publishEvent(ReportFcmEvent.of(

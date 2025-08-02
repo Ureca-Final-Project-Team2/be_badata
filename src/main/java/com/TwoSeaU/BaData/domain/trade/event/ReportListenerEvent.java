@@ -19,7 +19,7 @@ public class ReportListenerEvent {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void creatReportEmailEventListener(final ReportEmailEvent reportEmailEvent){
 
-        mailService.sendMail(reportEmailEvent.getTargetEmail(), reportEmailEvent.getTitle(), reportEmailEvent.getContent());
+        mailService.sendMail(reportEmailEvent.getTargetEmail(), reportEmailEvent.getTitle(), reportEmailEvent.getContents());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

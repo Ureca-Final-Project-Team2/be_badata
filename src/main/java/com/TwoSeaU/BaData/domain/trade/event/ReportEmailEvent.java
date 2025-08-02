@@ -9,14 +9,14 @@ import lombok.Getter;
 public class ReportEmailEvent {
 
     private String title;
-    private String content;
+    private String contents;
     private String targetEmail;
 
-    public static ReportEmailEvent of(final String title, final String content, final String email){
+    public static ReportEmailEvent of(final String title, final String contents, final String email){
 
         return ReportEmailEvent.builder()
                 .title(title)
-                .content(content)
+                .contents(contents)
                 .targetEmail(email)
                 .build();
     }

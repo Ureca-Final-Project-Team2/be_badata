@@ -31,7 +31,7 @@ public class EmailConfig {
     private static final String MAIL_SMTP_SSL_PROTOCOLS = "mail.smtp.ssl.protocols";
     private static final String MAIL_SMTP_SSL_PROTOCOLS_VALUE="TLSv1.2";
 
-    private static final int naverMailDefaultPortNumber = 587;
+    private static final int GMAIL_SMTP_PORT = 587;
 
     @Value("${mail.google.id}")
     private String googleId;
@@ -56,7 +56,7 @@ public class EmailConfig {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         mailSender.setHost(MAIL_SMTP_SSL_TRUST_VALUE);
-        mailSender.setPort(naverMailDefaultPortNumber);
+        mailSender.setPort(GMAIL_SMTP_PORT);
         mailSender.setUsername(googleId);
         mailSender.setPassword(googleAppPassword);
 

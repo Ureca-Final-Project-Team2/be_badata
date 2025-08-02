@@ -7,6 +7,7 @@ import com.TwoSeaU.BaData.global.response.GeneralException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MailService {
 
     private final JavaMailSender javaMailSender;
@@ -27,13 +29,12 @@ public class MailService {
             javaMailSender.send(message);
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause().getMessage());
-            throw new GeneralException(GlobalException.INTERNAL_MAIL_ERROR);
+            log.info("이메일 예외 : {}",e.getMessage());
+          //  throw new GeneralException(GlobalException.INTERNAL_MAIL_ERROR);
         }
     }
 
-    public void setMiMeMessageHelperForMailFormat(final MimeMessage message,final String email,final String title,final String contents)
+    private void setMiMeMessageHelperForMailFormat(final MimeMessage message,final String email,final String title,final String contents)
             throws  MessagingException {
 
         MimeMessageHelper helper = new MimeMessageHelper(message,true,encodingType);
