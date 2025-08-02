@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface GifticonRepository extends JpaRepository<Gifticon,Long> {
-
-    List<Gifticon> findByIsSoldAndIsDeletedAndDeadLineGreaterThanEqual(final boolean isSold, final boolean isDeleted, final LocalDate time);
+public interface GifticonRepository extends JpaRepository<Gifticon,Long>, GifticonQueryRepository {
     Boolean existsByCouponNumber(final String couponNumber);
 }
