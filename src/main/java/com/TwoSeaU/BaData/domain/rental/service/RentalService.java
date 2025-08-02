@@ -161,6 +161,32 @@ public class RentalService {
 
     private void validateRentalCondition(final ReserveRentalRequest reserveRentalRequest){
 
+        validateReserveCountCondition(reserveRentalRequest);
+        validateReserveRentalDate(reserveRentalRequest);
+    }
+
+    private void validateReserveRentalDate(final ReserveRentalRequest reserveRentalRequest) {
+
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime rentalStartDateTime = reserveRentalRequest.getRentalStartDate();
+        final LocalDateTime rentalEndDateTime = reserveRentalRequest.getRentalEndDate();
+
+        if (rentalStartDateTime == null || rentalEndDateTime == null) {
+            throw new GeneralException(RentalException.CANT_RESERVATION_ON_DATE_NULL);
+        }
+
+        if (rentalStartDateTime.toLocalDate().isEqual(now.toLocalDate()) ||
+                !rentalStartDateTime.isAfter(now) ||
+                rentalStartDateTime.isAfter(now.plusYears(10)) ||
+                !rentalStartDateTime.isBefore(rentalEndDateTime)) {
+
+            throw new GeneralException(RentalException.CANT_RESERVATION_NOT_VALID_RENTAL_DATE);
+        }
+
+    }
+
+    private void validateReserveCountCondition(final ReserveRentalRequest reserveRentalRequest) {
+        
         reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
 
             final StoreDevice storeDevice = storeDeviceRepository.findById(reserveDeviceRequest.getStoreDeviceId())

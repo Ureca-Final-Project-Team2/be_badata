@@ -26,7 +26,11 @@ public enum RentalException implements BaseException {
     CANT_RESERVATION_MORE_THAN_COUNT(HttpStatus.BAD_REQUEST , 4016, "예약은 해당 가맹점이 소유한 기기 이상으로 수행할 수 없습니다."),
     CANT_FIND_RESTOCK(HttpStatus.NOT_FOUND, 4017, "해당 재입고 알림을 찾을 수 없습니다."),
     CANT_DELETE_OTHER_RESTOCK(HttpStatus.BAD_REQUEST, 4018, "다른 사람의 재입고 알림은 삭제할 수 없습니다."),
-    CANT_DELETE_REVIEW_IN_7_DAYS(HttpStatus.BAD_REQUEST, 4019, "7일 이내에 작성된 리뷰는 삭제할 수 없습니다.");
+    CANT_DELETE_REVIEW_IN_7_DAYS(HttpStatus.BAD_REQUEST, 4019, "7일 이내에 작성된 리뷰는 삭제할 수 없습니다."),
+    CANT_RESERVATION_ON_DATE_NULL(HttpStatus.BAD_REQUEST , 4020, "렌탈 시작, 종료 날짜는 비어 있을 수 없습니다."),
+    CANT_RESERVATION_NOT_VALID_RENTAL_DATE(HttpStatus.BAD_REQUEST, 4021, "유효한 렌탈 시작날짜와 종료날짜여야 합니다."),
+    CANT_RESTOCK_ON_DATE_NULL(HttpStatus.BAD_REQUEST , 4022, "재입고 시작, 종료 날짜는 비어 있을 수 없습니다."),
+    CANT_RESTOCK_NOT_VALID_RENTAL_DATE(HttpStatus.BAD_REQUEST, 4023, "유효한 재입고 시작날짜와 종료날짜여야 합니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
