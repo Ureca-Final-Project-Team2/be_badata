@@ -62,18 +62,18 @@ public class ReportService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
-        if(!post.getIsSold()){
+        if (!post.getIsSold()) {
             throw new GeneralException(TradeException.NOT_PURCHASED_GIFTICON);
         }
 
         final Gifticon gifticon = gifticonRepository.findById(post.getId())
                 .orElseThrow(() -> new GeneralException(TradeException.GIFTICON_NOT_FOUND));
 
-        if(post.getDeadLine().isBefore(LocalDate.now())) {
+        if (post.getDeadLine().isBefore(LocalDate.now())) {
             throw new GeneralException(TradeException.EXPIRED_EXPIRATION_DATE);
         }
 
-        if(gifticon.getBarcodeViewTime() == null){
+        if (gifticon.getBarcodeViewTime() == null) {
             throw new GeneralException(TradeException.BARCODE_NOT_VIEWED);
         }
 
