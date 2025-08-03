@@ -11,6 +11,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class RecommendService {
 
     private final UserProfileVectorizer userProfileVectorizer;
     private final VectorUtils vectorUtils;
+    private final PostVectorizer postVectorizer;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
     private final PostLikesRepository postLikesRepository;
@@ -60,15 +62,17 @@ public class RecommendService {
     }
 
     private PostsResponse recommendContentBasedFiltering (User user, final boolean isStart) {
-        double[] userVector = userProfileVectorizer.vectorizeUserProfile(user);
-
         if(isStart){
             clearRecommendationCache(user.getId());
         }
 
-        List<Gifticon> candidatePosts = gifticonRepository.getAllSales(user.getUsername(), getRecommendedPostsCache(user.getId()));
+        Set<Long> recommendedPostsId = getRecommendedPostsCache(user.getId());
 
-        List<RecommendationResult> results = candidatePosts.parallelStream()
+        double[] userVector = userProfileVectorizer.vectorizeUserProfile(user, recommendedPostsId);
+
+        List<Gifticon> candidatePosts = gifticonRepository.getAllSales(user.getUsername(), recommendedPostsId);
+
+        List<RecommendationResult> results = candidatePosts.stream()
                 .map(post -> {
                     double[] postVector = post.getVector();
 
@@ -146,6 +150,22 @@ public class RecommendService {
             log.warn("{} userId에 대해 Redis를 clear하는 것을 실패했습니다.", userId, e);
 
         }
+    }
+
+    @Transactional
+    public String updateAllPostVector() {
+        for (Gifticon gifticon : gifticonRepository.findAll()) {
+            double[] vector = postVectorizer.vectorizePost(
+                    gifticon.getPrice(),
+                    gifticon.getDeadLine(),
+                    gifticon.getCategory(),
+                    gifticon.getPartner()
+            );
+
+            gifticon.updateVector(vector);
+        }
+
+        return "success";
     }
 
     @Data

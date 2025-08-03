@@ -116,7 +116,8 @@ public class PostService {
         final double[] vector = postVectorizer.vectorizePost(
                 saveGifticonPostRequest.getPrice(),
                 saveGifticonPostRequest.getDeadLine(),
-                category
+                category,
+                saveGifticonPostRequest.getPartner()
         );
 
         final Gifticon gifticon = new Gifticon(
@@ -278,10 +279,23 @@ public class PostService {
     public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
         final Post post = validateAndGetPost(postId, username);
 
+        if (!(post instanceof Gifticon gifticon)) {
+            throw new GeneralException(TradeException.GIFTICON_NOT_FOUND);
+        }
+
+        final double[] vector = postVectorizer.vectorizePost(
+                updateGifticonPostRequest.getPrice(),
+                gifticon.getDeadLine(),
+                gifticon.getCategory(),
+                gifticon.getPartner()
+        );
+
         post.updateCommentAndPrice(
                 updateGifticonPostRequest.getComment(),
                 updateGifticonPostRequest.getPrice()
         );
+
+        gifticon.updateVector(vector);
 
         return SavePostResponse.of(post.getId());
     }
