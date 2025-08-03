@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/topic/**", "/app/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/trades/**").permitAll()
-                                .requestMatchers(HttpMethod.PATCH, "/api/v1/trades/posts/recommend/vector/update").permitAll()
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/trades/posts/recommend/update/all").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/v1/auth/token/reissue","/api/v1/stores/**","/api/v1/stores","/api/v1/rentals/{storeId}/devices","/api/v1/review-quick-replies"
                                 ,"/api/v1/{storeId}/reviews","/api/v1/{storeId}/review-meta","/test/alarm","/api/v1/reviews/{reviewId}").permitAll()
                                 .anyRequest().authenticated())
