@@ -56,10 +56,9 @@ jobs:
 
       - name: Nori plugin 설치 및 Elasticsearch 재시작
         run: |
-          docker exec $(docker ps -q --filter ancestor=docker.elastic.co/elasticsearch/elasticsearch:9.0.3) \
-          bin/elasticsearch-plugin install analysis-nori
-          
-          docker restart $(docker ps -q --filter ancestor=docker.elastic.co/elasticsearch/elasticsearch:9.0.3)
+          CONTAINER_ID="${{ job.services.elasticsearch.id }}"
+          docker exec "$CONTAINER_ID" bin/elasticsearch-plugin install --batch analysis-nori
+          docker restart "$CONTAINER_ID"
 
       - name: Elasticsearch 재시작 대기
         run: |
