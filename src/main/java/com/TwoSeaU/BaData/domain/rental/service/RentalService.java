@@ -68,7 +68,7 @@ public class RentalService {
         final User user = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(
                 UserException.COIN_NOT_FOUND));
 
-        final Store store = storeRepository.findById(reserveRentalRequest.getStoreId()).orElseThrow(()-> new GeneralException(
+        final Store store = storeRepository.findByIdWithLock(reserveRentalRequest.getStoreId()).orElseThrow(()-> new GeneralException(
                 StoreException.CANT_FIND_STORE));
 
         final Reservation reservation = Reservation.of(user,store,reserveRentalRequest.getRentalStartDate(),
