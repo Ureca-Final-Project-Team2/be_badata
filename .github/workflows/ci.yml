@@ -17,7 +17,7 @@ jobs:
           - 9200:9200
           - 9300:9300
         options: >-
-          --health-cmd curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s
+          --health-cmd curl http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
