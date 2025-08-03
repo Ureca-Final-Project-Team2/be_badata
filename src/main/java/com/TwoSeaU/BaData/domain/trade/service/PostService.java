@@ -278,7 +278,10 @@ public class PostService {
 
     public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
         final Post post = validateAndGetPost(postId, username);
-        final Gifticon gifticon = (Gifticon) post;
+
+        if (!(post instanceof Gifticon gifticon)) {
+            throw new GeneralException(TradeException.GIFTICON_NOT_FOUND);
+        }
 
         final double[] vector = postVectorizer.vectorizePost(
                 updateGifticonPostRequest.getPrice(),

@@ -42,7 +42,7 @@ public class UserProfileVectorizer {
 
         // 2. 제휴사 선호도 벡터
         final double[] partnerPreferences = createPreferenceVector(
-                userProfile.getCategoryPreferences(),
+                userProfile.getPartnerPreferences(),
                 PostVectorizer.partnerToIndex
         );
 
@@ -131,6 +131,9 @@ public class UserProfileVectorizer {
 
         if (totalCategory > 0) {
             userProfileCategoryPreferences.replaceAll((category, value) -> value / totalCategory);
+        }
+
+        if (totalPartner > 0) {
             userProfilePartnerPreferences.replaceAll((partner, value) -> value / totalPartner);
         }
 

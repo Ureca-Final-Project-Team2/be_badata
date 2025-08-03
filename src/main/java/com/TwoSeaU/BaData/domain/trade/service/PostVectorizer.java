@@ -24,8 +24,6 @@ public class PostVectorizer {
     private final PartnerRepository partnerRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
 
-    private final static int CATEGORY_COUNT = 8;
-    private final static int PARTNER_COUNT = 49;
     public final static Map<String, Integer> categoryToIndex = new HashMap<>();
     public final static Map<String, Integer> partnerToIndex = new HashMap<>();
 
@@ -36,7 +34,7 @@ public class PostVectorizer {
                 .map(GifticonCategory::getCategoryName)
                 .toList();
 
-        for (int i = 0; i < CATEGORY_COUNT; i++) {
+        for (int i = 0; i < categories.size(); i++) {
             categoryToIndex.put(categories.get(i), i);
         }
 
@@ -45,7 +43,7 @@ public class PostVectorizer {
                 .map(Partner::getPartner)
                 .toList();
 
-        for (int i = 0; i < PARTNER_COUNT; i++) {
+        for (int i = 0; i < partners.size(); i++) {
             partnerToIndex.put(partners.get(i), i);
         }
     }
