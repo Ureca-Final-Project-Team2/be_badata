@@ -33,9 +33,9 @@ jobs:
         uses: supercharge/redis-github-action@1.6.0
 
       - name: elasticsearch 실행
-        uses: getong/elasticsearch-action@v1.3
+        uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          elasticsearch version: '8.11.0'
+          elasticsearch version: '9.0.3'
           host port: 9200
           container port: 9200
           host node port: 9300
