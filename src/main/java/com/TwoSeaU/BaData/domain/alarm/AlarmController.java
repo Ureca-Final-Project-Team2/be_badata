@@ -18,7 +18,7 @@ public class AlarmController {
     @GetMapping("/test/alarm")
     public ResponseEntity<ApiResponse<String>> sendAlarm(@RequestParam("token") String token) {
 
-         fcmService.send(NotificationRequest.forSingleToken("찜한 와이파이 왔어요!"," 지금 아니면 또 놓칠지도 몰라요, 파도처럼 \uD83C\uDF0A", token,null));
+         fcmService.testSend(NotificationRequest.forSingleToken("찜한 와이파이 왔어요!"," 지금 아니면 또 놓칠지도 몰라요, 파도처럼 \uD83C\uDF0A", token,null));
 
          return ResponseEntity.ok(ApiResponse.success("성공"));
     }

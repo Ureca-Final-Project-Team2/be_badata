@@ -47,16 +47,16 @@ public class FCMService {
 
                 if(messagingErrorCode == MessagingErrorCode.UNREGISTERED){
                     log.warn("만료된 fcmToken: {}", expiredToken);
-                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
+    //                throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
                 }
                 if(messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT){
                     log.warn("유효하지 않은 fcmToken: {}", expiredToken);
-                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
+   //                 throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
                 }
 
             } else {
                 log.error("Failed to send FCM: {}", messagingErrorCode, e);
-                throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+     //           throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
             }
         }
     }
@@ -103,16 +103,16 @@ public class FCMService {
 
                             if(messagingErrorCode == MessagingErrorCode.UNREGISTERED){
                                 log.warn("만료된 fcmToken: {}", expiredToken);
-                                throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
+                 //               throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
                             }
                             if(messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT){
                                 log.warn("유효하지 않은 fcmToken: {}", expiredToken);
-                                throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
+               //                 throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
                             }
 
                         } else {
                             log.error("Failed to send FCM: {}", failedToken, messagingErrorCode);
-                            throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+          //                  throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
                         }
                     }
                 }
@@ -121,6 +121,46 @@ public class FCMService {
         } catch (FirebaseMessagingException e) {
             log.error("Failed to send multicast message", e);
             throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+        }
+    }
+
+    public void testSend(final NotificationRequest notificationRequest) {
+        try {
+            Message.Builder builder = Message.builder()
+                    .putData("title", notificationRequest.getTitle())
+                    .putData("content", notificationRequest.getContent())
+                    .setToken(notificationRequest.getFcmTokens().get(0)); // 단건 전송용 (첫 번째 토큰)
+
+            // 추가 데이터 처리
+            if (notificationRequest.getData() != null) {
+                for (Map.Entry<String, String> entry : notificationRequest.getData().entrySet()) {
+                    builder.putData(entry.getKey(), entry.getValue());
+                }
+            }
+
+            FirebaseMessaging.getInstance().send(builder.build());
+
+        } catch (FirebaseMessagingException e) {
+            MessagingErrorCode messagingErrorCode = e.getMessagingErrorCode();
+
+            // 로그 출력 및 만료 토큰 처리
+            if (messagingErrorCode == MessagingErrorCode.UNREGISTERED || messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT) {
+
+                final String expiredToken = notificationRequest.getFcmTokens().get(0);
+
+                if(messagingErrorCode == MessagingErrorCode.UNREGISTERED){
+                    log.warn("만료된 fcmToken: {}", expiredToken);
+                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
+                }
+                if(messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT){
+                    log.warn("유효하지 않은 fcmToken: {}", expiredToken);
+                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
+                }
+
+            } else {
+                log.error("Failed to send FCM: {}", messagingErrorCode, e);
+                throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+            }
         }
     }
 }
