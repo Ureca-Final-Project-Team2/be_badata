@@ -151,7 +151,7 @@ public class RecommendService {
     }
 
     @Transactional
-    public Integer updatePostVector() {
+    public String updateAllPostVector() {
         for (Gifticon gifticon : gifticonRepository.findAll()) {
             double[] vector = postVectorizer.vectorizePost(
                     gifticon.getPrice(),
@@ -163,7 +163,7 @@ public class RecommendService {
             gifticon.updateVector(vector);
         }
 
-        return 1;
+        return "success";
     }
 
     @Data

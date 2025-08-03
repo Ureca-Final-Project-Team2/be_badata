@@ -28,8 +28,8 @@ public class RecommendController {
         return ResponseEntity.ok().body(ApiResponse.success(likeService.likesAtRecommendation(user == null ? null : user.getUsername(), postId)));
     }
 
-    @PatchMapping("/vector/update")
-    public ResponseEntity<ApiResponse<Integer>> updatePostVector() {
-        return ResponseEntity.ok().body(ApiResponse.success(recommendService.updatePostVector()));
+    @PatchMapping("/vector/update/all")
+    public ResponseEntity<ApiResponse<String>> updateAllPostVector() {
+        return ResponseEntity.ok().body(ApiResponse.success(recommendService.updateAllPostVector()));
     }
 }

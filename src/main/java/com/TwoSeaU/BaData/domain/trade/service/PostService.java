@@ -278,11 +278,21 @@ public class PostService {
 
     public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
         final Post post = validateAndGetPost(postId, username);
+        final Gifticon gifticon = (Gifticon) post;
+
+        final double[] vector = postVectorizer.vectorizePost(
+                updateGifticonPostRequest.getPrice(),
+                gifticon.getDeadLine(),
+                gifticon.getCategory(),
+                gifticon.getPartner()
+        );
 
         post.updateCommentAndPrice(
                 updateGifticonPostRequest.getComment(),
                 updateGifticonPostRequest.getPrice()
         );
+
+        gifticon.updateVector(vector);
 
         return SavePostResponse.of(post.getId());
     }
