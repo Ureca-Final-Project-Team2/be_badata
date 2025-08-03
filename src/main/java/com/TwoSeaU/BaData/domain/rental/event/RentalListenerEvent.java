@@ -64,7 +64,7 @@ public class RentalListenerEvent {
         final List<String> fcmTokens = fcmTokenRepository.findByUserIn(sendTargetUsers)
                 .stream().map(FcmToken::getToken).toList();
 
-        fcmService.send(NotificationRequest.forMultipleTokens(restockTitle, restockContent, fcmTokens, Map.of()));
+        fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(restockTitle, restockContent, fcmTokens, Map.of()));
     }
 
     private List<User> getSendTargetUser(final Reservation reservation, final List<DeviceReservation> deviceReservations) {
