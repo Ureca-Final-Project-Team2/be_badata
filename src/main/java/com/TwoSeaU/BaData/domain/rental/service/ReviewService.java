@@ -67,7 +67,9 @@ public class ReviewService {
 
         saveQuickReply(createReviewRequest.getQuickReplyIds(), review);
 
-        reservation.getStore().adjustReviewRatingByAdd(review);
+        final Store store = storeRepository.findByIdWithLock(reservation.getStore().getId()).orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE));
+
+        store.adjustReviewRatingByAdd(review);
 
         final Integer rewardCoin = reservation.getPrice()/10;
         loginUser.addCoin(rewardCoin);
@@ -91,7 +93,7 @@ public class ReviewService {
         checkReviewOwner(loginUser, review);
         checkValidateReviewDelete(review);
 
-        final Store store = review.getReservation().getStore();
+        final Store store = storeRepository.findByIdWithLock(review.getReservation().getStore().getId()).orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE));
 
         store.adjustReviewRatingByRemove(review);
 
@@ -109,7 +111,7 @@ public class ReviewService {
 
         checkReviewOwner(loginUser, review);
 
-        final Store store = review.getReservation().getStore();
+        final Store store = storeRepository.findByIdWithLock(review.getReservation().getStore().getId()).orElseThrow(()-> new GeneralException(StoreException.CANT_FIND_STORE));
 
         store.changeReviewRatingAndRecalculatingAverage(review.getRating(),updateReviewRequest.getRating());
 
