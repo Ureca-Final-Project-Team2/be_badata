@@ -7,6 +7,7 @@ import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MessagingErrorCode;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.SendResponse;
 import java.util.List;
@@ -37,7 +38,26 @@ public class FCMService {
             FirebaseMessaging.getInstance().send(builder.build());
 
         } catch (FirebaseMessagingException e) {
-            throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+            MessagingErrorCode messagingErrorCode = e.getMessagingErrorCode();
+
+            // 로그 출력 및 만료 토큰 처리
+            if (messagingErrorCode == MessagingErrorCode.UNREGISTERED || messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT) {
+
+                final String expiredToken = notificationRequest.getFcmTokens().get(0);
+
+                if(messagingErrorCode == MessagingErrorCode.UNREGISTERED){
+                    log.warn("만료된 fcmToken: {}", expiredToken);
+                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
+                }
+                if(messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT){
+                    log.warn("유효하지 않은 fcmToken: {}", expiredToken);
+                    throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
+                }
+
+            } else {
+                log.error("Failed to send FCM: {}", messagingErrorCode, e);
+                throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+            }
         }
     }
 
@@ -67,9 +87,33 @@ public class FCMService {
             if (response.getFailureCount() > 0) {
                 List<SendResponse> responses = response.getResponses();
                 for (int i = 0; i < responses.size(); i++) {
-                    if (!responses.get(i).isSuccessful()) {
-                        String failedToken = tokens.get(i);
-                        log.info("전송 실패 토큰: {}",failedToken);
+
+                    final SendResponse sendResponse = responses.get(i);
+
+                    if (!sendResponse.isSuccessful()) {
+
+                        final String failedToken = tokens.get(i);
+
+                        FirebaseMessagingException ex = sendResponse.getException();
+                        MessagingErrorCode messagingErrorCode = ex.getMessagingErrorCode();
+
+                        if (messagingErrorCode == MessagingErrorCode.UNREGISTERED || messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT) {
+
+                            final String expiredToken = failedToken;
+
+                            if(messagingErrorCode == MessagingErrorCode.UNREGISTERED){
+                                log.warn("만료된 fcmToken: {}", expiredToken);
+                                throw new GeneralException(GlobalException.FIREBASE_TOKEN_EXPIRED);
+                            }
+                            if(messagingErrorCode == MessagingErrorCode.INVALID_ARGUMENT){
+                                log.warn("유효하지 않은 fcmToken: {}", expiredToken);
+                                throw new GeneralException(GlobalException.FIREBASE_TOKEN_NOT_VALID);
+                            }
+
+                        } else {
+                            log.error("Failed to send FCM: {}", failedToken, messagingErrorCode);
+                            throw new GeneralException(GlobalException.INTERNAL_FIREBASE_ERROR);
+                        }
                     }
                 }
             }
