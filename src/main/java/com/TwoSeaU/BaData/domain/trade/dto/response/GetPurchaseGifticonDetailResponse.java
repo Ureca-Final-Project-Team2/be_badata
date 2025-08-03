@@ -23,6 +23,7 @@ public class GetPurchaseGifticonDetailResponse {
     private LocalDate deadLine;
     private LocalDateTime boughtAt;
     private String partner;
+    private LocalDateTime barcodeViewTime;
 
     public static GetPurchaseGifticonDetailResponse from(final User seller,
                                                          final Gifticon gifticon,
@@ -37,6 +38,7 @@ public class GetPurchaseGifticonDetailResponse {
                 .deadLine(gifticon.getDeadLine())
                 .boughtAt(boughtAt)
                 .partner(gifticon.getPartner())
+                .barcodeViewTime(gifticon.getBarcodeViewTime())
                 .build();
     }
 }
