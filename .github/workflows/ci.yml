@@ -12,7 +12,7 @@ jobs:
 
     services:
       elasticsearch:
-        image: elasticsearch:9.0.3
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
         ports:
           - 9200:9200
           - 9300:9300
