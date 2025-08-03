@@ -11,6 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      elasticsearch:
+        image: elasticsearch:9.0.3
+        ports:
+          - 9200:9200
+          - 9300:9300
+        options: >-
+          --health-cmd curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          discovery.type: single-node
+
       postgres:
         image: postgres:16
         env:
@@ -32,15 +45,31 @@ jobs:
       - name: Redis 실행
         uses: supercharge/redis-github-action@1.6.0
 
-      - name: elasticsearch 실행
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: '9.0.3'
-          host port: 9200
-          container port: 9200
-          host node port: 9300
-          node port: 9300
-          discovery type: 'single-node'
+      - name: elasticsearch 실행 대기
+        run: |
+          echo "Elasticsearch 실행을 위해 준비중..."
+          until curl -s http://localhost:9200/_cluster/health | grep -q '"status":"green\|yellow"'; do
+            echo "Elasticsearch 실행 대기중..."
+            sleep 10
+          done
+          echo "Elasticsearch 준비 완료"
+
+      - name: Nori plugin 설치 및 Elasticsearch 재시작
+        run: |
+          docker exec $(docker ps -q --filter ancestor=docker.elastic.co/elasticsearch/elasticsearch:9.0.3) \
+          bin/elasticsearch-plugin install analysis-nori
+          
+          docker restart $(docker ps -q --filter ancestor=docker.elastic.co/elasticsearch/elasticsearch:9.0.3)
+
+      - name: Elasticsearch 재시작 대기
+        run: |
+          echo "Waiting for Elasticsearch to restart with Nori plugin..."
+          sleep 30
+          until curl -s http://localhost:9200/_cluster/health | grep -q '"status":"green\|yellow"'; do
+          echo "Waiting for Elasticsearch to be ready after restart..."
+          sleep 10
+          done
+          echo "Elasticsearch with Nori plugin is ready!"
 
       - name: logstash 실행
         uses: sjafferali/logstash-config-lint-action@v1
