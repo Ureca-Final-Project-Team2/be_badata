@@ -62,15 +62,17 @@ public class RecommendService {
     }
 
     private PostsResponse recommendContentBasedFiltering (User user, final boolean isStart) {
-        double[] userVector = userProfileVectorizer.vectorizeUserProfile(user);
-
         if(isStart){
             clearRecommendationCache(user.getId());
         }
 
-        List<Gifticon> candidatePosts = gifticonRepository.getAllSales(user.getUsername(), getRecommendedPostsCache(user.getId()));
+        Set<Long> recommendedPostsId = getRecommendedPostsCache(user.getId());
 
-        List<RecommendationResult> results = candidatePosts.parallelStream()
+        double[] userVector = userProfileVectorizer.vectorizeUserProfile(user, recommendedPostsId);
+
+        List<Gifticon> candidatePosts = gifticonRepository.getAllSales(user.getUsername(), recommendedPostsId);
+
+        List<RecommendationResult> results = candidatePosts.stream()
                 .map(post -> {
                     double[] postVector = post.getVector();
 
