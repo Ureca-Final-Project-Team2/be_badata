@@ -5,6 +5,7 @@ import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
+import com.TwoSeaU.BaData.domain.trade.service.PostSearchService;
 import com.TwoSeaU.BaData.domain.trade.service.PostService;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/trades")
 public class PostController {
     private final PostService postService;
+    private final PostSearchService postSearchService;
 
     @GetMapping("/posts")
     public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPosts(
@@ -32,7 +34,7 @@ public class PostController {
             @RequestParam(required = false) String query,
             @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok().body(ApiResponse.success(postService.searchPosts(query, user == null ? null : user.getUsername(), cursor, size)));
+        return ResponseEntity.ok().body(ApiResponse.success(postSearchService.searchPosts(query, user == null ? null : user.getUsername(), cursor, size)));
     }
 
     @GetMapping("/posts/{userId}/{isSold}")
