@@ -32,12 +32,14 @@ public class ReportService {
     private final GifticonRepository gifticonRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final ReportNotificationService reportNotificationService;
 
+    @Transactional
     public SaveReportResponse createReport(final Long postId, final SaveReportRequest saveReportRequest, final String username) {
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        final Post post = postRepository.findById(postId)
+        final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
         if (saveReportRequest.getReportType() == ReportType.ETC){
@@ -52,6 +54,8 @@ public class ReportService {
 
         final Report savedReport = reportRepository.save(Report.of(post, user, ReportStatus.QUESTION,
                 saveReportRequest.getReportType(), saveReportRequest.getComment()));
+
+        reportNotificationService.sendReportNotification(savedReport);
 
         return SaveReportResponse.of(savedReport.getId());
     }

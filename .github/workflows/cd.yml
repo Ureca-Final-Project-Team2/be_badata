@@ -71,6 +71,8 @@ jobs:
           echo "FIRE_BASE_JSON=${{ secrets.FIRE_BASE_JSON }}" >> $GITHUB_ENV
           echo "ELK_SERVER_URL=${{ secrets.ELK_SERVER_URL }}" >> $GITHUB_ENV
           echo "ELK_PEM_KEY=${{ secrets.ELK_PEM_KEY }}" >> $GITHUB_ENV
+          echo "GOOGLE_MAIL=${{ secrets.GOOGLE_MAIL }}" >> $GITHUB_ENV
+          echo "GOOGLE_MAIL_PASSWORD=${{ secrets.GOOGLE_MAIL_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
