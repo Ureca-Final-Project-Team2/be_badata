@@ -166,7 +166,7 @@ class RentalServiceTest {
                                                     .build();
 
             given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(storeRepository.findByIdWithLock(storeId)).willReturn(Optional.of(store));
             given(storeDeviceRepository.findById(10L)).willReturn(Optional.of(storeDevice));
             given(deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(anyLong(), any(), any()))
                     .willReturn(Optional.of(5L));
