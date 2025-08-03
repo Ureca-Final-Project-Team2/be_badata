@@ -35,7 +35,7 @@ jobs:
       - name: elasticsearch 실행
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          elasticsearch version: '9.0.3'
+          stack-version: '9.0.3'
           host port: 9200
           container port: 9200
           host node port: 9300
