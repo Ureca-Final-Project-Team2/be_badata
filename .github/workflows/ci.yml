@@ -9,22 +9,7 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
     services:
-      elasticsearch:
-        image: elasticsearch:8.11.0
-        ports:
-          - 9200:9200
-          - 9300:9300
-        options: >-
-          --health-cmd "curl -f http://localhost:9200/_cluster/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        env:
-          discovery.type: single-node
-          xpack.security.enabled: "false"
-
       postgres:
         image: postgres:16
         env:
@@ -40,6 +25,14 @@ jobs:
           --health-retries 5
 
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Elasticsearch with Nori
+        uses: miyataka/elasticsearch-github-actions@1
+        with:
+          stack-version: '8.11.0'
+          plugins: 'analysis-nori'
+
       - name: 소스 코드 Checkout
         uses: actions/checkout@v4
 
