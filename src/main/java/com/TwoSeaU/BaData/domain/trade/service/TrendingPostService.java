@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,10 @@ public class TrendingPostService {
         }
 
         if (resultPosts.size() < POSTS_LIMIT) {
-            resultPosts.addAll(postsRepository.getRecentPostsBySize(POSTS_LIMIT - resultPosts.size()));
+            final Set<Long> postIdSet = resultPosts.stream()
+                    .map(Post::getId)
+                    .collect(Collectors.toSet());
+            resultPosts.addAll(postsRepository.getRecentPostsBySize(POSTS_LIMIT - resultPosts.size(), postIdSet));
         }
 
         return resultPosts
