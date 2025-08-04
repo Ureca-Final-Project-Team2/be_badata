@@ -44,15 +44,7 @@ jobs:
 
       - name: 소스 코드 Checkout
         uses: actions/checkout@v4
-
-      - name: Install analysis-nori plugin
-        run: |
-          CONTAINER_ID="${{ job.services.elasticsearch.id }}"
-          docker exec "$CONTAINER_ID" bin/elasticsearch-plugin install --batch analysis-nori
-          docker restart "$CONTAINER_ID"
-          sleep 20
-        shell: bash
-
+        
       - name: Redis 실행
         uses: supercharge/redis-github-action@1.6.0
 
