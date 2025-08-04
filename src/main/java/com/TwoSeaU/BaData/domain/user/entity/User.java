@@ -94,4 +94,6 @@ public class User extends BaseEntity {
     }
 
     public void updateNotificationSetting(final Boolean isEnabled) { this.isNotificationEnabled = isEnabled; }
+
+    public void addData(final Integer data) { this.dataAmount += data; }
 }
