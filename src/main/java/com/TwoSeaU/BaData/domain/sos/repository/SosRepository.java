@@ -15,4 +15,7 @@ public interface SosRepository extends JpaRepository<Sos, Long>, SosQueryReposit
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("SELECT s FROM Sos s WHERE s.id = :id")
 	Optional<Sos> findByIdForUpdate(@Param("id") Long id);
+
+	Optional<Sos> findFirstByRequesterIdOrderByCreatedAtDesc(final Long requesterId);
+
 }

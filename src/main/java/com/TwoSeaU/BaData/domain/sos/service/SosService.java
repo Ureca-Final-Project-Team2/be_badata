@@ -1,5 +1,8 @@
 package com.TwoSeaU.BaData.domain.sos.service;
 
+import java.time.YearMonth;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.TwoSeaU.BaData.domain.sos.dto.response.RespondSosResponse;
@@ -30,6 +33,16 @@ public class SosService {
 	public SaveSosResponse requestSos(final String username) {
 		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+		final Optional<Sos> latestSos = sosRepository.findFirstByRequesterIdOrderByCreatedAtDesc(user.getId());
+		if(latestSos.isPresent()) {
+			final YearMonth latestSosYearMonth = YearMonth.from(latestSos.get().getCreatedAt());
+			final YearMonth nowYearMonth = YearMonth.now();
+
+			if(latestSosYearMonth.equals(nowYearMonth) && latestSos.get().getResponder() != null) {
+				throw new GeneralException(SosException.ALREADY_REQUEST_SOS);
+			}
+		}
 
 		final Sos savedSos = sosRepository.save(Sos.of(user));
 
