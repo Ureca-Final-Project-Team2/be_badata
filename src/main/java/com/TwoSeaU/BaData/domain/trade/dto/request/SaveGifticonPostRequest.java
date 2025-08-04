@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
+@Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SaveGifticonPostRequest {
     @NotNull(message = "제목은 필수 작성입니다.")
