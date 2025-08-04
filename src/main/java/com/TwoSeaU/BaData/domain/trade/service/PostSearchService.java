@@ -86,7 +86,7 @@ public class PostSearchService {
     }
 
     public CursorPageResponse<PostResponse> searchByTitleAndComment(final String userQuery, final String username, final Long cursor, final int size) {
-        final User user = userRepository.findByUsername(username)
+        final User user = username == null ? null : userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
         final NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
