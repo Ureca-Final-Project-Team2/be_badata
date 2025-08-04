@@ -207,7 +207,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 		where.and(qpost.isDeleted.isFalse());
 		where.and(qpost.isSold.isFalse());
 		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
-		where.and(qpost.id.notIn(excludedPostIds));
+		if (excludedPostIds != null && !excludedPostIds.isEmpty()){
+			where.and(qpost.id.notIn(excludedPostIds));
+		}
 
 		return queryFactory.selectFrom(qpost)
 				.where(where)
