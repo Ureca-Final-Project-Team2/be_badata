@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.trade.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.*;
@@ -199,13 +200,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 	}
 
 	@Override
-	public List<Post> getRecentPostsBySize(final int size) {
+	public List<Post> getRecentPostsBySize(final int size, final Set<Long> excludedPostIds) {
 		final QPost qpost = QPost.post;
 		final BooleanBuilder where = new BooleanBuilder();
 
 		where.and(qpost.isDeleted.isFalse());
 		where.and(qpost.isSold.isFalse());
 		where.and(qpost.deadLine.goe(java.time.LocalDate.now()));
+		where.and(qpost.id.notIn(excludedPostIds));
 
 		return queryFactory.selectFrom(qpost)
 				.where(where)

@@ -7,6 +7,7 @@ import com.TwoSeaU.BaData.domain.user.dto.response.GetSaleResponse;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PostQueryRepository {
 
@@ -16,5 +17,5 @@ public interface PostQueryRepository {
 
     CursorPageResponse<PostResponse> searchPostsByDeadLine(final String username, final Long cursor, final int size);
 
-    List<Post> getRecentPostsBySize(final int size);
+    List<Post> getRecentPostsBySize(final int size, final Set<Long> excludedPostIds);
 }
