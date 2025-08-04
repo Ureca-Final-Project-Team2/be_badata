@@ -6,10 +6,12 @@ import com.TwoSeaU.BaData.domain.trade.dto.response.GetValidatePaymentResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
 import com.TwoSeaU.BaData.domain.trade.entity.Payment;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
+import com.TwoSeaU.BaData.domain.trade.entity.PostDocument;
 import com.TwoSeaU.BaData.domain.trade.enums.PayMethod;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.PaymentRepository;
+import com.TwoSeaU.BaData.domain.trade.repository.PostDocumentRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
 import com.TwoSeaU.BaData.domain.user.entity.CoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
@@ -40,6 +42,7 @@ import java.util.UUID;
 @Transactional
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final PostDocumentRepository postDocumentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CoinHistoryRepository coinHistoryRepository;
@@ -156,6 +159,9 @@ public class PaymentService {
         }
 
         payment.updatePaymentStatus(PaymentStatus.PAID);
+
+        final PostDocument postDocument = PostDocument.from(post);
+        postDocumentRepository.delete(postDocument);
 
         user.updateUsedCoin(payment.getUseCoin().intValue());
 

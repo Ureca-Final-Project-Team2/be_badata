@@ -7,34 +7,27 @@ import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
-import com.TwoSeaU.BaData.domain.trade.entity.Data;
-import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
-import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
+import com.TwoSeaU.BaData.domain.trade.entity.*;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
-import com.TwoSeaU.BaData.domain.user.entity.SearchHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
-import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class PostService {
     private final TrendingPostService trendingPostService;
     private final PostRepository postRepository;
@@ -43,12 +36,12 @@ public class PostService {
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
-    private final SearchHistoryRepository searchHistoryRepository;
     private final PaymentRepository paymentRepository;
     private final ELAService elaService;
     private final PostVectorizer postVectorizer;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
+    private final PostDocumentRepository postDocumentRepository;
 
     private static final String COOKIE_NAME = "View_Post";
 
@@ -69,31 +62,6 @@ public class PostService {
 
         return postRepository.searchPostsByDeadLine(username, cursor, size);
     }
-    private void saveSearchHistoryIfUserExists(final String username, final String query) {
-        if (username == null) {
-            return;
-        }
-
-        try {
-            final User user = userRepository.findByUsername(username).orElseThrow(() ->
-                    new GeneralException(UserException.USER_NOT_FOUND));
-
-            searchHistoryRepository.save(SearchHistory.of(user, query));
-        } catch (Exception e) {
-            log.info("검색 기록 저장에 실패: {}", e.getMessage());
-        }
-    }
-
-    public CursorPageResponse<PostResponse> searchPosts(final String query, final String username, final Long cursor, final int size) {
-
-        if (query != null && !query.isEmpty()) {
-            log.info("event-keyword-search, {}", query);
-            saveSearchHistoryIfUserExists(username, query);
-        }
-
-        return postRepository.searchPostsByKeyword(query, username, cursor, size);
-    }
-
 
     public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
 
@@ -135,6 +103,8 @@ public class PostService {
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
+        final PostDocument postDocument = PostDocument.from(savedGifticon);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.builder()
                 .postId(savedGifticon.getId())
@@ -160,6 +130,8 @@ public class PostService {
         );
 
         final Data savedData = dataRepository.save(data);
+        final PostDocument postDocument = PostDocument.from(savedData);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.builder()
                 .postId(savedData.getId())
@@ -260,6 +232,8 @@ public class PostService {
         }
 
         post.updateIsDeleted();
+        final PostDocument postDocument = PostDocument.from(post);
+        postDocumentRepository.delete(postDocument);
 
         return DeletePostResponse.of(postId);
     }
@@ -272,6 +246,9 @@ public class PostService {
                 updateDataPostRequest.getPrice(),
                 updateDataPostRequest.getTitle()
         );
+
+        final PostDocument postDocument = PostDocument.from(post);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.of(post.getId());
     }
@@ -296,6 +273,9 @@ public class PostService {
         );
 
         gifticon.updateVector(vector);
+
+        final PostDocument postDocument = PostDocument.from(gifticon);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.of(post.getId());
     }

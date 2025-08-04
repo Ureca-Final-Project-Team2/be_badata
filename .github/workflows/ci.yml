@@ -9,8 +9,22 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
     services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+        ports:
+          - 9200:9200
+          - 9300:9300
+        env:
+          discovery.type: single-node
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          xpack.security.enabled: false
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
       postgres:
         image: postgres:16
         env:
@@ -26,21 +40,13 @@ jobs:
           --health-retries 5
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: 소스 코드 Checkout
         uses: actions/checkout@v4
-
+        
       - name: Redis 실행
         uses: supercharge/redis-github-action@1.6.0
-
-      - name: elasticsearch 실행
-        uses: getong/elasticsearch-action@v1.3
-        with:
-          elasticsearch version: '8.11.0'
-          host port: 9200
-          container port: 9200
-          host node port: 9300
-          node port: 9300
-          discovery type: 'single-node'
 
       - name: logstash 실행
         uses: sjafferali/logstash-config-lint-action@v1
