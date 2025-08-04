@@ -8,6 +8,7 @@ import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservedDeviceResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
+import com.TwoSeaU.BaData.domain.rental.event.RestockEvent;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
@@ -20,11 +21,11 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +39,7 @@ public class RentalService {
     private final UserRepository userRepository;
     private final StoreDeviceRepository storeDeviceRepository;
     private final ReservationRepository reservationRepository;
-    private final RestockNotificationService restockNotificationService;
-    private final EntityManager em;
-
-
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<ShowReservationDeviceInfoResponse> getReservationDeviceInfoResponse(final LocalDateTime rentalStartDate,
                                                                                     final LocalDateTime rentalEndDate,
@@ -136,9 +134,7 @@ public class RentalService {
         deviceReservationRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
 
-        em.flush();
-
-        restockNotificationService.sendRestockNotification(reservation,deviceReservations);
+        applicationEventPublisher.publishEvent(RestockEvent.from(reservation, deviceReservations));
 
         return reservation.getId();
     }

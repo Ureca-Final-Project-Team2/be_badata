@@ -92,7 +92,7 @@ public class UserService {
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
 		final int totalCount = tradeType == TradeType.SALE
-			? postRepository.countBySellerId(user.getId()) : paymentRepository.countByUserId(user.getId());
+			? postRepository.countBySellerIdAndIsDeletedFalse(user.getId()) : paymentRepository.countByUserId(user.getId());
 
 		return GetTotalPostCountResponse.of(totalCount);
 	}
