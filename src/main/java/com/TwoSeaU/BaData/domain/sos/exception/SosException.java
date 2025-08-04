@@ -15,7 +15,8 @@ public enum SosException implements BaseException {
 	ALREADY_RESPONDER_EXIST(HttpStatus.BAD_REQUEST, 5002, "이미 응답자가 존재합니다."),
 	CANNOT_RESPOND_TO_OWN_SOS(HttpStatus.FORBIDDEN, 5003, "자신이 요청한 SOS에는 응답할 수 없습니다."),
 	CANNOT_CONNECT_SSE(HttpStatus.BAD_REQUEST, 5004, "SSE 연결에 실패하였습니다."),
-	INSUFFICIENT_DATA(HttpStatus.BAD_REQUEST, 5005, "남아 있는 데이터량이 부족합니다.")
+	INSUFFICIENT_DATA(HttpStatus.BAD_REQUEST, 5005, "남아 있는 데이터량이 부족합니다."),
+	ALREADY_REQUEST_SOS(HttpStatus.BAD_REQUEST, 5006, "이번 달에는 이미 SOS를 신청하였습니다.")
 	;
 
 	private final HttpStatus httpStatus;
