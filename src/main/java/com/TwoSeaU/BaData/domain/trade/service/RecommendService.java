@@ -11,7 +11,6 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -150,22 +149,6 @@ public class RecommendService {
             log.warn("{} userId에 대해 Redis를 clear하는 것을 실패했습니다.", userId, e);
 
         }
-    }
-
-    @Transactional
-    public String updateAllPostVector() {
-        for (Gifticon gifticon : gifticonRepository.findAll()) {
-            double[] vector = postVectorizer.vectorizePost(
-                    gifticon.getPrice(),
-                    gifticon.getDeadLine(),
-                    gifticon.getCategory(),
-                    gifticon.getPartner()
-            );
-
-            gifticon.updateVector(vector);
-        }
-
-        return "success";
     }
 
     @Data
