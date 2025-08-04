@@ -56,9 +56,14 @@ public class Sos extends BaseEntity {
 			throw new GeneralException(SosException.CANNOT_RESPOND_TO_OWN_SOS);
 		}
 
+		final int sosData = 100;
+		if(responder.getDataAmount() < 100) {
+			throw new GeneralException(SosException.INSUFFICIENT_DATA);
+		}
+
 		this.responder = responder;
-		this.requester.addData(100);
-		this.responder.addData(-100);
+		this.requester.addData(sosData);
+		this.responder.addData(-sosData);
 
 		return true;
 	}
