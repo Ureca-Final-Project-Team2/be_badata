@@ -17,5 +17,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, Payment
 	@Query("SELECT COUNT(p) FROM Payment p "
 		+ "WHERE p.user.id = :buyerId "
 		+ "AND p.post.isDeleted = false")
-	int countByUserIdAndPostIsNotDeleted(@Param("buyerId") Long buyerId);
+	int countByUserIdAndPostIsNotDeleted(@Param("buyerId") final Long buyerId);
 }
