@@ -1,7 +1,9 @@
 package com.TwoSeaU.BaData.domain.trade.repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.TwoSeaU.BaData.domain.trade.entity.*;
@@ -78,23 +80,54 @@ public class PostLikesQueryRepositoryImpl implements PostLikesQueryRepository{
 
 	@Override
 	public List<Long> findDistinctPostIdsByUserId(Long userId) {
-		QPostLikes postLikes = QPostLikes.postLikes;
-		QPayment payment = QPayment.payment;
+		final QPostLikes qPostLikes = QPostLikes.postLikes;
+		final QPayment qPayment = QPayment.payment;
 
-		return queryFactory.select(postLikes.post.id)
-				.from(postLikes)
+		return queryFactory.select(qPostLikes.post.id)
+				.from(qPostLikes)
 				.where(
-						postLikes.user.id.eq(userId),
-						postLikes.post.id.notIn(
+						qPostLikes.user.id.eq(userId),
+						qPostLikes.post.id.notIn(
 								JPAExpressions
-										.select(payment.post.id)
-										.from(payment)
+										.select(qPayment.post.id)
+										.from(qPayment)
 										.where(
-												payment.user.id.eq(userId),
-												payment.paymentStatus.eq(PaymentStatus.PAID)
+												qPayment.user.id.eq(userId),
+												qPayment.paymentStatus.eq(PaymentStatus.PAID)
 										)
 						)
 				)
 				.fetch();
 	}
+
+	@Override
+	public Map<Long, Integer> countByPostIds(final List<Long> postIds) {
+		final QPostLikes qPostLikes = QPostLikes.postLikes;
+
+		return queryFactory.select(qPostLikes.post.id, qPostLikes.count())
+				.from(qPostLikes)
+				.where(qPostLikes.post.id.in(postIds))
+				.groupBy(qPostLikes.post.id)
+				.fetch()
+				.stream()
+				.collect(Collectors.toMap(
+						tuple -> tuple.get(0, Long.class),
+						tuple -> tuple.get(1, Long.class).intValue()
+				));
+	}
+
+	@Override
+	public Set<Long> findLikedPostIdsByUserIdAndPostIds(final Long userId, final List<Long> postIds) {
+		final QPostLikes qPostLikes = QPostLikes.postLikes;
+
+		return new HashSet<>(queryFactory.select(qPostLikes.post.id)
+                .from(qPostLikes)
+                .where(
+                        qPostLikes.user.id.eq(userId),
+                        qPostLikes.post.id.in(postIds)
+                )
+                .fetch());
+
+	}
+
 }
