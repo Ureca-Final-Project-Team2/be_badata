@@ -39,11 +39,11 @@ public class SosService {
 	}
 
 	public RespondSosResponse respondSos(final Long sosId, final String username) {
+		final Sos sos = sosRepository.findByIdForUpdate(sosId)
+			.orElseThrow(() -> new GeneralException(SosException.SOS_NOT_FOUND));
+
 		final User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-		final Sos sos = sosRepository.findById(sosId)
-			.orElseThrow(() -> new GeneralException(SosException.SOS_NOT_FOUND));
 
 		final Boolean isSuccess = sos.respond(user);
 

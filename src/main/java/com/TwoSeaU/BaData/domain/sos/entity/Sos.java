@@ -57,6 +57,9 @@ public class Sos extends BaseEntity {
 		}
 
 		this.responder = responder;
+		this.requester.addData(100);
+		this.responder.addData(-100);
+
 		return true;
 	}
 }
