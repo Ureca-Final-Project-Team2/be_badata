@@ -65,6 +65,9 @@ public class Sos extends BaseEntity {
 		this.requester.addData(sosData);
 		this.responder.addData(-sosData);
 
+		final int rewardCoin = 10;
+		this.responder.addCoin(rewardCoin);
+
 		return true;
 	}
 }
