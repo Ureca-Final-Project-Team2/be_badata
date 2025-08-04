@@ -50,6 +50,7 @@ jobs:
           CONTAINER_ID="${{ job.services.elasticsearch.id }}"
           docker exec "$CONTAINER_ID" bin/elasticsearch-plugin install --batch analysis-nori
           docker restart "$CONTAINER_ID"
+          sleep 20
         shell: bash
 
       - name: Redis 실행
