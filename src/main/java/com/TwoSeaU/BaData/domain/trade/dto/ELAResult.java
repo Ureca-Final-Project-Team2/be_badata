@@ -15,8 +15,8 @@ public class ELAResult {
         this.ratio = ratio;
     }
 
-    //테스트를 위해 임시로 검증을 통과하도록 하드코딩
+    //테스트를 위해 임시로 아주 높은 조작 수치가 아니라면 통과
     public boolean isManipulated() {
-        return false;
+        return this.ratio > 98;
     }
 }

@@ -306,7 +306,7 @@ public class PostService {
         }
 
         if (post.getIsSold()) {
-            throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
+            throw new GeneralException(TradeException.SOLD_POST_ALREADY);
         }
     }
 

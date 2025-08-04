@@ -50,6 +50,7 @@ public enum TradeException implements BaseException {
     NOT_PURCHASED_GIFTICON(HttpStatus.BAD_REQUEST, 3038, "구매하지 않은 기프티콘은 조회할 수 없습니다."),
     GIFTICON_NOT_FOUND(HttpStatus.NOT_FOUND, 3039, "신고하려는 게시글이 기프티콘이 아닙니다."),
     BARCODE_NOT_VIEWED(HttpStatus.BAD_REQUEST, 3040, "바코드를 조회하지 않은 기프티콘은 신고할 수 없습니다."),
+    SOLD_POST_ALREADY(HttpStatus.BAD_REQUEST, 3041, "이미 판매 완료된 게시글입니다."),
     ;
 
     private final HttpStatus httpStatus;
