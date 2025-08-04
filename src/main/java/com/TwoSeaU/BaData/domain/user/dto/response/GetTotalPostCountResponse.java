@@ -1,7 +1,5 @@
 package com.TwoSeaU.BaData.domain.user.dto.response;
 
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class GetAllPurchasesResponse {
+public class GetTotalPostCountResponse {
+	private Integer postCount;
 
-	private List<GetPurchaseResponse> purchaseResponseList;
-
-	public static GetAllPurchasesResponse of(List<GetPurchaseResponse> purchaseResponseList) {
-		return GetAllPurchasesResponse.builder()
-			.purchaseResponseList(purchaseResponseList)
+	public static GetTotalPostCountResponse of(final Integer postCount) {
+		return GetTotalPostCountResponse.builder()
+			.postCount(postCount)
 			.build();
 	}
 }

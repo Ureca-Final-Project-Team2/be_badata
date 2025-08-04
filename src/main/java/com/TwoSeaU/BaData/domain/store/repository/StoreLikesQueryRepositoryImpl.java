@@ -1,7 +1,11 @@
 package com.TwoSeaU.BaData.domain.store.repository;
 
+import static com.TwoSeaU.BaData.domain.store.entity.QStoreLikes.storeLikes;
+
+import java.util.HashSet;
 import java.util.List;
 
+import java.util.Set;
 import org.springframework.stereotype.Repository;
 
 import com.TwoSeaU.BaData.domain.store.entity.QStoreLikes;
@@ -59,5 +63,19 @@ public class StoreLikesQueryRepositoryImpl implements StoreLikesQueryRepository 
 		Long nextCursor = responseList.isEmpty() ? null : responseList.get(responseList.size() - 1).getId();
 
 		return CursorPageResponse.of(responseList, nextCursor, hasNext);
+	}
+
+	@Override
+	public Set<Long> getUserLikedStoreIds(final String username) {
+
+		if(username == null){
+			return new HashSet<>();
+		}
+
+		return new HashSet<>(queryFactory
+				.select(storeLikes.store.id)
+				.from(storeLikes)
+				.where(storeLikes.user.username.eq(username))
+				.fetch());
 	}
 }

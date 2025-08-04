@@ -41,6 +41,7 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String detailAddress;
 
+    @Column(length = 1000)
     private String storeImage;
 
     @Column(nullable = false)

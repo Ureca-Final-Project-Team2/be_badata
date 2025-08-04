@@ -6,6 +6,7 @@ import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import com.TwoSeaU.BaData.global.response.GeneralException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,6 +58,9 @@ public class Reservation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+    @OneToMany(mappedBy = "reservation")
+    private List<DeviceReservation> deviceReservations = new ArrayList<>();
+
     public static Reservation of(final User user, final Store store, final LocalDateTime rentalStartDate, final LocalDateTime rentalEndDate){
 
         if (rentalStartDate.isAfter(rentalEndDate)) {
@@ -72,6 +79,10 @@ public class Reservation extends BaseEntity {
 
     public void changePrice(final Integer price){
         this.price = price;
+    }
+
+    public void updateStatus(final ReservationStatus reservationStatus){
+        this.status = reservationStatus;
     }
 
 

@@ -1,7 +1,8 @@
 package com.TwoSeaU.BaData.domain.rental.dto.response;
 
+import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
+import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Review;
-import com.TwoSeaU.BaData.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +32,19 @@ public class ShowReviewResponse {
 
     private LocalDateTime createdAt;
 
+    private LocalDateTime rentalStartDate;
+
     private Integer rating;
 
     private Integer countOfVisit;
 
     private List<String> quickReplyNames = new ArrayList<>();
 
-    public static ShowReviewResponse from(final Review review, final Integer countOfVisit, final List<String> quickReplyName){
+    private List<ShowReservedDeviceOnReviewResponse> reservedDeviceOnReviewResponses = new ArrayList<>();
+
+    public static ShowReviewResponse from(final Review review, final Integer countOfVisit, final List<String> quickReplyName, final List<DeviceReservation> deviceReservations){
+
+        final Reservation reservation = review.getReservation();
 
         return ShowReviewResponse.builder()
                 .reviewId(review.getId())
@@ -50,6 +57,8 @@ public class ShowReviewResponse {
                 .rating(review.getRating())
                 .countOfVisit(countOfVisit)
                 .quickReplyNames(quickReplyName)
+                .rentalStartDate(reservation.getRentalStartDate())
+                .reservedDeviceOnReviewResponses(deviceReservations.stream().map(ShowReservedDeviceOnReviewResponse::from).toList())
                 .build();
     }
 

@@ -7,8 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -29,14 +30,10 @@ public class SaveGifticonPostRequest {
     @NotNull(message = "유효 기간은 필수입니다.")
     private LocalDate deadLine;
 
-    @NotNull(message = "발급일은 필수입니다.")
-    private LocalDateTime issueDate;
-
     @NotNull(message = "가격은 필수 작성입니다.")
     @PositiveOrZero(message = "가격은 양수여야 합니다.")
-    private Integer price;
+    private BigDecimal price;
 
-    @NotNull(message = "상세 설명은 필수 작성입니다.")
     private String comment;
 
     @NotNull(message = "쿠폰 이미지 등록은 필수입니다.")

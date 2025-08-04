@@ -8,10 +8,10 @@ import com.TwoSeaU.BaData.domain.rental.dto.response.ShowReservedDeviceResponse;
 import com.TwoSeaU.BaData.domain.rental.entity.DeviceReservation;
 import com.TwoSeaU.BaData.domain.rental.entity.Reservation;
 import com.TwoSeaU.BaData.domain.rental.enums.ReservationStatus;
+import com.TwoSeaU.BaData.domain.rental.event.RestockEvent;
 import com.TwoSeaU.BaData.domain.rental.exception.RentalException;
 import com.TwoSeaU.BaData.domain.rental.repository.DeviceReservationRepository;
 import com.TwoSeaU.BaData.domain.rental.repository.ReservationRepository;
-import com.TwoSeaU.BaData.domain.store.entity.Device;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 import com.TwoSeaU.BaData.domain.store.exception.StoreException;
@@ -24,8 +24,8 @@ import com.TwoSeaU.BaData.global.response.GeneralException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +39,19 @@ public class RentalService {
     private final UserRepository userRepository;
     private final StoreDeviceRepository storeDeviceRepository;
     private final ReservationRepository reservationRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<ShowReservationDeviceInfoResponse> getReservationDeviceInfoResponse(final LocalDateTime rentalStartDate,
                                                                                     final LocalDateTime rentalEndDate,
                                                                                     final Long storeId){
 
-        if(!storeRepository.existsById(storeId)){
+        if (!storeRepository.existsById(storeId)){
             throw new GeneralException(StoreException.CANT_FIND_STORE);
+        }
+
+        if (rentalStartDate == null || rentalEndDate == null){
+            return deviceReservationRepository.findAvailableDevicesByStoreId(storeId).stream()
+                    .map(ShowReservationDeviceInfoResponse::from).toList();
         }
 
         return deviceReservationRepository.findAvailableDevicesByStoreIdAndPeriod(storeId,rentalStartDate,rentalEndDate)
@@ -60,7 +66,7 @@ public class RentalService {
         final User user = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(
                 UserException.COIN_NOT_FOUND));
 
-        final Store store = storeRepository.findById(reserveRentalRequest.getStoreId()).orElseThrow(()-> new GeneralException(
+        final Store store = storeRepository.findByIdWithLock(reserveRentalRequest.getStoreId()).orElseThrow(()-> new GeneralException(
                 StoreException.CANT_FIND_STORE));
 
         final Reservation reservation = Reservation.of(user,store,reserveRentalRequest.getRentalStartDate(),
@@ -102,13 +108,15 @@ public class RentalService {
             throw new GeneralException(RentalException.CANT_ACCESS_TO_OTHER_RESERVATION);
         }
 
+        final Integer countOfVisit = reservationRepository.countByReservationAndStore(reservation.getStore(), loginUser);
+
         // 특정 예약에 대한 장치 가져오기
         final List<ShowReservedDeviceResponse> reservedStoreDevice = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(reservationId).stream().map(deviceReservation -> {
             final StoreDevice storeDevice = deviceReservation.getStoreDevice();
             return ShowReservedDeviceResponse.from(storeDevice, deviceReservation, reservation);
         }).toList();
 
-        return ShowRentalResponse.of(reservation.getStore().getName(), reservedStoreDevice);
+        return ShowRentalResponse.of(reservation.getStore(), reservedStoreDevice, countOfVisit);
 
     }
 
@@ -121,11 +129,17 @@ public class RentalService {
 
         validateCancelReservation(loginUser, reservation);
 
+        final List<DeviceReservation> deviceReservations = deviceReservationRepository.findByReservationIdWithFetchStoreDeviceAndDevice(reservationId);
+
         deviceReservationRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
 
+        applicationEventPublisher.publishEvent(RestockEvent.from(reservation, deviceReservations));
+
         return reservation.getId();
     }
+
+
 
     private void validateCancelReservation(final User loginUser, final Reservation reservation) {
 
@@ -143,6 +157,32 @@ public class RentalService {
 
     private void validateRentalCondition(final ReserveRentalRequest reserveRentalRequest){
 
+        validateReserveCountCondition(reserveRentalRequest);
+        validateReserveRentalDate(reserveRentalRequest);
+    }
+
+    private void validateReserveRentalDate(final ReserveRentalRequest reserveRentalRequest) {
+
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime rentalStartDateTime = reserveRentalRequest.getRentalStartDate();
+        final LocalDateTime rentalEndDateTime = reserveRentalRequest.getRentalEndDate();
+
+        if (rentalStartDateTime == null || rentalEndDateTime == null) {
+            throw new GeneralException(RentalException.CANT_RESERVATION_ON_DATE_NULL);
+        }
+
+        if (rentalStartDateTime.toLocalDate().isEqual(now.toLocalDate()) ||
+                !rentalStartDateTime.isAfter(now) ||
+                rentalStartDateTime.isAfter(now.plusYears(10)) ||
+                !rentalStartDateTime.isBefore(rentalEndDateTime)) {
+
+            throw new GeneralException(RentalException.CANT_RESERVATION_NOT_VALID_RENTAL_DATE);
+        }
+
+    }
+
+    private void validateReserveCountCondition(final ReserveRentalRequest reserveRentalRequest) {
+        
         reserveRentalRequest.getStoreDevices().forEach(reserveDeviceRequest -> {
 
             final StoreDevice storeDevice = storeDeviceRepository.findById(reserveDeviceRequest.getStoreDeviceId())
@@ -150,6 +190,10 @@ public class RentalService {
 
             if(!storeDevice.getStore().getId().equals(reserveRentalRequest.getStoreId())){
                 throw new GeneralException(RentalException.DONT_MATCH_STORE_DEVICE_STORE);
+            }
+
+            if(storeDevice.getCount() < reserveDeviceRequest.getCount()){
+                throw new GeneralException(RentalException.CANT_RESERVATION_MORE_THAN_COUNT);
             }
 
             Long availableCount = deviceReservationRepository.findAvailableCountsByStoreDeviceIdAndPeriod(

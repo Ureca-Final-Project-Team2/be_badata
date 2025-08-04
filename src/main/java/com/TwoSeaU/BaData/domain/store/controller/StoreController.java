@@ -12,7 +12,11 @@ import com.TwoSeaU.BaData.global.response.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,15 +32,20 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping("/map")
-    public ResponseEntity<ApiResponse<List<ShowStoreMapResponse>>> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest){
+    public ResponseEntity<ApiResponse<List<ShowStoreMapResponse>>> getStoreMapResponse(@ModelAttribute StoreMapSearchRequest storeMapSearchRequest,
+                                                                                       @RequestParam int zoomLevel,
+                                                                                       @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest)));
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreMapResponse(storeMapSearchRequest, user == null ? null : user.getUsername(), zoomLevel)));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<ShowStoreWithMetaResponse>> getStoresResponse(@ModelAttribute StoreSearchRequest storeSearchRequest, Pageable pageable){
+    public ResponseEntity<ApiResponse<ShowStoreWithMetaResponse>> getStoresResponse(@ModelAttribute StoreSearchRequest storeSearchRequest,
+                                                                                    @PageableDefault(size = 10, page = 0, sort = "distance", direction = Sort.Direction.ASC)
+                                                                                    final Pageable pageable,
+                                                                                    @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoresResponse(storeSearchRequest,pageable)));
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoresResponse(storeSearchRequest, pageable, user == null ? null : user.getUsername())));
     }
 
     @GetMapping("/{storeId}/devices")
@@ -49,9 +58,12 @@ public class StoreController {
     @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<ShowStoreDetailResponse>> getStoreDetailResponse(@PathVariable("storeId") Long storeId,
                                                                                        @RequestParam("centerLat") Double centerLat,
-                                                                                       @RequestParam("centerLng") Double centerLng){
+                                                                                       @RequestParam("centerLng") Double centerLng,
+                                                                                       @AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng)));
+        final String username = user==null ? null : user.getUsername();
+
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(storeId,centerLat,centerLng, username)));
     }
 
 

@@ -18,17 +18,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetRentalResponse {
 	private Long id;
+	private Long storeId;
 	private String storeName;
 	private LocalDateTime rentalStartDate;
+	private LocalDateTime rentalEndDate;
 	private Integer price;
+	private Boolean isReviewed;
 	private ReservationStatus reservationStatus;
 
-	public static GetRentalResponse from(final Reservation reservation, final Store store) {
+	public static GetRentalResponse from(final Reservation reservation, final Store store, final Boolean isReviewed) {
 		return GetRentalResponse.builder()
 			.id(reservation.getId())
+			.storeId(store.getId())
 			.storeName(store.getName())
 			.rentalStartDate(reservation.getRentalStartDate())
+			.rentalEndDate(reservation.getRentalEndDate())
 			.price(reservation.getPrice())
+			.isReviewed(isReviewed)
 			.reservationStatus(reservation.getStatus())
 			.build();
 	}

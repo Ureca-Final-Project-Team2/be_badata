@@ -24,6 +24,7 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
         MAX(sd.device.name) AS deviceName,
         sd.price AS price,
         MAX(sd.device.imageUrl) AS imageUrl,
+        sd.count AS totalCount,
         (sd.count - COALESCE(SUM(
             CASE 
                 WHEN r.id IS NOT NULL 
@@ -44,6 +45,26 @@ public interface DeviceReservationRepository extends JpaRepository<DeviceReserva
             @Param("rentalStartDate") LocalDateTime rentalStartDate,
             @Param("rentalEndDate") LocalDateTime rentalEndDate
     );
+
+    @Query("""
+    SELECT   
+        sd.id AS storeDeviceId,
+        sd.device.id AS deviceId,
+        sd.dataCapacity AS dataCapacity,
+        MAX(sd.device.name) AS deviceName,
+        sd.price AS price,
+        MAX(sd.device.imageUrl) AS imageUrl,
+        sd.count AS totalCount,
+        sd.count AS availableCount
+    FROM StoreDevice sd
+    WHERE sd.store.id = :storeId
+    GROUP BY sd.id
+    """)
+    List<AvailableDeviceProjection> findAvailableDevicesByStoreId(
+            @Param("storeId") Long storeId
+    );
+
+
 
     @Query("""
     SELECT 

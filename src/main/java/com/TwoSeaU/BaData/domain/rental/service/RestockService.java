@@ -12,7 +12,7 @@ import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
-import java.util.Optional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,14 +39,33 @@ public class RestockService {
                 UserException.USER_NOT_FOUND));
 
         final ReStock reStock = reStockRepository.save(
-                ReStock.of(storeDevice, user, restockDeviceRequest.getDesiredStartDate(), restockDeviceRequest.getDesiredEndDate()));
+                ReStock.of(storeDevice, user, restockDeviceRequest.getDesiredStartDate(), restockDeviceRequest.getDesiredEndDate(),
+                        restockDeviceRequest.getCount()));
 
         return reStock.getId();
+    }
+
+    @Transactional
+    public Long deleteRestock(final Long restockId, final String username){
+
+        final User loginUser = userRepository.findByUsername(username).orElseThrow(()->new GeneralException(UserException.USER_NOT_FOUND));
+
+        final ReStock reStock = reStockRepository.findById(restockId).orElseThrow(()-> new GeneralException(RentalException.CANT_FIND_RESTOCK));
+
+        if(!reStock.getUser().getId().equals(loginUser.getId())){
+            throw new GeneralException(RentalException.CANT_DELETE_OTHER_RESTOCK);
+        }
+
+        reStockRepository.delete(reStock);
+
+        return restockId;
     }
 
 
     // 해당 기간에 예약 가능하다면 예외 처리
     private void validateRestock(final RestockDeviceRequest restockDeviceRequest, final StoreDevice storeDevice){
+
+        validateRestockDate(restockDeviceRequest);
 
         // 재입고 알림 요청 댓수가 가맹점이 소유한 기기보다 더 많다면
         if(storeDevice.getCount()<restockDeviceRequest.getCount()){
@@ -61,6 +80,26 @@ public class RestockService {
 
         if(availableCount >= restockDeviceRequest.getCount()){
             throw new GeneralException(RentalException.CANT_RESTOCK_WHEN_AVAILABLE_COUNT);
+        }
+
+    }
+
+    private void validateRestockDate(final RestockDeviceRequest RestockDeviceRequest) {
+
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime desiredStartDateTime = RestockDeviceRequest.getDesiredStartDate();
+        final LocalDateTime desiredEndDateTime = RestockDeviceRequest.getDesiredEndDate();
+
+        if (desiredStartDateTime == null || desiredEndDateTime == null) {
+            throw new GeneralException(RentalException.CANT_RESTOCK_ON_DATE_NULL);
+        }
+
+        if (desiredStartDateTime.toLocalDate().isEqual(now.toLocalDate()) ||
+                !desiredStartDateTime.isAfter(now) ||
+                desiredStartDateTime.isAfter(now.plusYears(10)) ||
+                !desiredStartDateTime.isBefore(desiredEndDateTime)) {
+
+            throw new GeneralException(RentalException.CANT_RESTOCK_NOT_VALID_RENTAL_DATE);
         }
 
     }

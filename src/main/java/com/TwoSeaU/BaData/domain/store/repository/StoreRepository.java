@@ -2,8 +2,11 @@ package com.TwoSeaU.BaData.domain.store.repository;
 
 import com.TwoSeaU.BaData.domain.store.dto.projection.StoreWithDistanceProjection;
 import com.TwoSeaU.BaData.domain.store.entity.Store;
+import jakarta.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,5 +30,9 @@ public interface StoreRepository extends JpaRepository<Store,Long> {
             @Param("lat") double latitude,
             @Param("lon") double longitude
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM Store s WHERE s.id = :id")
+    Optional<Store> findByIdWithLock(@Param("id") Long id);
 
 }

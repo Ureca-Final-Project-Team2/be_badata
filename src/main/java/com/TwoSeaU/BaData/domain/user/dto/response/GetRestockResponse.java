@@ -2,6 +2,7 @@ package com.TwoSeaU.BaData.domain.user.dto.response;
 
 import com.TwoSeaU.BaData.domain.rental.entity.ReStock;
 import com.TwoSeaU.BaData.domain.store.entity.Device;
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import com.TwoSeaU.BaData.domain.store.entity.StoreDevice;
 
 import lombok.AccessLevel;
@@ -19,15 +20,19 @@ public class GetRestockResponse {
 	private String deviceImage;
 	private Integer price;
 	private String deviceName;
+	private String storeName;
+	private Integer desiredCount;
 	private Boolean is5G;
 
-	public static GetRestockResponse from(final ReStock reStock, final StoreDevice storeDevice, final Device device) {
+	public static GetRestockResponse from(final ReStock reStock, final StoreDevice storeDevice, final Device device, final Store store) {
 		return GetRestockResponse.builder()
 			.id(reStock.getId())
 			.deviceImage(device.getImageUrl())
 			.deviceName(device.getName())
 			.price(storeDevice.getPrice())
 			.is5G(device.getIs5G())
+			.storeName(store.getName())
+			.desiredCount(reStock.getDesiredCount())
 			.build();
 	}
 }

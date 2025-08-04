@@ -3,7 +3,12 @@ package com.TwoSeaU.BaData.domain.trade.entity;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -27,7 +32,7 @@ public abstract class Post extends BaseEntity {
 
     private String comment;
 
-    private Integer price;
+    private BigDecimal price;
 
     private LocalDate deadLine;
 
@@ -35,7 +40,9 @@ public abstract class Post extends BaseEntity {
 
     private Boolean isSold;
 
-    public Post(final User seller, final String title, final String comment, final Integer price,
+    private Boolean isDeleted;
+
+    public Post(final User seller, final String title, final String comment, final BigDecimal price,
                 final LocalDate deadLine, final String postImage, final Boolean isSold) {
         this.seller = seller;
         this.title = title;
@@ -44,14 +51,25 @@ public abstract class Post extends BaseEntity {
         this.deadLine = deadLine;
         this.postImage = postImage;
         this.isSold = isSold;
+        this.isDeleted = false;
     }
 
-    public void updateCommentAndPrice(final String comment, final Integer price) {
+    public void updateCommentAndPrice(final String comment, final BigDecimal price) {
         this.comment = comment;
         this.price = price;
     }
 
+    public void updateCommentAndPriceAndTitle(final String comment, final BigDecimal price, final String title) {
+        this.comment = comment;
+        this.price = price;
+        this.title = title;
+    }
+
     public void updateIsSold(final Boolean isSold) {
         this.isSold = isSold;
+    }
+
+    public void updateIsDeleted() {
+        this.isDeleted = true;
     }
 }

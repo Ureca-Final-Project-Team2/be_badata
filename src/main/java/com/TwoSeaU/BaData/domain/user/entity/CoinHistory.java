@@ -16,8 +16,10 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,12 +40,15 @@ public class CoinHistory extends BaseEntity {
 
 	private Integer amount;
 
-	public static CoinHistory of(final User user, final CoinSource coinSource, final Integer amount) {
+	private Integer totalAmount;
+
+	public static CoinHistory of(final User user, final CoinSource coinSource, final Integer amount, final Integer totalAmount) {
 
 		return CoinHistory.builder()
 			.user(user)
 			.coinSource(coinSource)
 			.amount(amount)
+			.totalAmount(totalAmount)
 			.build();
 	}
 }

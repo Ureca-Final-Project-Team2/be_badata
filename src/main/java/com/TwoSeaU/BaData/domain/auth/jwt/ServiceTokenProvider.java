@@ -132,6 +132,7 @@ public class ServiceTokenProvider implements InitializingBean {
             log.info("잘못된 형식의 토큰입니다.");
         } catch(ExpiredJwtException e) {
             log.info("만료된 토큰입니다.");
+            throw e;
         } catch(UnsupportedJwtException e) {
             log.info("지원하지 않는 형식의 토큰입니다.");
         } catch(IllegalArgumentException e) {

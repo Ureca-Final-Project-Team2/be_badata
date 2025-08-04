@@ -7,9 +7,12 @@ import com.TwoSeaU.BaData.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,9 +48,15 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    private Boolean isNotificationEnabled;
+
     private String email;
 
     private String profileImageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
+    private PlanData planData;
 
     public static User of(final String nickName,
                           final String userName,
@@ -57,7 +66,8 @@ public class User extends BaseEntity {
                           final Role role,
                           final SocialType socialType,
                           final String email,
-                          final String profileImageUrl){
+                          final String profileImageUrl,
+                          final PlanData planData){
 
         return User.builder()
                 .nickName(nickName)
@@ -67,10 +77,23 @@ public class User extends BaseEntity {
                 .coin(coin)
                 .role(role)
                 .socialType(socialType)
+                .isNotificationEnabled(true)
                 .email(email)
                 .profileImageUrl(profileImageUrl)
+                .planData(planData)
                 .build();
 
     }
 
+    public void updateUsedCoin(final Integer usedCoin) {
+        this.coin -= usedCoin;
+    }
+
+    public void addCoin(final Integer coin){
+        this.coin += coin;
+    }
+
+    public void updateNotificationSetting(final Boolean isEnabled) { this.isNotificationEnabled = isEnabled; }
+
+    public void addData(final Integer data) { this.dataAmount += data; }
 }

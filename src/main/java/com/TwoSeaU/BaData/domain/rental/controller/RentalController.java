@@ -31,8 +31,8 @@ public class RentalController {
 
     @GetMapping("/{storeId}/devices")
     public ResponseEntity<ApiResponse<List<ShowReservationDeviceInfoResponse>>> getStoreDetailDeviceResponse(
-            @RequestParam("rentalStartDate") LocalDateTime rentalStartDate,
-            @RequestParam("rentalEndDate") LocalDateTime rentalEndDate,
+            @RequestParam(value = "rentalStartDate",required = false) LocalDateTime rentalStartDate,
+            @RequestParam(value = "rentalEndDate",required = false) LocalDateTime rentalEndDate,
             @PathVariable("storeId") Long storeId){
 
         return ResponseEntity.ok(ApiResponse.success(rentalService.getReservationDeviceInfoResponse(rentalStartDate,rentalEndDate,storeId)));

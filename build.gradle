@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.13'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.2SeaU'
@@ -32,8 +33,6 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	//validation
@@ -56,7 +55,6 @@ dependencies {
 	// hibernate-spatial
 	implementation 'org.hibernate.orm:hibernate-spatial'
 
-
 	//queryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
@@ -68,8 +66,82 @@ dependencies {
 
 	//s3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+
+	//google cloud vision
+	implementation 'com.google.cloud:google-cloud-vision:3.65.0'
+
+	//test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.testcontainers:postgresql'
+	testImplementation "org.testcontainers:junit-jupiter"
+
+	//logback
+	implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
+
+	//elastic search
+	implementation 'co.elastic.clients:elasticsearch-java:8.12.2'
+	implementation 'org.springframework.data:spring-data-elasticsearch:5.2.0'
+
+	//FCM
+	implementation 'com.google.firebase:firebase-admin:9.3.0'
+
+	//prometheus
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	//websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.webjars:sockjs-client:1.0.2'
+	implementation 'org.webjars:stomp-websocket:2.3.3'
+
+	// mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.9"
+}
+
+/** Jacoco start **/
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+
+		// QueryDSL Q클래스 제외
+		def Qdomains = []
+		for (qPattern in "**/QA".."**/QZ") {
+			Qdomains.add(qPattern + "*")
+		}
+
+		def jacocoExcludePatterns = [
+				'com/TwoSeaU/BaDataApplication.class',
+				'**/common/**',
+				'**/exception/**',
+				'**/dto/**',
+				'**/config/**',
+				'**/test/**'
+		]
+
+		afterEvaluate {
+			classDirectories.setFrom(files(classDirectories.files.collect {
+				fileTree(dir: it,
+						exclude:  Qdomains + jacocoExcludePatterns)
+			}))
+		}
+
+		xml.destination file("${buildDir}/jacoco/index.xml")
+		html.destination file("${buildDir}/jacoco/index.html")
+	}
 }

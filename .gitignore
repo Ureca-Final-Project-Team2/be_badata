@@ -39,3 +39,4 @@ node_modules
 
 ### application.properties ###
 /src/main/resources/*.properties
+/src/main/resources/firebase.json

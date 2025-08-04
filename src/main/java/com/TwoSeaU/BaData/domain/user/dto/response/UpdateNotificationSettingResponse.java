@@ -1,5 +1,7 @@
 package com.TwoSeaU.BaData.domain.user.dto.response;
 
+import com.TwoSeaU.BaData.domain.user.entity.User;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class DataResponse {
+public class UpdateNotificationSettingResponse {
 
-	private Integer dataAmount;
+	private Boolean isNotificationEnabled;
 
-	public static DataResponse of(final Integer dataAmount) {
-		return DataResponse.builder()
-			.dataAmount(dataAmount)
+	public static UpdateNotificationSettingResponse from(final User user) {
+		return UpdateNotificationSettingResponse.builder()
+			.isNotificationEnabled(user.getIsNotificationEnabled())
 			.build();
 	}
 }

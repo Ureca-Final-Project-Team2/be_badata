@@ -3,13 +3,14 @@
 ## 🛠 기술적 특징
 
 ### - ERD 🔗[ERDCloud에서 열기](https://www.erdcloud.com/d/NnvfEkHaQgXSXHWCm)
-<img src="https://github.com/user-attachments/assets/0a8563e0-43b0-4050-aba6-bbd1b884ee54" style="width:100%; height:auto;" />
+
+<img src="https://github.com/user-attachments/assets/7721441f-692e-497a-a105-c09021ddb369" style="width:100%; height:auto;" />
 
 <br>
 
 ### - 아키텍처 
 
-<img src="https://github.com/user-attachments/assets/27973cb4-3853-4115-ae58-9a0f82114734" style="width:100%; height:auto;" />
+<img width="985" height="765" alt="image" src="https://github.com/user-attachments/assets/a5b95953-23ab-451c-b3f1-33201a3164bb" />
 
 <br>
 
@@ -28,6 +29,11 @@
 | AWS S3           | <img src="https://github.com/user-attachments/assets/dcd0111d-e598-4b05-9f76-0d7f033f85c3" width="40"/> | 객체 스토리지      | 이미지 파일 저장 및 관리                                     |
 | AWS EC2          | <img src="https://github.com/user-attachments/assets/0db85e5d-7497-4874-8ecb-9fa711ac72f3" width="40"/> | 컴퓨팅 서비스      | 유연한 서버 인프라 제공                                     |
 | AWS RDS          | <img src="https://github.com/user-attachments/assets/3b6db2b5-10ae-4196-81b8-3450f7c3005b" width="40"/> | 관리형 DB          | 간편한 DB 관리 및 자동 백업과 확장성 제공                    |
+| Grafana          | <img src="https://github.com/user-attachments/assets/437994d4-0f2d-457b-bf66-2bda16aee882" width="40"/> | 모니터링 도구	      | 시스템/애플리케이션 지표 실시간 모니터링                    |
+| Prometheus       | <img src="https://github.com/user-attachments/assets/d2dc8ac8-ec42-48bc-a59e-822bc1fb3eee" width="40"/> | 메트릭 수집 도구 	  | 메트릭 수집 및 경고 기능 제공                    |
+| elasticsearch    | <img src="https://github.com/user-attachments/assets/261d34e3-dd6b-4591-b3a3-b684eb122a09" width="40"/> | 모니터링 및 검색 엔진	      | 대용량 데이터 검색에 적합                    |
+| logstash         | <img src="https://github.com/user-attachments/assets/f91b58ef-7b1f-4cd2-9d69-80ef930acfca" width="40"/> | 데이터 수집 도구 	  | 로그 수집 및 ES 연동에 적절                    |
+| docker           | <img src="https://github.com/user-attachments/assets/2322657b-c1b3-4a97-b890-14b784fbfe8b" width="40"/> | 애플리케이션 컨테이너화 | 실행 환경 일관성 보장                    |
 
 <br>
 
@@ -47,7 +53,7 @@
 ---
 
 
-## 📑 API 명세서 🔗[Notion에서 열기](https://www.notion.so/API-225672106a2081389214daa0b7ed286d?source=copy_link)
+## 📑 API 명세서 🔗[Swagger에서 열기](http://api.badata.store/swagger-ui/index.html#/)
 
 
 <details>
@@ -65,8 +71,8 @@
 
 <details>
   <summary>렌탈 API</summary>
-  <img src="https://github.com/user-attachments/assets/a5025c38-ca18-42c5-8236-8f6f4cc38017" style="width:100%; height:auto;" />
-  <img src="https://github.com/user-attachments/assets/b5bb88b9-3e0d-47af-9e43-60c045dc570b" style="width:100%; height:auto;" />
+  <img src="https://github.com/user-attachments/assets/b27e3f8a-361e-41be-98e0-ff04d71f1f7e" style="width:100%; height:auto;" />
+  <img src="https://github.com/user-attachments/assets/cbaf29dd-3116-4318-8d94-d971305b98d9" style="width:100%; height:auto;" />
 </details>
 
 <details>

@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class ShowStoreDetailResponse {
 
     private Long storeId;
+    private String name;
     private String imageUrl;
     private String detailAddress;
     private String phoneNumber;
@@ -24,14 +25,16 @@ public class ShowStoreDetailResponse {
     private Boolean isOpening;
     private LocalTime startTime;
     private LocalTime endTime;
+    private boolean isLiked;
 
-    public static ShowStoreDetailResponse from(final StoreWithDistanceProjection storeWithDistanceProjection){
+    public static ShowStoreDetailResponse from(final StoreWithDistanceProjection storeWithDistanceProjection,final boolean isLiked){
 
         Boolean isOpening = LocalTime.now().isAfter(storeWithDistanceProjection.getStartTime())&& LocalTime.now().isBefore(storeWithDistanceProjection.getEndTime())?
                             true : false;
 
         return ShowStoreDetailResponse.builder()
                 .storeId(storeWithDistanceProjection.getStoreId())
+                .name(storeWithDistanceProjection.getName())
                 .imageUrl(storeWithDistanceProjection.getImageUrl())
                 .detailAddress(storeWithDistanceProjection.getDetailAddress())
                 .phoneNumber(storeWithDistanceProjection.getPhoneNumber())
@@ -40,6 +43,7 @@ public class ShowStoreDetailResponse {
                 .startTime(storeWithDistanceProjection.getStartTime())
                 .endTime(storeWithDistanceProjection.getEndTime())
                 .distanceFromMe(storeWithDistanceProjection.getDistanceFromMe())
+                .isLiked(isLiked)
                 .build();
     }
 

@@ -6,6 +6,7 @@ import com.TwoSeaU.BaData.global.redis.RedisUtil;
 import com.TwoSeaU.BaData.global.response.ApiResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +51,15 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-        } catch (Exception e){
+        }
+        catch (ExpiredJwtException e){
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(
+                    ApiResponse.error(new GeneralException(AuthException.ACCESS_TOKEN_EXPIRED))));
+        }
+        catch (Exception e){
 
             log.info(e.getMessage());
 

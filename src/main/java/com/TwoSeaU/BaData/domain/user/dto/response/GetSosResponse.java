@@ -18,6 +18,7 @@ public class GetSosResponse {
 	private Long sosId;
 	private Long responderId;
 	private LocalDateTime createdAt;
+	private String dataAmount;
 	private Boolean isSuccess;
 
 	public static GetSosResponse from(final Sos sos) {
@@ -27,6 +28,7 @@ public class GetSosResponse {
 			.sosId(sos.getId())
 			.responderId(hasResponder ? sos.getResponder().getId() : null)
 			.createdAt(sos.getCreatedAt())
+			.dataAmount("100MB")
 			.isSuccess(hasResponder)
 			.build();
 	}

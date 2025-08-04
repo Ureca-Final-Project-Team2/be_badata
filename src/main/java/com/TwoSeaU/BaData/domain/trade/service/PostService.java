@@ -1,110 +1,73 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
 import com.TwoSeaU.BaData.domain.trade.dto.ELAResult;
+import com.TwoSeaU.BaData.domain.trade.dto.OCRResult;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveDataPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.request.SaveGifticonPostRequest;
-import com.TwoSeaU.BaData.domain.trade.dto.request.UpdatePostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateDataPostRequest;
+import com.TwoSeaU.BaData.domain.trade.dto.request.UpdateGifticonPostRequest;
 import com.TwoSeaU.BaData.domain.trade.dto.response.*;
-import com.TwoSeaU.BaData.domain.trade.entity.Data;
-import com.TwoSeaU.BaData.domain.trade.entity.Gifticon;
-import com.TwoSeaU.BaData.domain.trade.entity.GifticonCategory;
-import com.TwoSeaU.BaData.domain.trade.entity.Post;
+import com.TwoSeaU.BaData.domain.trade.entity.*;
+import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
-import com.TwoSeaU.BaData.domain.user.entity.SearchHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
-import com.TwoSeaU.BaData.domain.user.repository.SearchHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
+import com.TwoSeaU.BaData.global.dto.CursorPageResponse;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.s3.S3ImageService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class PostService {
+    private final TrendingPostService trendingPostService;
     private final PostRepository postRepository;
     private final GifticonRepository gifticonRepository;
     private final DataRepository dataRepository;
     private final UserRepository userRepository;
     private final GifticonCategoryRepository gifticonCategoryRepository;
     private final PostLikesRepository postLikesRepository;
-    private final SearchHistoryRepository searchHistoryRepository;
+    private final PaymentRepository paymentRepository;
     private final ELAService elaService;
+    private final PostVectorizer postVectorizer;
     private final S3ImageService s3ImageService;
+    private final OCRService ocrService;
+    private final PostDocumentRepository postDocumentRepository;
 
-    public PostsResponse postsToPostResponse(final List<Post> posts, final UserDetails userdetails) {
-        Optional<Long> optionalUserId;
+    private static final String COOKIE_NAME = "View_Post";
 
-        if(userdetails != null) {
-            optionalUserId = userRepository.findByUsername(userdetails.getUsername()).map(User::getId);
-        }
-        else {
-            optionalUserId = null;
-        }
+    public GetImageUploadResponse analyzeImage(final MultipartFile file){
+        ELAResult elaResult = elaService.analyzeImage(file);
+        OCRResult ocrResult = ocrService.extractTextFromImageFile(file);
 
-        final List<PostResponse> allPosts = posts
-                .stream()
-                .map(post -> PostResponse.from(
-                        post,
-                        postLikesRepository.countByPostId(post.getId()),
-                        userdetails == null ? false : postLikesRepository.existsByUserIdAndPostId(optionalUserId.get(), post.getId())
-                ))
-                .toList();
+        return GetImageUploadResponse.from(elaResult, ocrResult);
+    }
 
-        return PostsResponse.builder()
-                .postsResponse(allPosts)
-                .build();
+    public CursorPageResponse<PostResponse> getPostsByUserId(final Long userId, final boolean isSold, final String username, final Long cursor, final int size) {
+
+        return postRepository.searchPostsByUserAndIsSold(userId, isSold, username, cursor, size);
     }
 
 
-    public PostsResponse findAllPosts(final UserDetails userdetails) {
+    public CursorPageResponse<PostResponse> getPostsByDeadLine(final String username, final Long cursor, final int size) {
 
-        return postsToPostResponse(postRepository.findByIsSoldOrderByCreatedAtDesc(false), userdetails);
+        return postRepository.searchPostsByDeadLine(username, cursor, size);
     }
-
-
-    public UserPostsResponse getPostsByUserId(final Long userId, final UserDetails userdetails) {
-
-        return UserPostsResponse.of(
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(false, userId), userdetails),
-                postsToPostResponse(postRepository.findByIsSoldAndSellerIdOrderByCreatedAtDesc(true, userId), userdetails));
-    }
-
-
-    public PostsResponse getPostsByDeadLine(final UserDetails userdetails) {
-
-        return postsToPostResponse(postRepository.findByDeadLineBefore(LocalDateTime.now().minusDays(2)), userdetails);
-
-    }
-
-
-    public PostsResponse searchPosts(final String query, final UserDetails userdetails) {
-        if(userdetails != null) {
-            final User user = userRepository.findByUsername(userdetails.getUsername())
-                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-            try {
-                searchHistoryRepository.save(SearchHistory.of(user, query));
-            } catch (Exception e) {
-                log.info("검색 기록 저장에 실패: {}", e.getMessage());
-            }
-        }
-
-        return postsToPostResponse(postRepository.findByTitleContaining(query), userdetails);
-    }
-
 
     public SavePostResponse createGifticonPost(final SaveGifticonPostRequest saveGifticonPostRequest, final String username) {
+
+        if(gifticonRepository.existsByCouponNumber(saveGifticonPostRequest.getCouponNumber())) {
+            throw new GeneralException(TradeException.DUPLICATE_COUPON_NUMBER);
+        }
 
         final User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
@@ -118,6 +81,12 @@ public class PostService {
         }
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
+        final double[] vector = postVectorizer.vectorizePost(
+                saveGifticonPostRequest.getPrice(),
+                saveGifticonPostRequest.getDeadLine(),
+                category,
+                saveGifticonPostRequest.getPartner()
+        );
 
         final Gifticon gifticon = new Gifticon(
                 user,
@@ -127,13 +96,15 @@ public class PostService {
                 saveGifticonPostRequest.getDeadLine(),
                 imageUrl,
                 false,
-                saveGifticonPostRequest.getIssueDate(),
                 saveGifticonPostRequest.getCouponNumber(),
                 saveGifticonPostRequest.getPartner(),
-                category
+                category,
+                vector
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
+        final PostDocument postDocument = PostDocument.from(savedGifticon);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.builder()
                 .postId(savedGifticon.getId())
@@ -159,23 +130,72 @@ public class PostService {
         );
 
         final Data savedData = dataRepository.save(data);
+        final PostDocument postDocument = PostDocument.from(savedData);
+        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.builder()
                 .postId(savedData.getId())
                 .build();
     }
 
-    public GetPostDetailResponse getPost(final Long postId, final UserDetails user) {
+    private String getCookieValue(final Long postId) {
+        return "[" + postId + "]";
+    }
+
+    private void setCookieAndRecordView(final Long postId, final HttpServletRequest request, final HttpServletResponse response){
+        final Cookie[] cookies = request.getCookies();
+
+        if(cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_NAME)) {
+                    if (!cookie.getValue().contains(getCookieValue(postId))) {
+                        cookie.setValue(cookie.getValue() + getCookieValue(postId));
+                        cookie.setPath("/");
+                        cookie.setHttpOnly(true);
+                        response.addCookie(cookie);
+
+                        trendingPostService.recordView(postId);
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        final Cookie newCookie = new Cookie(COOKIE_NAME, getCookieValue(postId));
+        newCookie.setPath("/");
+        newCookie.setHttpOnly(true);
+        response.addCookie(newCookie);
+
+        trendingPostService.recordView(postId);
+    }
+
+    public GetPostDetailResponse getPost(final Long postId, final String username, final HttpServletRequest request, final HttpServletResponse response) {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
+        if (post.getIsSold() && username != null) {
+            final User loginUser = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+            if (!post.getSeller().getId().equals(loginUser.getId()) && paymentRepository.findByUserIdAndPostIdAndPaymentStatus(loginUser.getId(), postId, PaymentStatus.PAID).isEmpty()) {
+                throw new GeneralException(TradeException.POST_ACCESS_DENIED);
+            }
+        }
+
+        setCookieAndRecordView(postId, request, response);
 
         final GetSellerResponse seller = GetSellerResponse.from(post.getSeller());
 
         final int likesCount = postLikesRepository.countByPostId(postId);
         boolean isLiked = false;
 
-        if(user != null) {
-            final User loginUser = userRepository.findByUsername(user.getUsername())
+        if(username != null) {
+            final User loginUser = userRepository.findByUsername(username)
                     .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
             isLiked = postLikesRepository.existsByUserIdAndPostId(loginUser.getId(), postId);
         }
@@ -196,42 +216,103 @@ public class PostService {
     }
 
     public DeletePostResponse deletePost(final Long postId, final String username) {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-        final Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+        final User user = getUserByUsername(username);
+        final Post post = validateAndGetPost(postId, username);
 
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
 
-        postRepository.delete(post);
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
+
+        if(post.getIsSold()) {
+            throw new GeneralException(TradeException.SOLD_POST_DELETE_DENIED);
+        }
+
+        post.updateIsDeleted();
+        final PostDocument postDocument = PostDocument.from(post);
+        postDocumentRepository.delete(postDocument);
 
         return DeletePostResponse.of(postId);
     }
 
-    public SavePostResponse modifyPost(final Long postId, final UpdatePostRequest updatePostRequest, final String username) {
+    public SavePostResponse modifyPostData(final Long postId, final UpdateDataPostRequest updateDataPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
 
-        final User user = userRepository.findByUsername(username)
+        post.updateCommentAndPriceAndTitle(
+                updateDataPostRequest.getComment(),
+                updateDataPostRequest.getPrice(),
+                updateDataPostRequest.getTitle()
+        );
+
+        final PostDocument postDocument = PostDocument.from(post);
+        postDocumentRepository.save(postDocument);
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    public SavePostResponse modifyPostGifticon(final Long postId, final UpdateGifticonPostRequest updateGifticonPostRequest, final String username) {
+        final Post post = validateAndGetPost(postId, username);
+
+        if (!(post instanceof Gifticon gifticon)) {
+            throw new GeneralException(TradeException.GIFTICON_NOT_FOUND);
+        }
+
+        final double[] vector = postVectorizer.vectorizePost(
+                updateGifticonPostRequest.getPrice(),
+                gifticon.getDeadLine(),
+                gifticon.getCategory(),
+                gifticon.getPartner()
+        );
+
+        post.updateCommentAndPrice(
+                updateGifticonPostRequest.getComment(),
+                updateGifticonPostRequest.getPrice()
+        );
+
+        gifticon.updateVector(vector);
+
+        final PostDocument postDocument = PostDocument.from(gifticon);
+        postDocumentRepository.save(postDocument);
+
+        return SavePostResponse.of(post.getId());
+    }
+
+    private Post validateAndGetPost(final Long postId, final String username) {
+        final User user = getUserByUsername(username);
+        final Post post = getPostById(postId);
+
+        validatePostStatus(post);
+        validatePostOwnership(post, user);
+
+        return post;
+    }
+
+    private User getUserByUsername(final String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+    }
 
-        final Post post = postRepository.findById(postId)
+    private Post getPostById(final Long postId) {
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
+    }
+
+    private void validatePostStatus(final Post post) {
+        if (post.getIsDeleted()) {
+            throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
+        }
 
         if (post.getIsSold()) {
             throw new GeneralException(TradeException.EXPIRED_POST_MODIFY);
         }
+    }
 
+    private void validatePostOwnership(final Post post, final User user) {
         if (!post.getSeller().getId().equals(user.getId())) {
             throw new GeneralException(TradeException.POST_ACCESS_DENIED);
         }
-
-        post.updateCommentAndPrice(
-                updatePostRequest.getComment(),
-                updatePostRequest.getPrice()
-        );
-
-        return SavePostResponse.of(post.getId());
     }
 }

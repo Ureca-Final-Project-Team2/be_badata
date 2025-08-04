@@ -1,5 +1,6 @@
 package com.TwoSeaU.BaData.domain.rental.dto.response;
 
+import com.TwoSeaU.BaData.domain.store.entity.Store;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -14,15 +15,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ShowRentalResponse {
 
+    private Long storeId;
+
+    private String storeImageUrl;
+
     private String storeName;
 
     private List<ShowReservedDeviceResponse> showReservedDeviceResponses = new ArrayList<>();
 
-    public static ShowRentalResponse of(final String storeName, final List<ShowReservedDeviceResponse> showReservedDeviceResponses){
+    private Integer countOfVisit;
+
+    public static ShowRentalResponse of(final Store store, final List<ShowReservedDeviceResponse> showReservedDeviceResponses, final Integer countOfVisit){
 
         return ShowRentalResponse.builder()
-                .storeName(storeName)
+                .storeId(store.getId())
+                .storeImageUrl(store.getStoreImage())
+                .storeName(store.getName())
                 .showReservedDeviceResponses(showReservedDeviceResponses)
+                .countOfVisit(countOfVisit)
                 .build();
     }
 

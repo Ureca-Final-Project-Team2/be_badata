@@ -48,3 +48,24 @@ cloud:
 jwt:
   secret: ${JWT_SECRET_KEY}
   validationTime: ${JWT_VALIDATION_TIME}
+
+logging:
+  config: classpath:logback-spring.xml
+
+
+fcm:
+  certification: firebase.json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+
+mail:
+  google:
+    id: ${GOOGLE_MAIL}
+    password: ${GOOGLE_MAIL_PASSWORD}
