@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.TwoSeaU.BaData.domain.sos.dto.response.ConnectSseResponse;
 import com.TwoSeaU.BaData.domain.sos.exception.SosException;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
@@ -39,7 +40,7 @@ public class SseService {
 		return sseEmitter;
 	}
 
-	public void sendToClient(final Long userId, String message) {
+	public void sendToClient(final Long userId, Object message) {
 		final SseEmitter sseEmitter = emitterMap.get(userId);
 
 		if(sseEmitter != null) {
@@ -55,12 +56,12 @@ public class SseService {
 		}
 	}
 
-	public void broadcast(final String sosMessage) {
+	public void broadcast(final ConnectSseResponse connectSseResponse) {
 		final List<Long> userIds = new ArrayList<>(emitterMap.keySet());
 		final List<User> users = userRepository.findAllById(userIds);
 
 		users.stream()
 			.filter(User::getIsNotificationEnabled)
-			.forEach(user -> sendToClient(user.getId(), sosMessage));
+			.forEach(user -> sendToClient(user.getId(), connectSseResponse));
 	}
 }
