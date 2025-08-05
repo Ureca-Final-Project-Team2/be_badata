@@ -5,6 +5,7 @@ import com.TwoSeaU.BaData.global.fcm.FCMService;
 import com.TwoSeaU.BaData.global.fcm.dto.NotificationRequest;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -16,13 +17,13 @@ public class ReportListenerEvent {
     private final MailService mailService;
     private final FCMService fcmService;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void createReportEmailEventListener(final ReportEmailEvent reportEmailEvent){
 
         mailService.sendMail(reportEmailEvent.getTargetEmail(), reportEmailEvent.getTitle(), reportEmailEvent.getContents());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void createReportFcmEventListener(final ReportFcmEvent reportFcmEvent){
 
         fcmService.sendToManyUser(NotificationRequest.forMultipleTokens(reportFcmEvent.getTitle(),

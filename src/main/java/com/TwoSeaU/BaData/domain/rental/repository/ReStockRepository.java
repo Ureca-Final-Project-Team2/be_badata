@@ -11,10 +11,11 @@ import org.springframework.data.repository.query.Param;
 public interface ReStockRepository extends JpaRepository<ReStock,Long>, ReStockQueryRepository {
 
     @Query("""
-           SELECT r FROM ReStock r
+           SELECT r FROM ReStock r join fetch r.user u
            WHERE r.storeDevice = :storeDevice
            AND r.desiredStartDate <= :rentalEndDate
            AND r.desiredEndDate >= :rentalStartDate
+           
            """)
     List<ReStock> findOverlappedReStocks(
             @Param("storeDevice") StoreDevice storeDevice,
