@@ -11,6 +11,7 @@ import com.TwoSeaU.BaData.domain.user.repository.FcmTokenRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class ReportNotificationService {
     private static long REPORT_THRESHOLD = 3;
 
     @Transactional(readOnly = true)
+    @Async("threadPoolTaskExecutor")
     public void sendReportNotification(final Report report){
 
         final long reportCount = reportRepository.countByPost(report.getPost());
