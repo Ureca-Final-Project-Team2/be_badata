@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.TwoSeaU.BaData.domain.sos.dto.response.ConnectSseResponse;
 import com.TwoSeaU.BaData.domain.sos.dto.response.RespondSosResponse;
 import com.TwoSeaU.BaData.domain.sos.dto.response.SaveSosResponse;
 import com.TwoSeaU.BaData.domain.sos.entity.Sos;
@@ -46,7 +47,8 @@ public class SosService {
 
 		final Sos savedSos = sosRepository.save(Sos.of(user));
 
-		sseService.broadcast(sosMessage);
+		final ConnectSseResponse connectSseResponse = ConnectSseResponse.of(savedSos, "SOS_REQUEST");
+		sseService.broadcast(connectSseResponse);
 
 		return SaveSosResponse.of(savedSos.getId());
 	}
@@ -61,8 +63,8 @@ public class SosService {
 		final Boolean isSuccess = sos.respond(user);
 
 		if(isSuccess) {
-			sseService.sendToClient(sos.getRequester().getId(), "누군가 요청을 수락하였습니다.");
-			sseService.sendToClient(user.getId(), "SOS 요청을 수락하였습니다.");
+			final ConnectSseResponse connectSseResponse = ConnectSseResponse.of(sos, "SOS_RESPOND");
+			sseService.broadcast(connectSseResponse);
 		}
 
 		return RespondSosResponse.of(sos.getId(), isSuccess);
