@@ -114,7 +114,7 @@ public class PaymentService {
         }
         catch (IamportResponseException | IOException e){
             log.error("impUid {}에 대한 결제 환불에 실패했습니다. :", impUid, e);
-            throw new GeneralException(TradeException.PAYMENT_FAILED);
+            throw new GeneralException(TradeException.REFUND_FAILED);
         }
     }
 
@@ -131,13 +131,18 @@ public class PaymentService {
         final Post post = postRepository.findByIdWithLock(postId)
                 .orElseThrow(() -> new GeneralException(TradeException.POST_NOT_FOUND));
 
+        final Payment payment = paymentRepository.findByMerchantUid(portOnePayment.getResponse().getMerchantUid())
+                .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
+
         if (post.getIsDeleted()) {
             cancelPayment(impUid);
+            payment.updatePaymentStatus(PaymentStatus.REFUNDED);
             throw new GeneralException(TradeException.DELETED_POST_ACCESS_DENIED);
         }
 
         if (post.getIsSold()) {
             cancelPayment(impUid);
+            payment.updatePaymentStatus(PaymentStatus.REFUNDED);
             throw new GeneralException(TradeException.PAYMENT_DUPLICATE);
         }
 
@@ -145,16 +150,15 @@ public class PaymentService {
             throw new GeneralException(TradeException.SELF_PAYMENT_DENIED);
         }
 
-        final Payment payment = paymentRepository.findByMerchantUid(portOnePayment.getResponse().getMerchantUid())
-                .orElseThrow(() -> new GeneralException(TradeException.PAYMENT_NOT_FOUND));
-
         if (payment.getAmount().compareTo(portOnePayment.getResponse().getAmount()) != 0) {
             cancelPayment(impUid);
+            payment.updatePaymentStatus(PaymentStatus.REFUNDED);
             throw new GeneralException(TradeException.PAYMENT_AMOUNT_MISMATCH);
         }
 
         if (payment.getUseCoin().intValue() > user.getCoin()) {
             cancelPayment(impUid);
+            payment.updatePaymentStatus(PaymentStatus.REFUNDED);
             throw new GeneralException(TradeException.COIN_NOT_ENOUGH);
         }
 

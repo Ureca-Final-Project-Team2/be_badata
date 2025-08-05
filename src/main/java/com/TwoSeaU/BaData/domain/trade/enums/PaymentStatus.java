@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PaymentStatus {
-    PAID, PENDING, CANCELED;
+    PAID, PENDING, CANCELED, REFUNDED;
 }
