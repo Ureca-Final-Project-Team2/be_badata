@@ -21,7 +21,6 @@ public class PostResponse {
     private String partner;
     private BigDecimal price;
     private LocalDateTime createdAt;
-    private String postImage;
     private PostCategory postCategory;
     private String gifticonCategory;
     private LocalDate deadLine;
@@ -38,7 +37,6 @@ public class PostResponse {
                 .partner(post instanceof Gifticon gifticon ? gifticon.getPartner() : null)
                 .price(post.getPrice())
                 .createdAt(post.getCreatedAt())
-                .postImage(post.getPostImage())
                 .postCategory(post instanceof Gifticon ? PostCategory.GIFTICON : PostCategory.DATA)
                 .gifticonCategory(post instanceof Gifticon gifticon ? gifticon.getCategory().getCategoryName() : null)
                 .deadLine(post.getDeadLine())
