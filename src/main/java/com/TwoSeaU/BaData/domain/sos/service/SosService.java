@@ -11,8 +11,11 @@ import com.TwoSeaU.BaData.domain.sos.dto.response.SaveSosResponse;
 import com.TwoSeaU.BaData.domain.sos.entity.Sos;
 import com.TwoSeaU.BaData.domain.sos.exception.SosException;
 import com.TwoSeaU.BaData.domain.sos.repository.SosRepository;
+import com.TwoSeaU.BaData.domain.user.entity.CoinHistory;
 import com.TwoSeaU.BaData.domain.user.entity.User;
+import com.TwoSeaU.BaData.domain.user.enums.CoinSource;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
+import com.TwoSeaU.BaData.domain.user.repository.CoinHistoryRepository;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import com.TwoSeaU.BaData.global.sse.SseService;
@@ -28,6 +31,7 @@ public class SosService {
 	private final UserRepository userRepository;
 	private final SosRepository sosRepository;
 	private final SseService sseService;
+	private final CoinHistoryRepository coinHistoryRepository;
 
 	private final String sosMessage = "누군가 SOS를 요청하였습니다.";
 
@@ -63,6 +67,8 @@ public class SosService {
 		final Boolean isSuccess = sos.respond(user);
 
 		if(isSuccess) {
+			final Integer rewardCoin = 10;
+			coinHistoryRepository.save(CoinHistory.of(user, CoinSource.SOS, rewardCoin, user.getCoin()));
 			final ConnectSseResponse connectSseResponse = ConnectSseResponse.of(sos, "SOS_RESPOND");
 			sseService.broadcast(connectSseResponse);
 		}
