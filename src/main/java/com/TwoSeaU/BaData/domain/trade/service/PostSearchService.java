@@ -56,6 +56,16 @@ public class PostSearchService {
         return searchByTitleAndComment(query, username, cursor, size);
     }
 
+    public CursorPageResponse<PostResponse> searchPostsByRDB(final String query, final String username, final Long cursor, final int size) {
+
+        if (query != null && !query.isEmpty()) {
+            log.info("event-keyword-search, {}", query);
+            saveSearchHistoryIfUserExists(username, query);
+        }
+
+        return postRepository.searchPostsByKeyword(query, username, cursor, size);
+    }
+
     private void saveSearchHistoryIfUserExists(final String username, final String query) {
         if (username == null) {
             return;

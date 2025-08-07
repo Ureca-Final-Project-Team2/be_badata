@@ -23,7 +23,9 @@ public class Gifticon extends Post{
     @Column(nullable = false)
     private String partner;
 
-    private double[] vector;
+    private double[] doubleVector;
+
+    private float[] floatVector;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
@@ -34,16 +36,21 @@ public class Gifticon extends Post{
     public Gifticon(final User user, final String title, final String comment, final BigDecimal price,
                     final LocalDate deadLine, final String postImage, final Boolean isSold,
                     final String couponNumber, final String partner, final GifticonCategory category,
-                    final double[] vector) {
+                    final double[] doubleVector, final float[] floatVector) {
         super(user, title, comment, price, deadLine, postImage, isSold);
         this.couponNumber = couponNumber;
         this.partner = partner;
         this.category = category;
-        this.vector = vector;
+        this.doubleVector = doubleVector;
+        this.floatVector = floatVector;
     }
 
-    public void updateVector(final double[] vector) {
-        this.vector = vector;
+    public void updateDoubleVector(final double[] doubleVector) {
+        this.doubleVector = doubleVector;
+    }
+
+    public void updateFloatVector(final float[] floatVector) {
+        this.floatVector = floatVector;
     }
 
     public void updateBarcodeViewTime(final LocalDateTime barcodeViewTime) {

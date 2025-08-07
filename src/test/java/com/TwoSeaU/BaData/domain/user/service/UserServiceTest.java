@@ -186,6 +186,7 @@ class UserServiceTest {
 			"couponNumber",
 			"partner",
 			gifticonCategory,
+			null,
 			null
 		);
 

@@ -11,6 +11,9 @@ import com.TwoSeaU.BaData.domain.trade.entity.*;
 import com.TwoSeaU.BaData.domain.trade.enums.PaymentStatus;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.doubleVector.PostVectorizerDouble;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.floatVector.PostVectorizerFloat;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.pgVector.VectorUtilsPg;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.exception.UserException;
 import com.TwoSeaU.BaData.domain.user.repository.UserRepository;
@@ -22,9 +25,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -38,10 +49,14 @@ public class PostService {
     private final PostLikesRepository postLikesRepository;
     private final PaymentRepository paymentRepository;
     private final ELAService elaService;
-    private final PostVectorizer postVectorizer;
+    private final PostVectorizerDouble postVectorizerDouble;
+    private final PostVectorizerFloat postVectorizerFloat;
+    private final VectorUtilsPg vectorUtilsPg;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
     private final PostDocumentRepository postDocumentRepository;
+    private final JdbcRepository jdbcRepository;
+    private final PartnerRepository partnerRepository;
 
     private static final String COOKIE_NAME = "View_Post";
 
@@ -81,7 +96,15 @@ public class PostService {
         }
 
         final String imageUrl = s3ImageService.saveImage(saveGifticonPostRequest.getFile(), "trades/gifticon/", saveGifticonPostRequest.getFile().getOriginalFilename());
-        final double[] vector = postVectorizer.vectorizePost(
+
+        final double[] doubleVector = postVectorizerDouble.vectorizePost(
+                saveGifticonPostRequest.getPrice(),
+                saveGifticonPostRequest.getDeadLine(),
+                category,
+                saveGifticonPostRequest.getPartner()
+        );
+
+        final float[] floatVector = postVectorizerFloat.vectorizePost(
                 saveGifticonPostRequest.getPrice(),
                 saveGifticonPostRequest.getDeadLine(),
                 category,
@@ -99,12 +122,18 @@ public class PostService {
                 saveGifticonPostRequest.getCouponNumber(),
                 saveGifticonPostRequest.getPartner(),
                 category,
-                vector
+                doubleVector,
+                floatVector
+                //floatVector
+                //byteVector
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
         final PostDocument postDocument = PostDocument.from(savedGifticon);
         postDocumentRepository.save(postDocument);
+
+        //TODO: 여기
+        jdbcRepository.insertPostVector(savedGifticon.getId(), floatVector);
 
         return SavePostResponse.builder()
                 .postId(savedGifticon.getId())
@@ -260,7 +289,14 @@ public class PostService {
             throw new GeneralException(TradeException.GIFTICON_NOT_FOUND);
         }
 
-        final double[] vector = postVectorizer.vectorizePost(
+        final double[] doubleVector = postVectorizerDouble.vectorizePost(
+                updateGifticonPostRequest.getPrice(),
+                gifticon.getDeadLine(),
+                gifticon.getCategory(),
+                gifticon.getPartner()
+        );
+
+        final float[] floatVector = postVectorizerFloat.vectorizePost(
                 updateGifticonPostRequest.getPrice(),
                 gifticon.getDeadLine(),
                 gifticon.getCategory(),
@@ -272,12 +308,81 @@ public class PostService {
                 updateGifticonPostRequest.getPrice()
         );
 
-        gifticon.updateVector(vector);
+        gifticon.updateDoubleVector(doubleVector);
+        gifticon.updateFloatVector(floatVector);
+        jdbcRepository.updatePostVector(gifticon.getId(), floatVector);
 
         final PostDocument postDocument = PostDocument.from(gifticon);
         postDocumentRepository.save(postDocument);
 
         return SavePostResponse.of(post.getId());
+    }
+
+    public String generateGifticons() {
+        List<GifticonCategory> categories = gifticonCategoryRepository.findAll();
+        User user = userRepository.findById(2L)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        List<LocalDate> dates = Stream.iterate(LocalDate.now().plusDays(0), date -> date.plusDays(2))
+                .limit(60)
+                .toList();
+
+        List<BigDecimal> prices = new ArrayList<>();
+        for (int price = 1000; price <= 30000; price += 1000) {
+            prices.add(BigDecimal.valueOf(price));
+        }
+
+        int index = 1;
+
+        for (GifticonCategory category : categories) {
+            log.info("category : " + category.getCategoryName());
+            List<Partner> partners = partnerRepository.findByCategoryId(category.getId());
+
+            for (Partner partner : partners) {
+                log.info("partner : " + partner.getPartner());
+
+                for (LocalDate date : dates) {
+                    for (BigDecimal price : prices) {
+                        final double[] doubleVector = postVectorizerDouble.vectorizePost(
+                                price,
+                                date,
+                                category,
+                                partner.getPartner()
+                        );
+
+                        final float[] floatVector = postVectorizerFloat.vectorizePost(
+                                price,
+                                date,
+                                category,
+                                partner.getPartner()
+                        );
+
+                        Gifticon gifticon = new Gifticon(
+                                user,
+                                partner.getPartner() + " 싸게 팔아요",
+                                null,
+                                price,
+                                date,
+                                "temp.png",
+                                false,
+                                index+"",
+                                partner.getPartner(),
+                                category,
+                                doubleVector,
+                                floatVector
+                        );
+
+                        gifticonRepository.save(gifticon);
+                        jdbcRepository.insertPostVector(gifticon.getId(), floatVector);
+                        log.info("post id : " + index);
+
+                        index++;
+                    }
+                }
+            }
+        }
+
+        return "success";
     }
 
     private Post validateAndGetPost(final Long postId, final String username) {

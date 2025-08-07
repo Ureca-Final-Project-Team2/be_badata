@@ -13,6 +13,8 @@ import com.TwoSeaU.BaData.domain.trade.entity.Post;
 import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.doubleVector.PostVectorizerDouble;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.floatVector.PostVectorizerFloat;
 import com.TwoSeaU.BaData.domain.user.entity.PlanData;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.enums.Role;
@@ -38,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,9 +70,13 @@ class PostServiceTest {
     @Mock
     PostRepository postRepository;
     @Mock
-    PostVectorizer postVectorizer;
+    PostVectorizerDouble postVectorizerDouble;
+    @Mock
+    PostVectorizerFloat postVectorizerFloat;
     @Mock
     PostDocumentRepository postDocumentRepository;
+    @Mock
+    JdbcRepository jdbcRepository;
 
 
     private static final String USERNAME = "testUser";
