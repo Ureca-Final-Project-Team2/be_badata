@@ -61,7 +61,10 @@
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%93%A2-%EC%BD%94%EB%93%9C-%EC%BB%A8%EB%B2%A4%EC%85%98"> 🛠️ 코드 컨벤션</a></li>
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%97%A3%EF%B8%8F-Git-%EC%BB%A8%EB%B2%A4%EC%85%98-%EA%B0%80%EC%9D%B4%EB%93%9C-(COMMIT,-PR,-ISSUE)"> 📑 깃 컨벤션</a></li>
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%A7%AD-Jira-%EC%82%AC%EC%9A%A9%EB%B2%95-%EA%B0%80%EC%9D%B4%EB%93%9C"> 🏗️ 지라 컨벤션 </a></li>
+<li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%EA%B1%B0%EB%9E%98-%E2%80%90-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8C"> ⭐ 거래 - 기술 블로그 </a></li>
+<li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%EB%8C%80%EC%97%AC-%E2%80%90-%EC%A7%80%EB%8F%84-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8"> ⭐ 거래 - 기술 블로그 </a></li>
 </ul>
+
 
 ---
 
