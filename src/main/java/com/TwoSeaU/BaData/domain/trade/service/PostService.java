@@ -381,7 +381,6 @@ public class PostService {
                         Thread.sleep(1200);
                     }
                     catch (InterruptedException e){
-                        log.error("Thread sleep interrupted", e);
                         return "sleep error";
                     }
                 }
