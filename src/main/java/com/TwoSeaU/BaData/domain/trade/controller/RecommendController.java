@@ -34,7 +34,8 @@ public class RecommendController {
         return ResponseEntity.ok().body(ApiResponse.success(floatRecommendServiceFloat.recommendPostsByFloat(user == null ? null : user.getUsername(), isStart)));
     }
 
-    @GetMapping("/pgvector")
+    //@GetMapping("/pgvector")
+    @GetMapping
     public ResponseEntity<ApiResponse<PostsResponse>> recommendPostsByPgvector(@AuthenticationPrincipal User user, @RequestParam(defaultValue = "true") boolean isStart) {
         return ResponseEntity.ok().body(ApiResponse.success(pgvectorRecommendServicePg.recommendPostsBypgVector(user == null ? null : user.getUsername(), isStart)));
     }
