@@ -16,14 +16,13 @@
 <img src="https://github.com/user-attachments/assets/030d740b-1099-4b3b-bdc7-719051e92927" style="width:100%; height:auto;" />
 
 - Elastic search ERD
-<img src="https://github.com/user-attachments/assets/59f43ade-a253-40e4-b71c-2bb1e2ebef52" style="width:50%; height:auto;" />
+<img src="https://github.com/user-attachments/assets/2a185197-f7e1-4b90-a1af-efae37a65f9b" style="width:100%; height:auto;" />
 
 
 <br>
 
 ### - 아키텍처 
-
-<img width="985" height="765" alt="image" src="https://github.com/user-attachments/assets/a5b95953-23ab-451c-b3f1-33201a3164bb" />
+<img width="901" height="728" alt="image" src="https://github.com/user-attachments/assets/864d4e15-ff86-496a-ab54-aa6424d3b889" />
 
 <br>
 
@@ -65,6 +64,18 @@
 
 ---
 
+## 협업
+- 대여, 거래, 마이페이지, SOS, 추천의 큰 5가지 맥락 단위의 기능을 주요 기능, CRUD 비중을 고려해 분담하여 병렬적으로 진행
+- Swagger와 API 명세서를 통해 FE 개발자와 원활한 협업 수행
+
+## ⏫ CI/CD
+develop: CI/CD (빌드 및 테스트, 배포)
+feat: 기능 개발
+fix: 오류 수정
+chore: 레퍼런스 수정
+perf: 고도화 및 최적화
+
+---
 
 ## 📑 API 명세서 🔗[Swagger에서 열기](http://api.badata.store/swagger-ui/index.html#/)
 
@@ -129,7 +140,9 @@
 ## 📆 개발 일정
 | 기간   | 내용         |
 | ---- | ---------- |
-| 7/15 ~ 7/18 | 2차 스프린트 (남은 15% API 개발) |
+| 6/30 ~ 7/6 | 기획 및 프로젝트 초기 세팅 (CRUD 및 API 개발) |
+| 7/6 ~ 7/15 | 1차 스프린트 (85% 기능 개발) |
+| 7/16 ~ 7/18 | 2차 스프린트 (15% 기능 개발, 수정사항 및 새로운 요구사항 반영) |
 | 7/19 ~ 7/20 |  테스트 코드 작성   |
 | 7/21 ~ 8/1 | 성능 최적화 / 고도화 (주요 기능 최적화 및 고도화)  |
 
@@ -164,7 +177,7 @@
     <td align="center" valign="top">
       <ul align="left">
         <li>거래 커뮤니티, 결제 시스템</li>
-        <li>실시간 검색어 시스템</li>
+        <li>실시간 게시글/검색어 개발</li>
         <li>게시글 추천 시스템</li>
         <li>CI/CD</li>
       </ul>
