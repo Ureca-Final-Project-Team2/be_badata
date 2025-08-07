@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -335,12 +336,9 @@ public class PostService {
         int index = 1;
 
         for (GifticonCategory category : categories) {
-            log.info("category : " + category.getCategoryName());
             List<Partner> partners = partnerRepository.findByCategoryId(category.getId());
 
             for (Partner partner : partners) {
-                log.info("partner : " + partner.getPartner());
-
                 for (LocalDate date : dates) {
                     for (BigDecimal price : prices) {
                         final double[] doubleVector = postVectorizerDouble.vectorizePost(
@@ -360,7 +358,7 @@ public class PostService {
                         Gifticon gifticon = new Gifticon(
                                 user,
                                 partner.getPartner() + " 싸게 팔아요",
-                                null,
+                                "이 기프티콘은 " + partner.getPartner() + "에서 사용 가능합니다.",
                                 price,
                                 date,
                                 "temp.png",
@@ -377,6 +375,13 @@ public class PostService {
                         log.info("post id : " + index);
 
                         index++;
+                    }
+
+                    try{
+                        Thread.sleep(1200);
+                    }
+                    catch (InterruptedException e){
+                        return "sleep error";
                     }
                 }
             }
