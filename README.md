@@ -1,16 +1,29 @@
 # 📡 BADATA: 백엔드 소개 
+> 신속한 핵심 기능 구현과 고도화를 지향하는 2SEEU BE 파트 ReadMe 입니다.
 
 ## 🛠 기술적 특징
 
 ### - ERD 🔗[ERDCloud에서 열기](https://www.erdcloud.com/d/NnvfEkHaQgXSXHWCm)
-
+- RDS 전체 ERD
 <img src="https://github.com/user-attachments/assets/7721441f-692e-497a-a105-c09021ddb369" style="width:100%; height:auto;" />
+
+- 대여 ERD
+<img src="https://github.com/user-attachments/assets/ec63a52a-15ad-44d0-bb2f-be7b1e243546" style="width:100%; height:auto;" />
+
+- 거래 ERD
+<img src="https://github.com/user-attachments/assets/48741eeb-ce4c-437d-ab8b-7a827992f35e" style="width:100%; height:auto;" />
+
+- 마이페이지 ERD
+<img src="https://github.com/user-attachments/assets/030d740b-1099-4b3b-bdc7-719051e92927" style="width:100%; height:auto;" />
+
+- Elastic search ERD
+<img src="https://github.com/user-attachments/assets/2a185197-f7e1-4b90-a1af-efae37a65f9b" style="width:100%; height:auto;" />
+
 
 <br>
 
 ### - 아키텍처 
-
-<img width="985" height="765" alt="image" src="https://github.com/user-attachments/assets/a5b95953-23ab-451c-b3f1-33201a3164bb" />
+<img width="901" height="728" alt="image" src="https://github.com/user-attachments/assets/864d4e15-ff86-496a-ab54-aa6424d3b889" />
 
 <br>
 
@@ -48,10 +61,18 @@
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%93%A2-%EC%BD%94%EB%93%9C-%EC%BB%A8%EB%B2%A4%EC%85%98"> 🛠️ 코드 컨벤션</a></li>
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%97%A3%EF%B8%8F-Git-%EC%BB%A8%EB%B2%A4%EC%85%98-%EA%B0%80%EC%9D%B4%EB%93%9C-(COMMIT,-PR,-ISSUE)"> 📑 깃 컨벤션</a></li>
 <li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%F0%9F%A7%AD-Jira-%EC%82%AC%EC%9A%A9%EB%B2%95-%EA%B0%80%EC%9D%B4%EB%93%9C"> 🏗️ 지라 컨벤션 </a></li>
+<li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%EA%B1%B0%EB%9E%98-%E2%80%90-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8C"> ⭐ 거래 - 기술 블로그 </a></li>
+<li><a href="https://github.com/Ureca-Final-Project-Team2/be_badata/wiki/%EB%8C%80%EC%97%AC-%E2%80%90-%EC%A7%80%EB%8F%84-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8"> ⭐ 거래 - 기술 블로그 </a></li>
 </ul>
+
 
 ---
 
+## 🤲 협업
+- 대여, 거래, 마이페이지, SOS, 추천의 큰 5가지 맥락 단위의 기능을 주요 기능, CRUD 비중을 고려해 분담하여 병렬적으로 진행
+- Swagger와 API 명세서를 통해 FE 개발자와 원활한 협업 수행
+
+---
 
 ## 📑 API 명세서 🔗[Swagger에서 열기](http://api.badata.store/swagger-ui/index.html#/)
 
@@ -116,9 +137,37 @@
 ## 📆 개발 일정
 | 기간   | 내용         |
 | ---- | ---------- |
-| 7/15 ~ 7/18 | 2차 스프린트 (남은 15% API 개발) |
+| 6/30 ~ 7/6 | 기획 및 프로젝트 초기 세팅 (CRUD 및 API 개발) |
+| 7/7 ~ 7/15 | 1차 스프린트 (85% 기능 개발) |
+| 7/16 ~ 7/18 | 2차 스프린트 (15% 기능 개발, 수정사항 및 새로운 요구사항 반영) |
 | 7/19 ~ 7/20 |  테스트 코드 작성   |
 | 7/21 ~ 8/1 | 성능 최적화 / 고도화 (주요 기능 최적화 및 고도화)  |
+| 8/2 ~ 8/7 | 최종 QA 및 문서화 |
+
+---
+
+## 🚀 핵심 기능 요약
+### 로그인
+- JWT 기반 인증/인가 구현
+
+### 대여
+- 클러스터링이 적용된 지도 개발
+- 동시성을 고려한 대여 예약 기능 구현
+
+### 거래
+- PortOne 연동으로 PG사 결제/환불 처리
+- Redis Sort Set로 지금 인기 있는 게시글 점수 산출
+- Elastic Search 기반 빠른 검색
+- Elastic Search 실시간 검색어 기능 구현
+
+### 마이페이지
+- 반정규화로 성능 최적화
+
+### SOS
+- 동시성, 실시간성을 가진 SOS 기능 구현
+
+### ETC
+- Grafana를 사용해 시스템 모니터링 구축
 
 
 ---
@@ -151,7 +200,7 @@
     <td align="center" valign="top">
       <ul align="left">
         <li>거래 커뮤니티, 결제 시스템</li>
-        <li>실시간 검색어 시스템</li>
+        <li>실시간 게시글/검색어 개발</li>
         <li>게시글 추천 시스템</li>
         <li>CI/CD</li>
       </ul>
