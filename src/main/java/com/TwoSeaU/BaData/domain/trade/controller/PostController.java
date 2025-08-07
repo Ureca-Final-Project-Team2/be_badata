@@ -37,6 +37,15 @@ public class PostController {
         return ResponseEntity.ok().body(ApiResponse.success(postSearchService.searchPosts(query, user == null ? null : user.getUsername(), cursor, size)));
     }
 
+    @GetMapping("/posts/rdb")
+    public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPostsByRDB(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String query,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(ApiResponse.success(postSearchService.searchPostsByRDB(query, user == null ? null : user.getUsername(), cursor, size)));
+    }
+
     @GetMapping("/posts/{userId}/{isSold}")
     public ResponseEntity<ApiResponse<CursorPageResponse<PostResponse>>> getPostsByUserId(
             @RequestParam(required = false) Long cursor,
