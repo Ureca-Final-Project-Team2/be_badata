@@ -376,13 +376,6 @@ public class PostService {
 
                         index++;
                     }
-
-                    try{
-                        Thread.sleep(1200);
-                    }
-                    catch (InterruptedException e){
-                        return "sleep error";
-                    }
                 }
             }
         }
