@@ -14,6 +14,7 @@ import com.TwoSeaU.BaData.domain.trade.enums.MobileCarrier;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.*;
 import com.TwoSeaU.BaData.domain.trade.service.recommend.doubleVector.PostVectorizerDouble;
+import com.TwoSeaU.BaData.domain.trade.service.recommend.floatVector.PostVectorizerFloat;
 import com.TwoSeaU.BaData.domain.user.entity.PlanData;
 import com.TwoSeaU.BaData.domain.user.entity.User;
 import com.TwoSeaU.BaData.domain.user.enums.Role;
@@ -71,7 +72,11 @@ class PostServiceTest {
     @Mock
     PostVectorizerDouble postVectorizerDouble;
     @Mock
+    PostVectorizerFloat postVectorizerFloat;
+    @Mock
     PostDocumentRepository postDocumentRepository;
+    @Mock
+    JdbcRepository jdbcRepository;
 
 
     private static final String USERNAME = "testUser";
