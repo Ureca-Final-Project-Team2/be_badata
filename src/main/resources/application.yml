@@ -56,14 +56,14 @@ logging:
 fcm:
   certification: firebase.json
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
-  endpoint:
-    prometheus:
-      enabled: true
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: prometheus
+#  endpoint:
+#    prometheus:
+#      enabled: true
 
 mail:
   google:
