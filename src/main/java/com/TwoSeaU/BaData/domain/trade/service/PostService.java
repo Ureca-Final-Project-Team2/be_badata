@@ -33,7 +33,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -55,7 +54,6 @@ public class PostService {
     private final VectorUtilsPg vectorUtilsPg;
     private final S3ImageService s3ImageService;
     private final OCRService ocrService;
-    private final PostDocumentRepository postDocumentRepository;
     private final JdbcRepository jdbcRepository;
     private final PartnerRepository partnerRepository;
 
@@ -130,10 +128,7 @@ public class PostService {
         );
 
         final Gifticon savedGifticon = gifticonRepository.save(gifticon);
-        final PostDocument postDocument = PostDocument.from(savedGifticon);
-        postDocumentRepository.save(postDocument);
 
-        //TODO: 여기
         jdbcRepository.insertPostVector(savedGifticon.getId(), floatVector);
 
         return SavePostResponse.builder()
@@ -160,8 +155,6 @@ public class PostService {
         );
 
         final Data savedData = dataRepository.save(data);
-        final PostDocument postDocument = PostDocument.from(savedData);
-        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.builder()
                 .postId(savedData.getId())
@@ -262,8 +255,6 @@ public class PostService {
         }
 
         post.updateIsDeleted();
-        final PostDocument postDocument = PostDocument.from(post);
-        postDocumentRepository.delete(postDocument);
 
         return DeletePostResponse.of(postId);
     }
@@ -276,9 +267,6 @@ public class PostService {
                 updateDataPostRequest.getPrice(),
                 updateDataPostRequest.getTitle()
         );
-
-        final PostDocument postDocument = PostDocument.from(post);
-        postDocumentRepository.save(postDocument);
 
         return SavePostResponse.of(post.getId());
     }
@@ -313,14 +301,14 @@ public class PostService {
         gifticon.updateFloatVector(floatVector);
         jdbcRepository.updatePostVector(gifticon.getId(), floatVector);
 
-        final PostDocument postDocument = PostDocument.from(gifticon);
-        postDocumentRepository.save(postDocument);
-
         return SavePostResponse.of(post.getId());
     }
 
     public String generateGifticons() {
-        List<GifticonCategory> categories = gifticonCategoryRepository.findAll();
+        GifticonCategory category = gifticonCategoryRepository.findById(1L)
+                .orElseThrow(() -> new GeneralException(TradeException.NOT_FOUND_GIFTICON_CATEGORY));
+
+
         User user = userRepository.findById(2L)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
@@ -335,7 +323,7 @@ public class PostService {
 
         int index = 1;
 
-        for (GifticonCategory category : categories) {
+        //for (GifticonCategory category : categories) {
             List<Partner> partners = partnerRepository.findByCategoryId(category.getId());
 
             for (Partner partner : partners) {
@@ -377,8 +365,15 @@ public class PostService {
                         index++;
                     }
                 }
+
+                try {
+                    Thread.sleep(5000); // 0.1초 대기
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Thread was interrupted", e);
+                }
+
             }
-        }
+        //}
 
         return "success";
     }
