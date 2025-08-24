@@ -89,11 +89,11 @@ jobs:
             cd /home/ubuntu
             
             echo "기존 컨테이너 중지 및 제거"
-            docker stop badata_be || true
-            docker rm badata_be || true
+            sudo docker stop badata_be || true
+            sudo docker rm badata_be || true
             
             echo "새로운 이미지 빌드"
-            docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
-            docker run --add-host host.docker.internal:host-gateway --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/badata:latest
+            sudo docker run --add-host host.docker.internal:host-gateway --env-file ~/be_badata/.env -v ~/be_badata${{ secrets.OCR_JSON }}:/BaData/src${{ secrets.OCR_JSON }} -d -p 8080:8080 --name badata_be ${{ secrets.DOCKER_USERNAME }}/badata:latest
 
             echo "배포 완료"
