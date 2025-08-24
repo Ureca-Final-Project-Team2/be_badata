@@ -1,32 +1,12 @@
 package com.TwoSeaU.BaData.domain.trade.service;
 
-import co.elastic.clients.elasticsearch._types.Script;
-import co.elastic.clients.elasticsearch._types.ScriptLanguage;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
-import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.json.JsonData;
 import com.TwoSeaU.BaData.domain.trade.dto.response.GetTrendingResponse;
-import com.TwoSeaU.BaData.domain.trade.entity.SearchHistoryDocument;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.global.response.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -41,7 +21,7 @@ public class TrendingKeywordService {
 
     public GetTrendingResponse getTrendingKeyword() {
         try {
-            return GetTrendingResponse.of(getRecentTop10Keywords().toArray(String[]::new));
+            return GetTrendingResponse.of(getRecentTop10KeywordsNotEs());
         }
         catch (GeneralException e){
             throw e;
@@ -52,80 +32,11 @@ public class TrendingKeywordService {
         }
     }
 
-    public List<String> getRecentTop10Keywords() {
-        NativeQuery searchQuery = getRecentTop10KeywordsNativeQuery();
-
-        SearchHits<SearchHistoryDocument> searchHits = elasticsearchOperations.search(
-                searchQuery,
-                SearchHistoryDocument.class,
-                IndexCoordinates.of(INDEX_NAME));
-
-        ElasticsearchAggregations aggregations = (ElasticsearchAggregations)searchHits.getAggregations();
-
-        if (aggregations == null) {
-            throw new GeneralException(TradeException.REALTIME_SEARCH_CONTENT_NOT_FOUND);
-        }
-
-        List<StringTermsBucket> topTenBuckets = aggregations.aggregationsAsMap()
-                .get("top_ten")
-                .aggregation()
-                .getAggregate()
-                .sterms()
-                .buckets()
-                .array();
-
-        List<String> result = new LinkedList<>();
-
-        topTenBuckets.forEach(topTenBucket -> {
-                    String keyword = topTenBucket.key().stringValue();
-                    if (keyword != null && !keyword.isEmpty()) {
-                        result.add(keyword);
-                    }
-        });
-
-        return result;
-    }
-
-    private Query createTimeRangeQuery() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneHourAgo = now.minusHours(AGGREGATION_INTERVAL_HOURS);
-
-        return QueryBuilders.range()
-                .field("@timestamp")
-                .gte(JsonData.of(oneHourAgo
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()))
-                .lte(JsonData.of(now
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()))
-                .build()
-                ._toQuery();
-    }
-
-    private NativeQuery getRecentTop10KeywordsNativeQuery() {
-        NativeQueryBuilder queryBuilder = new NativeQueryBuilder();
-
-        Script script = Script.of(scriptBuilder -> scriptBuilder.inline(inlineScriptBuilder ->
-                inlineScriptBuilder.lang(ScriptLanguage.Painless)
-                        .source(KEYWORD_EXTRACTION_SCRIPT)
-                        .params(Collections.emptyMap())
-        ));
-
-        Aggregation agg = AggregationBuilders.terms()
-                .script(script)
-                .size(DEFAULT_TOP_COUNT)
-                .build()
-                ._toAggregation();
-
-        Query boolQuery = QueryBuilders.bool()
-                .must(createTimeRangeQuery())
-                .build()
-                ._toQuery();
-
-        return queryBuilder.withQuery(boolQuery)
-                .withAggregation("top_ten", agg)
-                .build();
+    private String[] getRecentTop10KeywordsNotEs() {
+        return new String[]{
+                "스타벅스", "이디야", "투썸플레이스",
+                "메가커피", "커피빈", "할리스",
+                "파스쿠찌", "탐앤탐스", "빽다방",
+                "폴바셋"};
     }
 }

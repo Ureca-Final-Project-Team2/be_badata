@@ -6,7 +6,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import com.TwoSeaU.BaData.domain.trade.dto.response.PostResponse;
 import com.TwoSeaU.BaData.domain.trade.entity.Post;
-import com.TwoSeaU.BaData.domain.trade.entity.PostDocument;
 import com.TwoSeaU.BaData.domain.trade.exception.TradeException;
 import com.TwoSeaU.BaData.domain.trade.repository.PostLikesRepository;
 import com.TwoSeaU.BaData.domain.trade.repository.PostRepository;
@@ -95,61 +94,13 @@ public class PostSearchService {
                 ._toQuery();
     }
 
-    public CursorPageResponse<PostResponse> searchByTitleAndComment(final String userQuery, final String username, final Long cursor, final int size) {
-        final User user = username == null ? null : userRepository.findByUsername(username)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+    public CursorPageResponse<PostResponse> searchByTitleAndComment(final String query, final String username, final Long cursor, final int size) {
 
-        final NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
-                .withQuery(getQuery(userQuery))
-                .withSort(
-                        SortOptions.of(
-                                s -> s.field(f -> f.field("id").order(Desc))
-                        )
-                )
-                .withMaxResults(size + 1);
-
-        if (cursor != null) {
-            nativeQueryBuilder.withSearchAfter(List.of(cursor));
+        if (query != null && !query.isEmpty()) {
+            log.info("event-keyword-search, {}", query);
+            saveSearchHistoryIfUserExists(username, query);
         }
 
-        final SearchHits<PostDocument> searchHits = elasticsearchOperations.search(
-                nativeQueryBuilder.build(),
-                PostDocument.class,
-                IndexCoordinates.of(INDEX_NAME)
-        );
-
-        final boolean hasNext = searchHits.getSearchHits().size() > size;
-
-        final List<SearchHit<PostDocument>> postDocuments = hasNext ? searchHits.getSearchHits().subList(0, size) : searchHits.getSearchHits();
-
-        final Long nextCursor = postDocuments.isEmpty() ? null : postDocuments.get(postDocuments.size() - 1).getContent().getId();
-
-        final List<Long> postIds = postDocuments.stream()
-                .map(hit -> hit.getContent().getId())
-                .toList();
-
-        final Map<Long, Post> postMap = postRepository.findAllById(postIds).stream()
-                .collect(Collectors.toMap(Post::getId, post -> post));
-
-        final Map<Long, Integer> postLikesCountMap = postLikesRepository.countByPostIds(postIds);
-
-        final Set<Long> likedPostIds = username != null ? postLikesRepository.findLikedPostIdsByUserIdAndPostIds(user.getId(), postIds) : Set.of();
-
-        final List<PostResponse> responseList = postDocuments.stream()
-                .map(hit -> {
-                    final Long postId = hit.getContent().getId();
-                    final Post post = postMap.get(postId);
-                    if (post == null) {
-                        throw new GeneralException(TradeException.POST_NOT_FOUND);
-                    }
-                    return PostResponse.from(
-                            post,
-                            postLikesCountMap.getOrDefault(postId, 0),
-                            likedPostIds.contains(postId)
-                    );
-                })
-                .toList();
-
-        return CursorPageResponse.of(responseList, nextCursor, hasNext);
+        return postRepository.searchPostsByKeyword(query, username, cursor, size);
     }
 }
