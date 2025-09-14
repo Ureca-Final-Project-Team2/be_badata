@@ -3,7 +3,7 @@ name: CD - upload to EC2 with no elasticsearch
 on:
   push:
     branches:
-      - feature/BADA-388-no-use-es
+      - develop-no-es
 
 jobs:
   upload-to-ec2 :
