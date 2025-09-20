@@ -56,7 +56,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus
+        include: prometheus, health, info
+  metrics:
+    binders:
+      system: true
   endpoint:
     prometheus:
       enabled: true
