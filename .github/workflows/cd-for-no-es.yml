@@ -1,6 +1,7 @@
 name: CD - upload to EC2 with no elasticsearch
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop-no-es
