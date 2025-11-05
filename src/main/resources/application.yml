@@ -58,6 +58,9 @@ management:
       exposure:
         include: prometheus, health, info
   metrics:
+    enable:
+      process: false
+      processor: false
     binders:
       system: true
   endpoint:
