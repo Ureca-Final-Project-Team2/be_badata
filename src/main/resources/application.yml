@@ -53,17 +53,19 @@ fcm:
   certification: firebase.json
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
   metrics:
     enable:
       process: false
       processor: false
-#  endpoints:
-#    web:
-#      exposure:
-#        include: prometheus
-#  endpoint:
-#    prometheus:
-#      enabled: true
+    binders:
+      system: true
+  endpoint:
+    prometheus:
+      enabled: true
 
 mail:
   google:
