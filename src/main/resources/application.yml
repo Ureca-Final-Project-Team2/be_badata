@@ -52,7 +52,11 @@ jwt:
 fcm:
   certification: firebase.json
 
-#management:
+management:
+  metrics:
+    enable:
+      process: false
+      processor: false
 #  endpoints:
 #    web:
 #      exposure:
